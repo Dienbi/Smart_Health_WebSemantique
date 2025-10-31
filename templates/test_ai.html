@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Health AI Query Tester</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        
+        .input-section {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .example-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+        
+        .results-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .results-section h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        pre {
+            background: #2d3748;
+            color: #68d391;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .success {
+            background: #c6f6d5;
+            color: #22543d;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .info-box {
+            background: #e6fffa;
+            border-left: 4px solid #319795;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Smart Health AI Query</h1>
+        <p class="subtitle">Test natural language queries to SPARQL conversion</p>
+        
+        <div class="info-box">
+            <strong>🔍 How it works:</strong> Type a natural language question below, and the AI will convert it to a SPARQL query and fetch results from your ontology.
+        </div>
+        
+        <div class="input-section">
+            <label for="prompt">Enter your question:</label>
+            <textarea id="prompt" rows="4" placeholder="e.g., Show me all users&#10;What are the activities for user 1?&#10;Show health metrics"></textarea>
+        </div>
+        
+        <div class="button-group">
+            <button onclick="sendQuery()">🚀 Send Query</button>
+            <button onclick="clearResults()" style="background: #718096;">🗑️ Clear</button>
+        </div>
+        
+        <div style="margin-top: 20px;">
+            <strong>Try these examples:</strong>
+            <div class="examples-grid">
+                <button class="example-btn" onclick="setPrompt('Show me all users')">All Users</button>
+                <button class="example-btn" onclick="setPrompt('List all activities')">All Activities</button>
+                <button class="example-btn" onclick="setPrompt('Show health metrics')">Health Metrics</button>
+                <button class="example-btn" onclick="setPrompt('What are the meals?')">Meals</button>
+                <button class="example-btn" onclick="setPrompt('Show all habits')">Habits</button>
+                <button class="example-btn" onclick="setPrompt('List all challenges')">Challenges</button>
+            </div>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 10px; color: #667eea;">Processing your query...</p>
+        </div>
+        
+        <div class="results-section" id="results" style="display: none;">
+            <h2>📊 Results</h2>
+            <div id="results-content"></div>
+        </div>
+    </div>
+    
+    <script>
+        const API_URL = 'http://127.0.0.1:8000/api/ai/query/';
+        
+        function setPrompt(text) {
+            document.getElementById('prompt').value = text;
+        }
+        
+        function clearResults() {
+            document.getElementById('prompt').value = '';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('results-content').innerHTML = '';
+        }
+        
+        async function sendQuery() {
+            const prompt = document.getElementById('prompt').value.trim();
+            
+            if (!prompt) {
+                alert('Please enter a question!');
+                return;
+            }
+            
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prompt: prompt })
+                });
+                
+                const data = await response.json();
+                
+                // Hide loading
+                document.getElementById('loading').style.display = 'none';
+                
+                // Show results
+                document.getElementById('results').style.display = 'block';
+                
+                let html = '';
+                
+                if (data.success) {
+                    html += '<div class="success">✅ Query executed successfully!</div>';
+                    html += `<p><strong>Intent Detected:</strong> ${data.intent || 'N/A'}</p>`;
+                    html += `<p><strong>Results Count:</strong> ${data.results_count || 0}</p>`;
+                    if (data.user_id) {
+                        html += `<p><strong>User ID:</strong> ${data.user_id}</p>`;
+                    }
+                    html += '<h3 style="margin-top: 20px; color: #667eea;">Generated SPARQL Query:</h3>';
+                    html += `<pre>${escapeHtml(data.sparql_query || 'N/A')}</pre>`;
+                    html += '<h3 style="margin-top: 20px; color: #667eea;">Results:</h3>';
+                    html += `<pre>${JSON.stringify(data.results, null, 2)}</pre>`;
+                } else {
+                    html += `<div class="error">❌ Error: ${data.error || 'Unknown error'}</div>`;
+                    html += `<p>${data.message || ''}</p>`;
+                }
+                
+                document.getElementById('results-content').innerHTML = html;
+                
+            } catch (error) {
+                // Hide loading
+                document.getElementById('loading').style.display = 'none';
+                
+                // Show error
+                document.getElementById('results').style.display = 'block';
+                document.getElementById('results-content').innerHTML = `
+                    <div class="error">
+                        <strong>❌ Connection Error</strong>
+                        <p>${error.message}</p>
+                        <p>Make sure the Django server is running at ${API_URL}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Allow Enter key to submit (Ctrl+Enter for new line)
+        document.getElementById('prompt').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey) {
+                e.preventDefault();
+                sendQuery();
+            }
+        });
+    </script>
+</body>
+</html>
