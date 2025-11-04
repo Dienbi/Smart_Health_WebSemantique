@@ -1,7 +1,7 @@
 import sys
 sys.path.append('D:/OneDrive/Bureau/Web Sementique/Smart_Health_Web')
 import os
-os.environ['DJANGO_SETTINGS_MODULE'] = 'backend.settings'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'Smart_Health.settings'
 import django
 django.setup()
 

@@ -10,7 +10,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Smart_Health.settings')
 django.setup()
 
 from apps.sparql_service.client import SparqlClient

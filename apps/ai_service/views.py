@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.conf import settings
 from apps.sparql_service.client import SparqlClient
 from apps.sparql_service.formatter import SparqlResultFormatter
 from .gemini_service import GeminiAIService
@@ -81,11 +82,16 @@ class AIQueryView(APIView):
             })
         
         except Exception as e:
+            import traceback
+            error_details = traceback.format_exc()
+            print(f"Error in AIQueryView: {error_details}")  # Log to console
             return Response(
                 {
                     'success': False,
                     'error': str(e),
-                    'message': 'An error occurred while processing your query'
+                    'error_type': type(e).__name__,
+                    'message': 'An error occurred while processing your query',
+                    'details': error_details if settings.DEBUG else None
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
