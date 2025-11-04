@@ -28,6 +28,8 @@ urlpatterns = [
     path('api/meals/', include('apps.meals.urls')),
     path('api/habits/', include('apps.habits.urls')),
     path('api/defis/', include('apps.defis.urls')),
+    # Frontend pages for défis (CRUD)
+    path('defis/', include(('apps.defis.front_urls', 'defis'), namespace='defis')),
 ]
 
 # Serve media files in development

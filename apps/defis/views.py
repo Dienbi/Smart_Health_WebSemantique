@@ -5,6 +5,44 @@ from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
 from .models import Defi, Participation
 from .serializers import DefiSerializer, ParticipationSerializer
+from django.views import generic
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+
+# Frontend class-based views (regular CRUD)
+
+
+class DefiListView(generic.ListView):
+    model = Defi
+    template_name = 'defis/defi_list.html'
+    context_object_name = 'defis'
+
+
+class DefiDetailView(generic.DetailView):
+    model = Defi
+    template_name = 'defis/defi_detail.html'
+    context_object_name = 'defi'
+
+
+class DefiCreateView(LoginRequiredMixin, generic.CreateView):
+    model = Defi
+    fields = ['defi_name', 'defi_description']
+    template_name = 'defis/defi_form.html'
+    success_url = reverse_lazy('defis:list')
+
+
+class DefiUpdateView(LoginRequiredMixin, generic.UpdateView):
+    model = Defi
+    fields = ['defi_name', 'defi_description']
+    template_name = 'defis/defi_form.html'
+    success_url = reverse_lazy('defis:list')
+
+
+class DefiDeleteView(LoginRequiredMixin, generic.DeleteView):
+    model = Defi
+    template_name = 'defis/defi_confirm_delete.html'
+    success_url = reverse_lazy('defis:list')
 
 
 class DefiViewSet(viewsets.ModelViewSet):
