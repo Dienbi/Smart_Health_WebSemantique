@@ -61,25 +61,62 @@ class AIQueryView(APIView):
                     'prompt': prompt
                 }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
-            # Execute query
+            # Execute query based on intent
             client = SparqlClient()
-            results = client.execute_query(sparql_query)
             
-            # Format results
-            formatted_results = SparqlResultFormatter.format_results(results)
+            # Determine if it's a modification query
+            is_modification = any(keyword in sparql_query.upper() for keyword in ['INSERT', 'DELETE', 'UPDATE'])
             
-            return Response({
-                'success': True,
-                'prompt': prompt,
-                'intent': intent,
-                'action': 'query',
-                'user_id': user_id,
-                'sparql_query': sparql_query,
-                'results_count': len(formatted_results),
-                'results': formatted_results,
-                'ai_powered': True,
-                'ai_model': 'Google Gemini Pro'
-            })
+            if is_modification:
+                # Execute update query
+                success = client.execute_update(sparql_query)
+                
+                if success:
+                    # Get operation type
+                    operation = 'unknown'
+                    if 'INSERT DATA' in sparql_query.upper():
+                        operation = 'insert'
+                    elif 'DELETE' in sparql_query.upper() and 'INSERT' in sparql_query.upper():
+                        operation = 'update'
+                    elif 'DELETE' in sparql_query.upper():
+                        operation = 'delete'
+                    
+                    return Response({
+                        'success': True,
+                        'prompt': prompt,
+                        'intent': intent,
+                        'action': operation,
+                        'user_id': user_id,
+                        'sparql_query': sparql_query,
+                        'message': f'Data {operation}ed successfully',
+                        'ai_powered': True,
+                        'ai_model': 'Google Gemini Pro'
+                    })
+                else:
+                    return Response({
+                        'success': False,
+                        'error': 'Failed to execute modification query',
+                        'sparql_query': sparql_query
+                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            else:
+                # Execute select query
+                results = client.execute_query(sparql_query)
+                
+                # Format results
+                formatted_results = SparqlResultFormatter.format_results(results)
+                
+                return Response({
+                    'success': True,
+                    'prompt': prompt,
+                    'intent': intent,
+                    'action': 'query',
+                    'user_id': user_id,
+                    'sparql_query': sparql_query,
+                    'results_count': len(formatted_results),
+                    'results': formatted_results,
+                    'ai_powered': True,
+                    'ai_model': 'Google Gemini Pro'
+                })
         
         except Exception as e:
             import traceback
@@ -99,40 +136,105 @@ class AIQueryView(APIView):
     def get(self, request):
         """Get example prompts and usage information"""
         examples = {
-            'examples': [
+            'query_examples': [
                 {
                     'prompt': 'Show me all users',
-                    'description': 'Retrieves all users from the system'
+                    'description': 'Retrieves all users from the system',
+                    'type': 'SELECT'
                 },
                 {
                     'prompt': 'What are the activities for user 1?',
-                    'description': 'Gets activity logs for a specific user'
+                    'description': 'Gets activity logs for a specific user',
+                    'type': 'SELECT'
                 },
                 {
                     'prompt': 'Show me health metrics for user 1',
-                    'description': 'Retrieves health metrics for a specific user'
+                    'description': 'Retrieves health metrics for a specific user',
+                    'type': 'SELECT'
                 },
                 {
                     'prompt': 'What meals does user 1 have?',
-                    'description': 'Gets meal information for a specific user'
+                    'description': 'Gets meal information for a specific user',
+                    'type': 'SELECT'
                 },
                 {
                     'prompt': 'Show me all challenges',
-                    'description': 'Lists all available challenges'
+                    'description': 'Lists all available challenges',
+                    'type': 'SELECT'
+                }
+            ],
+            'insert_examples': [
+                {
+                    'prompt': 'Add a new user named Alice with email alice@example.com',
+                    'description': 'Creates a new user in the system',
+                    'type': 'INSERT'
                 },
                 {
-                    'prompt': 'What are the habits for user 1?',
-                    'description': 'Gets habit information for a specific user'
+                    'prompt': 'Create a cardio activity called Running',
+                    'description': 'Adds a new cardio activity',
+                    'type': 'INSERT'
+                },
+                {
+                    'prompt': 'Add a breakfast meal with 500 calories',
+                    'description': 'Creates a new breakfast meal entry',
+                    'type': 'INSERT'
+                },
+                {
+                    'prompt': 'Create a new challenge called 30-Day Fitness',
+                    'description': 'Adds a new challenge/defi',
+                    'type': 'INSERT'
+                }
+            ],
+            'update_examples': [
+                {
+                    'prompt': 'Update user Alice email to newalice@example.com',
+                    'description': 'Changes the email of an existing user',
+                    'type': 'UPDATE'
+                },
+                {
+                    'prompt': 'Change the duration of Running activity to 45 minutes',
+                    'description': 'Modifies an activity\'s duration',
+                    'type': 'UPDATE'
+                },
+                {
+                    'prompt': 'Set meal calories to 600 for breakfast',
+                    'description': 'Updates the calorie count of a meal',
+                    'type': 'UPDATE'
+                }
+            ],
+            'delete_examples': [
+                {
+                    'prompt': 'Delete user Alice',
+                    'description': 'Removes a user from the system',
+                    'type': 'DELETE'
+                },
+                {
+                    'prompt': 'Remove activity Running',
+                    'description': 'Deletes an activity',
+                    'type': 'DELETE'
+                },
+                {
+                    'prompt': 'Delete the breakfast meal',
+                    'description': 'Removes a meal entry',
+                    'type': 'DELETE'
                 }
             ],
             'usage': {
                 'endpoint': '/api/ai/query/',
                 'method': 'POST',
                 'body': {
-                    'prompt': 'Your natural language query',
+                    'prompt': 'Your natural language query/command',
                     'user_id': 'Optional: specific user ID (can be extracted from prompt)'
                 }
-            }
+            },
+            'capabilities': [
+                'Query data with natural language (SELECT)',
+                'Insert new data (INSERT)',
+                'Update existing data (UPDATE)',
+                'Delete data (DELETE)',
+                'AI-powered intent detection',
+                'Automatic entity extraction'
+            ]
         }
         
         return Response(examples)

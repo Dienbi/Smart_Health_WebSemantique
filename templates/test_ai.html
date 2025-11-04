@@ -410,7 +410,7 @@
             <div class="ai-header">
                 <div class="ai-header-content">
                     <h1><i class="bi bi-robot"></i> Smart Health AI Assistant</h1>
-                    <p>Ask questions in natural language and get instant insights from your health data</p>
+                    <p>Query, Insert, Update, and Delete data using natural language powered by Google Gemini AI</p>
                 </div>
             </div>
             
@@ -420,8 +420,8 @@
                 <div class="info-banner">
                     <i class="bi bi-lightbulb"></i>
                     <div class="info-banner-content">
-                        <h5>How it works</h5>
-                        <p>Type your question below in natural language. Our AI will convert it to a SPARQL query and fetch results from the Smart Health knowledge base.</p>
+                        <h5>Full Database Control with AI</h5>
+                        <p>Type your command in natural language. Our AI will convert it to SPARQL and execute it on the Smart Health knowledge base. You can query, insert new data, update existing records, or delete information - all with simple text commands!</p>
                     </div>
                 </div>
                 
@@ -429,9 +429,9 @@
                 <div class="input-section">
                     <div class="input-label">
                         <i class="bi bi-chat-dots"></i>
-                        <span>Your Question</span>
+                        <span>Your Command or Question</span>
                     </div>
-                    <textarea id="prompt" class="query-textarea" rows="4" placeholder="E.g., Show me all users&#10;What activities are available?&#10;List all meals&#10;Show health metrics"></textarea>
+                    <textarea id="prompt" class="query-textarea" rows="4" placeholder="Examples:&#10;• Show me all users&#10;• Add a new user named John with email john@example.com&#10;• Update user Alice email to newalice@example.com&#10;• Delete user Bob"></textarea>
                 </div>
                 
                 <!-- Buttons -->
@@ -449,6 +449,11 @@
                     <div class="examples-header">
                         <i class="bi bi-stars"></i> Try these examples:
                     </div>
+                    
+                    <!-- Query Examples -->
+                    <h6 style="color: var(--primary-blue); font-weight: 600; margin-top: 1rem; margin-bottom: 0.75rem;">
+                        <i class="bi bi-search"></i> Query Data (SELECT)
+                    </h6>
                     <div class="examples-grid">
                         <button class="example-btn" onclick="setPrompt('Show me all users')">
                             <i class="bi bi-people"></i> All Users
@@ -462,11 +467,56 @@
                         <button class="example-btn" onclick="setPrompt('What are the meals?')">
                             <i class="bi bi-egg-fried"></i> Meals
                         </button>
-                        <button class="example-btn" onclick="setPrompt('Show all habits')">
-                            <i class="bi bi-book"></i> Habits
+                    </div>
+                    
+                    <!-- Insert Examples -->
+                    <h6 style="color: #4caf50; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem;">
+                        <i class="bi bi-plus-circle"></i> Add Data (INSERT)
+                    </h6>
+                    <div class="examples-grid">
+                        <button class="example-btn" onclick="setPrompt('Add a new user named Alice with email alice@example.com')">
+                            <i class="bi bi-person-plus"></i> Add User
                         </button>
-                        <button class="example-btn" onclick="setPrompt('List all challenges')">
-                            <i class="bi bi-trophy"></i> Challenges
+                        <button class="example-btn" onclick="setPrompt('Create a cardio activity called Running')">
+                            <i class="bi bi-plus-circle"></i> Add Activity
+                        </button>
+                        <button class="example-btn" onclick="setPrompt('Add a breakfast meal with 500 calories')">
+                            <i class="bi bi-plus-square"></i> Add Meal
+                        </button>
+                        <button class="example-btn" onclick="setPrompt('Create a new challenge called 30-Day Fitness')">
+                            <i class="bi bi-trophy"></i> Add Challenge
+                        </button>
+                    </div>
+                    
+                    <!-- Update Examples -->
+                    <h6 style="color: #ff9800; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem;">
+                        <i class="bi bi-pencil-square"></i> Update Data (UPDATE)
+                    </h6>
+                    <div class="examples-grid">
+                        <button class="example-btn" onclick="setPrompt('Update user Alice email to newalice@example.com')">
+                            <i class="bi bi-pencil"></i> Update Email
+                        </button>
+                        <button class="example-btn" onclick="setPrompt('Change Running activity duration to 45 minutes')">
+                            <i class="bi bi-arrow-clockwise"></i> Update Activity
+                        </button>
+                        <button class="example-btn" onclick="setPrompt('Set breakfast meal calories to 600')">
+                            <i class="bi bi-pencil-square"></i> Update Meal
+                        </button>
+                    </div>
+                    
+                    <!-- Delete Examples -->
+                    <h6 style="color: #f44336; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem;">
+                        <i class="bi bi-trash"></i> Delete Data (DELETE)
+                    </h6>
+                    <div class="examples-grid">
+                        <button class="example-btn" onclick="setPrompt('Delete user Alice')">
+                            <i class="bi bi-person-x"></i> Delete User
+                        </button>
+                        <button class="example-btn" onclick="setPrompt('Remove activity Running')">
+                            <i class="bi bi-x-circle"></i> Delete Activity
+                        </button>
+                        <button class="example-btn" onclick="setPrompt('Delete the breakfast meal')">
+                            <i class="bi bi-trash"></i> Delete Meal
                         </button>
                     </div>
                 </div>
@@ -542,11 +592,27 @@
             let html = '';
             
             if (data.success) {
-                // Success Alert
+                // Determine action type for styling
+                const actionType = data.action || 'query';
+                const actionColor = {
+                    'query': '#1e88e5',
+                    'insert': '#4caf50',
+                    'update': '#ff9800',
+                    'delete': '#f44336'
+                }[actionType] || '#1e88e5';
+                
+                const actionIcon = {
+                    'query': 'search',
+                    'insert': 'plus-circle',
+                    'update': 'pencil-square',
+                    'delete': 'trash'
+                }[actionType] || 'check-circle';
+                
+                // Success Alert with action-specific styling
                 html += `
-                    <div class="alert-success">
-                        <i class="bi bi-check-circle-fill"></i>
-                        <span><strong>Success!</strong> Query executed successfully</span>
+                    <div class="alert-success" style="border-left-color: ${actionColor}">
+                        <i class="bi bi-${actionIcon}-fill" style="color: ${actionColor}"></i>
+                        <span><strong>Success!</strong> ${data.message || `${actionType.toUpperCase()} operation completed successfully`}</span>
                     </div>
                 `;
                 
@@ -554,16 +620,29 @@
                 html += '<div class="result-meta">';
                 html += `
                     <div class="result-meta-item">
-                        <div class="result-meta-label">Intent</div>
-                        <div class="result-meta-value"><i class="bi bi-bullseye"></i> ${data.intent || 'N/A'}</div>
+                        <div class="result-meta-label">Action</div>
+                        <div class="result-meta-value" style="color: ${actionColor}">
+                            <i class="bi bi-${actionIcon}"></i> ${actionType.toUpperCase()}
+                        </div>
                     </div>
                 `;
                 html += `
                     <div class="result-meta-item">
-                        <div class="result-meta-label">Results Count</div>
-                        <div class="result-meta-value"><i class="bi bi-hash"></i> ${data.results_count || 0}</div>
+                        <div class="result-meta-label">Intent</div>
+                        <div class="result-meta-value"><i class="bi bi-bullseye"></i> ${data.intent || 'N/A'}</div>
                     </div>
                 `;
+                
+                // Show results count only for query actions
+                if (actionType === 'query') {
+                    html += `
+                        <div class="result-meta-item">
+                            <div class="result-meta-label">Results Count</div>
+                            <div class="result-meta-value"><i class="bi bi-hash"></i> ${data.results_count || 0}</div>
+                        </div>
+                    `;
+                }
+                
                 if (data.user_id) {
                     html += `
                         <div class="result-meta-item">
@@ -585,22 +664,24 @@
                     <div class="query-box">
                         <div class="query-box-header">
                             <i class="bi bi-code-slash"></i>
-                            <span>Generated SPARQL Query</span>
+                            <span>Generated SPARQL ${actionType.toUpperCase()}</span>
                         </div>
                         <pre class="code-block">${escapeHtml(data.sparql_query || 'N/A')}</pre>
                     </div>
                 `;
                 
-                // Results Data
-                html += `
-                    <div class="query-box">
-                        <div class="query-box-header">
-                            <i class="bi bi-table"></i>
-                            <span>Query Results (${data.results_count || 0} items)</span>
+                // Results Data (only for query actions)
+                if (actionType === 'query' && data.results) {
+                    html += `
+                        <div class="query-box">
+                            <div class="query-box-header">
+                                <i class="bi bi-table"></i>
+                                <span>Query Results (${data.results_count || 0} items)</span>
+                            </div>
+                            <pre class="code-block results-data">${JSON.stringify(data.results, null, 2)}</pre>
                         </div>
-                        <pre class="code-block results-data">${JSON.stringify(data.results, null, 2)}</pre>
-                    </div>
-                `;
+                    `;
+                }
             } else {
                 // Error Alert
                 html += `

@@ -98,16 +98,39 @@ def logout_view(request):
 @user_passes_test(lambda u: u.is_staff)
 def dashboard_view(request):
     """Admin dashboard view"""
+    from apps.activities.models import ActivityLog
+    from apps.meals.models import Meal
+    from apps.health_records.models import HealthRecord
+    from apps.habits.models import HabitLog
+    from apps.defis.models import Participation
+    
     # Get statistics
     total_users = User.objects.count()
+    total_activities = ActivityLog.objects.count()
+    total_meals = Meal.objects.count()
+    total_records = HealthRecord.objects.count()
+    total_habits = HabitLog.objects.count()
+    total_participations = Participation.objects.count()
+    
+    # Recent users
     recent_users = User.objects.order_by('-date_joined')[:5]
+    
+    # Recent activities
+    recent_activities = ActivityLog.objects.select_related('user', 'activity').order_by('-date')[:10]
+    
+    # Recent meals
+    recent_meals = Meal.objects.select_related('user').order_by('-meal_date')[:10]
     
     context = {
         'total_users': total_users,
-        'total_activities': 0,  # To be implemented
-        'total_meals': 0,  # To be implemented
-        'total_records': 0,  # To be implemented
+        'total_activities': total_activities,
+        'total_meals': total_meals,
+        'total_records': total_records,
+        'total_habits': total_habits,
+        'total_participations': total_participations,
         'recent_users': recent_users,
+        'recent_activities': recent_activities,
+        'recent_meals': recent_meals,
         'current_date': timezone.now(),
     }
     

@@ -22,14 +22,12 @@ urlpatterns = [
     
     # API endpoints
     path('api/ai/', include(('apps.ai_service.urls', 'api_ai'), namespace='api_ai')),
-    
-    # Add more API endpoints here as they are created
-    # path('api/users/', include('apps.users.urls')),
-    # path('api/activities/', include('apps.activities.urls')),
-    # path('api/health-records/', include('apps.health_records.urls')),
-    # path('api/meals/', include('apps.meals.urls')),
-    # path('api/habits/', include('apps.habits.urls')),
-    # path('api/defis/', include('apps.defis.urls')),
+    path('api/users/', include('apps.users.urls')),
+    path('api/activities/', include('apps.activities.urls')),
+    path('api/health-records/', include('apps.health_records.urls')),
+    path('api/meals/', include('apps.meals.urls')),
+    path('api/habits/', include('apps.habits.urls')),
+    path('api/defis/', include('apps.defis.urls')),
 ]
 
 # Serve media files in development

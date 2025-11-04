@@ -106,6 +106,24 @@ You are a SPARQL query expert. Convert natural language questions to SPARQL quer
 - "show meals" → SELECT ?s WHERE {{ {{ ?s a sh:Breakfast }} UNION {{ ?s a sh:Lunch }} UNION {{ ?s a sh:Dinner }} UNION {{ ?s a sh:Snack }} }}
 - "show activities" → SELECT ?s WHERE {{ {{ ?s a sh:Cardio }} UNION {{ ?s a sh:Musculation }} UNION {{ ?s a sh:Natation }} }}
 
+**INSERT Examples:**
+- "add user John with email john@email.com" → 
+  INSERT DATA {{ sh:User_John a sh:User ; sh:username "John" ; sh:email "john@email.com" }}
+- "create activity Running" →
+  INSERT DATA {{ sh:Activity_Running a sh:Cardio ; sh:activity_name "Running" }}
+- "add meal Breakfast with 500 calories" →
+  INSERT DATA {{ sh:Meal_1 a sh:Breakfast ; sh:total_calories 500 }}
+
+**UPDATE Examples:**
+- "update user John set email to newemail@test.com" →
+  DELETE {{ ?u sh:email ?old }} INSERT {{ ?u sh:email "newemail@test.com" }} WHERE {{ ?u a sh:User ; sh:username "John" ; sh:email ?old }}
+- "change activity Running duration to 45" →
+  DELETE {{ ?a sh:duration ?old }} INSERT {{ ?a sh:duration 45 }} WHERE {{ ?a sh:activity_name "Running" ; sh:duration ?old }}
+
+**DELETE Examples:**
+- "delete user John" → DELETE WHERE {{ ?u a sh:User ; sh:username "John" . ?u ?p ?o }}
+- "remove activity Running" → DELETE WHERE {{ ?a a sh:Cardio ; sh:activity_name "Running" . ?a ?p ?o }}
+
 **CRITICAL RULES:**
 1. Generate ONLY the SPARQL query, no explanations
 2. Always include PREFIX definitions
@@ -115,7 +133,10 @@ You are a SPARQL query expert. Convert natural language questions to SPARQL quer
    - ALWAYS use UNION to query ALL subclasses
    - Example: For "meals", query: {{ ?s a sh:Breakfast }} UNION {{ ?s a sh:Lunch }} UNION {{ ?s a sh:Dinner }} UNION {{ ?s a sh:Snack }}
 5. For user-specific queries, filter by user ID if provided
-6. Return proper SELECT, INSERT, or DELETE queries based on intent
+6. Return proper SELECT, INSERT DATA, DELETE/INSERT (UPDATE), or DELETE WHERE queries based on intent
+7. For INSERT operations, generate unique IDs using underscore notation (e.g., sh:User_John)
+8. For UPDATE operations, use DELETE/INSERT pattern
+9. For DELETE operations, ensure all related triples are removed
 
 **User Question:** {prompt}
 """
