@@ -292,19 +292,32 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'home' %}">Home</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#services">Services</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#about">About</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#contact">Contact</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'defis:list' %}">Défis</a>
-                    </li>
                     {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'habits:habit-list' %}">
+                                <i class="bi bi-calendar-check"></i> Habits
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'activities:activity-list' %}">
+                                <i class="bi bi-activity"></i> Activities
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'meals:meal-list' %}">
+                                <i class="bi bi-egg-fried"></i> Meals
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'health_records:record-list' %}">
+                                <i class="bi bi-heart-pulse"></i> Health
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'defis:challenge-list' %}">
+                                <i class="bi bi-trophy"></i> Challenges
+                            </a>
+                        </li>
                         {% if user.is_staff %}
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'dashboard' %}">

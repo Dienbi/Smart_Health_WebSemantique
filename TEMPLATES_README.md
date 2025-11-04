@@ -1,11 +1,13 @@
 # Smart Health Web Templates
 
 ## Overview
+
 Beautiful, modern, and responsive healthcare templates for the Smart Health application with blue and white theme inspired by medical aesthetics.
 
 ## Templates Created
 
 ### 1. Base Template (`base.html`)
+
 - **Purpose**: Main layout template with navigation and footer
 - **Features**:
   - Responsive Bootstrap 5 navbar with gradient blue design
@@ -15,6 +17,7 @@ Beautiful, modern, and responsive healthcare templates for the Smart Health appl
   - Mobile-friendly responsive design
 
 ### 2. Home Page (`home.html`)
+
 - **Purpose**: Landing page for visitors and logged-in users
 - **Sections**:
   - **Hero Section**: Eye-catching introduction with statistics
@@ -28,6 +31,7 @@ Beautiful, modern, and responsive healthcare templates for the Smart Health appl
   - Smooth scroll for anchor links
 
 ### 3. Login Page (`login.html`)
+
 - **Purpose**: User authentication page
 - **Features**:
   - Two-column layout (info + form)
@@ -40,6 +44,7 @@ Beautiful, modern, and responsive healthcare templates for the Smart Health appl
   - Link to signup page
 
 ### 4. Signup Page (`signup.html`)
+
 - **Purpose**: User registration page
 - **Features**:
   - Two-column layout matching login design
@@ -55,6 +60,7 @@ Beautiful, modern, and responsive healthcare templates for the Smart Health appl
   - Responsive design
 
 ### 5. Admin Dashboard (`dashboard.html`)
+
 - **Purpose**: Admin control panel for managing the platform
 - **Features**:
   - **Dashboard Header**: Welcome message with current date
@@ -94,12 +100,14 @@ Beautiful, modern, and responsive healthcare templates for the Smart Health appl
 ## Authentication Flow
 
 ### For Regular Users:
+
 1. Visit home page
 2. Click "Login / Sign Up"
 3. Login or create account
 4. Redirected to home page (with access to AI features)
 
 ### For Admin Users:
+
 1. Visit home page or /admin
 2. Login with admin credentials
 3. Automatically redirected to `/dashboard/`
@@ -108,14 +116,14 @@ Beautiful, modern, and responsive healthcare templates for the Smart Health appl
 ## Color Scheme
 
 ```css
---primary-blue: #1e88e5;      /* Main blue */
---secondary-blue: #0d47a1;    /* Dark blue */
---light-blue: #e3f2fd;        /* Light blue background */
---accent-blue: #42a5f5;       /* Accent blue */
---white: #ffffff;             /* White */
---light-gray: #f5f7fa;        /* Light gray background */
---text-dark: #2c3e50;         /* Dark text */
---text-light: #7f8c8d;        /* Light text */
+--primary-blue: #1e88e5; /* Main blue */
+--secondary-blue: #0d47a1; /* Dark blue */
+--light-blue: #e3f2fd; /* Light blue background */
+--accent-blue: #42a5f5; /* Accent blue */
+--white: #ffffff; /* White */
+--light-gray: #f5f7fa; /* Light gray background */
+--text-dark: #2c3e50; /* Dark text */
+--text-light: #7f8c8d; /* Light text */
 ```
 
 ## Typography
@@ -141,18 +149,21 @@ Beautiful, modern, and responsive healthcare templates for the Smart Health appl
 ## Features
 
 ### Animations
+
 - Fade in up on scroll
 - Hover effects on cards and buttons
 - Smooth transitions
 - Float animation for hero images
 
 ### Security
+
 - CSRF protection on all forms
 - Password visibility toggle
 - Remember me functionality
 - Staff-only dashboard access
 
 ### Accessibility
+
 - Semantic HTML5 elements
 - ARIA labels where needed
 - Keyboard navigation support
@@ -163,17 +174,20 @@ Beautiful, modern, and responsive healthcare templates for the Smart Health appl
 ### Running the Application
 
 1. **Start Django Server**:
+
 ```bash
 python manage.py runserver
 ```
 
 2. **Start Fuseki Server** (required for AI features):
+
 ```bash
 cd C:\apache-jena-fuseki-5.6.0
 .\fuseki-server.bat
 ```
 
 3. **Access the Application**:
+
 - Home: http://127.0.0.1:8000/
 - Login: http://127.0.0.1:8000/login/
 - Signup: http://127.0.0.1:8000/signup/
@@ -191,23 +205,28 @@ Follow prompts to create admin account, then login to access dashboard.
 ## Customization
 
 ### Changing Colors
+
 Edit CSS variables in template `<style>` sections:
+
 ```css
 :root {
-    --primary-blue: #your-color;
-    --secondary-blue: #your-color;
-    /* ... */
+  --primary-blue: #your-color;
+  --secondary-blue: #your-color;
+  /* ... */
 }
 ```
 
 ### Adding New Pages
+
 1. Create template in `templates/` directory
 2. Extend `base.html`
 3. Create view in `apps/users/views.py`
 4. Add URL route in `Smart_Health/urls.py`
 
 ### Modifying Dashboard Stats
+
 Update `dashboard_view()` in `apps/users/views.py`:
+
 ```python
 context = {
     'total_users': User.objects.count(),

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}My Meals - Smart Health{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <h4><i class="bi bi-egg-fried"></i> Meals Module</h4>
+                <p>Full meal management interface coming soon! For now, use the <a href="{% url 'api_ai:ai-test' %}">AI Assistant</a> or <a href="{% url 'admin:index' %}">Django Admin</a>.</p>
+                <a href="{% url 'home' %}" class="btn btn-primary">Back to Home</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

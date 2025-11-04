@@ -1,3 +1,5 @@
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -514,20 +516,20 @@ class ParticipationViewSet(viewsets.ModelViewSet):
     def leave(self, request, pk=None):
         """Leave a challenge"""
         participation = self.get_object()
-        
+
         if participation.user != request.user:
             return Response(
                 {'message': 'You can only leave your own participations'},
                 status=status.HTTP_403_FORBIDDEN
             )
-        
+
         participation.end_date = timezone.now()
         participation.save()
-        
+
         return Response({'message': 'Successfully left the challenge'})
 
 
-# Front views for participation actions
+# Front views for participation actions (web UI)
 class JoinDefiView(LoginRequiredMixin, View):
     def post(self, request, pk):
         defi = get_object_or_404(Defi, pk=pk)

@@ -1,7 +1,10 @@
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import SessionAuthentication
 from .models import Habit, HabitLog, Reading, Cooking, Drawing, Journaling
 from .serializers import (
     HabitSerializer, HabitLogSerializer,
@@ -15,6 +18,7 @@ class HabitViewSet(viewsets.ModelViewSet):
     """
     queryset = Habit.objects.all()
     serializer_class = HabitSerializer
+    authentication_classes = [SessionAuthentication]
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
@@ -61,6 +65,7 @@ class HabitLogViewSet(viewsets.ModelViewSet):
     """
     queryset = HabitLog.objects.all()
     serializer_class = HabitLogSerializer
+    authentication_classes = [SessionAuthentication]
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
@@ -131,3 +136,24 @@ class JournalingViewSet(viewsets.ModelViewSet):
         if self.request.user.is_staff:
             return Journaling.objects.all()
         return Journaling.objects.filter(habit__user=self.request.user)
+
+
+# Web Interface Views
+@login_required
+def habit_list_view(request):
+    """Display list of user's habits"""
+    habits = Habit.objects.filter(user=request.user).order_by('-created_at')
+    return render(request, 'habits/habit_list.html', {
+        'habits': habits
+    })
+
+
+@login_required
+def habit_logs_view(request, habit_id):
+    """Display logs for a specific habit"""
+    habit = get_object_or_404(Habit, habit_id=habit_id, user=request.user)
+    logs = habit.logs.select_related('frequency', 'notes').all().order_by('-start_date')
+    return render(request, 'habits/habit_logs.html', {
+        'habit': habit,
+        'logs': logs
+    })

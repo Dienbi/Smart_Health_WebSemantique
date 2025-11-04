@@ -20,18 +20,16 @@ urlpatterns = [
     path('logout/', logout_view, name='logout'),
     path('dashboard/', dashboard_view, name='dashboard'),
     
+    # Web interface URLs
+    path('habits/', include('apps.habits.urls', namespace='habits')),
+    path('activities/', include('apps.activities.urls', namespace='activities')),
+    path('meals/', include('apps.meals.urls', namespace='meals')),
+    path('health/', include('apps.health_records.urls', namespace='health_records')),
+    path('challenges/', include('apps.defis.urls', namespace='defis')),
+    
     # API endpoints
     path('api/ai/', include(('apps.ai_service.urls', 'api_ai'), namespace='api_ai')),
     path('api/users/', include('apps.users.urls')),
-    path('api/activities/', include('apps.activities.urls')),
-    path('api/health-records/', include('apps.health_records.urls')),
-    path('api/meals/', include('apps.meals.urls')),
-    path('api/habits/', include('apps.habits.urls')),
-    path('api/defis/', include('apps.defis.urls')),
-    # Frontend pages for défis (CRUD)
-    path('defis/', include(('apps.defis.front_urls', 'defis'), namespace='defis')),
-    # Backoffice/admin CRUD for défis (staff only)
-    path('backoffice/defis/', include(('apps.defis.back_urls', 'defis_admin'), namespace='defis_admin')),
 ]
 
 # Serve media files in development

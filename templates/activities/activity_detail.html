@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}Activity Details - Smart Health{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Activity Details</h2>
+    <p>Details for activity #{{ activity.activity_log_id }}</p>
+    <a href="{% url 'activities:activity-list' %}" class="btn btn-secondary">Back</a>
+</div>
+{% endblock %}
