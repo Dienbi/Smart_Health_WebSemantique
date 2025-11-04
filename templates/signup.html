@@ -1,0 +1,417 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Up - Smart Health{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-page {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        background: linear-gradient(135deg, var(--light-blue) 0%, var(--white) 100%);
+        padding: 2rem 0;
+    }
+    
+    .auth-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+    
+    .auth-card {
+        background: var(--white);
+        border-radius: 25px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+    }
+    
+    .auth-left {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+        color: var(--white);
+        padding: 4rem 3rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .auth-left::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+    }
+    
+    .auth-left::after {
+        content: '';
+        position: absolute;
+        bottom: -50%;
+        left: -20%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+    }
+    
+    .auth-left-content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .auth-left h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    
+    .auth-left p {
+        font-size: 1.1rem;
+        opacity: 0.95;
+        margin-bottom: 2rem;
+    }
+    
+    .auth-left-icon {
+        font-size: 8rem;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+    }
+    
+    .auth-right {
+        padding: 3rem;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .auth-header h3 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+    }
+    
+    .auth-header p {
+        color: var(--text-light);
+    }
+    
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+        display: block;
+        font-size: 0.95rem;
+    }
+    
+    .form-control {
+        padding: 0.65rem 1rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 0.2rem rgba(30, 136, 229, 0.15);
+    }
+    
+    .input-group {
+        position: relative;
+    }
+    
+    .input-group-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-light);
+        font-size: 1.1rem;
+        pointer-events: none;
+    }
+    
+    .input-group .form-control {
+        padding-left: 2.75rem;
+    }
+    
+    .password-toggle {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: var(--text-light);
+        font-size: 1.1rem;
+    }
+    
+    .btn-signup {
+        width: 100%;
+        padding: 0.875rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 10px;
+        border: none;
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+        color: var(--white);
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(30, 136, 229, 0.3);
+    }
+    
+    .btn-signup:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(30, 136, 229, 0.4);
+    }
+    
+    .form-check-label {
+        color: var(--text-dark);
+        font-weight: 400;
+        font-size: 0.9rem;
+    }
+    
+    .form-check-label a {
+        color: var(--primary-blue);
+        text-decoration: none;
+        font-weight: 600;
+    }
+    
+    .form-check-label a:hover {
+        text-decoration: underline;
+    }
+    
+    .auth-footer {
+        text-align: center;
+        margin-top: 1.5rem;
+        color: var(--text-light);
+    }
+    
+    .auth-footer a {
+        color: var(--primary-blue);
+        text-decoration: none;
+        font-weight: 600;
+    }
+    
+    .auth-footer a:hover {
+        text-decoration: underline;
+    }
+    
+    .user-type-selector {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .user-type-card {
+        flex: 1;
+        padding: 1.5rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 15px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .user-type-card:hover {
+        border-color: var(--primary-blue);
+        transform: translateY(-3px);
+    }
+    
+    .user-type-card.active {
+        border-color: var(--primary-blue);
+        background: var(--light-blue);
+    }
+    
+    .user-type-card i {
+        font-size: 2.5rem;
+        color: var(--primary-blue);
+        margin-bottom: 0.5rem;
+    }
+    
+    .user-type-card h5 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+    
+    .user-type-card p {
+        font-size: 0.85rem;
+        color: var(--text-light);
+        margin: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="container">
+        <div class="auth-container">
+            <div class="auth-card">
+                <div class="row g-0">
+                    <!-- Left Side -->
+                    <div class="col-lg-5 d-none d-lg-block">
+                        <div class="auth-left">
+                            <div class="auth-left-content">
+                                <div class="auth-left-icon">
+                                    <i class="bi bi-heart-pulse-fill"></i>
+                                </div>
+                                <h2>Join Smart Health</h2>
+                                <p>Start your journey to a healthier lifestyle today with personalized tracking and AI-powered insights.</p>
+                                <div class="mt-4">
+                                    <p class="mb-2"><i class="bi bi-check-circle"></i> Free Forever</p>
+                                    <p class="mb-2"><i class="bi bi-check-circle"></i> No Credit Card Required</p>
+                                    <p class="mb-2"><i class="bi bi-check-circle"></i> Instant Access</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Side - Signup Form -->
+                    <div class="col-lg-7">
+                        <div class="auth-right">
+                            <div class="auth-header">
+                                <h3>Create Account</h3>
+                                <p>Fill in your details to get started</p>
+                            </div>
+                            
+                            <form method="post" action="{% url 'signup' %}">
+                                {% csrf_token %}
+                                
+                                <!-- User Type Selection -->
+                                <div class="user-type-selector">
+                                    <div class="user-type-card active" onclick="selectUserType('student')">
+                                        <i class="bi bi-mortarboard"></i>
+                                        <h5>Student</h5>
+                                        <p>For learners</p>
+                                    </div>
+                                    <div class="user-type-card" onclick="selectUserType('teacher')">
+                                        <i class="bi bi-person-workspace"></i>
+                                        <h5>Teacher</h5>
+                                        <p>For educators</p>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="user_type" name="user_type" value="student">
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="first_name" class="form-label">First Name</label>
+                                            <div class="input-group">
+                                                <i class="bi bi-person input-group-icon"></i>
+                                                <input type="text" class="form-control" id="first_name" name="first_name" placeholder="John" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="last_name" class="form-label">Last Name</label>
+                                            <div class="input-group">
+                                                <i class="bi bi-person input-group-icon"></i>
+                                                <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Doe" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="username" class="form-label">Username</label>
+                                    <div class="input-group">
+                                        <i class="bi bi-at input-group-icon"></i>
+                                        <input type="text" class="form-control" id="username" name="username" placeholder="johndoe" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="email" class="form-label">Email Address</label>
+                                    <div class="input-group">
+                                        <i class="bi bi-envelope input-group-icon"></i>
+                                        <input type="email" class="form-control" id="email" name="email" placeholder="john@example.com" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="password1" class="form-label">Password</label>
+                                    <div class="input-group">
+                                        <i class="bi bi-lock input-group-icon"></i>
+                                        <input type="password" class="form-control" id="password1" name="password1" placeholder="Create a strong password" required>
+                                        <i class="bi bi-eye password-toggle" onclick="togglePassword('password1')"></i>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="password2" class="form-label">Confirm Password</label>
+                                    <div class="input-group">
+                                        <i class="bi bi-lock-fill input-group-icon"></i>
+                                        <input type="password" class="form-control" id="password2" name="password2" placeholder="Re-enter your password" required>
+                                        <i class="bi bi-eye password-toggle" onclick="togglePassword('password2')"></i>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="terms" name="terms" required>
+                                        <label class="form-check-label" for="terms">
+                                            I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-signup">
+                                    <i class="bi bi-person-plus"></i> Create Account
+                                </button>
+                            </form>
+                            
+                            <div class="auth-footer">
+                                <p>Already have an account? <a href="{% url 'login' %}">Sign In</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function selectUserType(type) {
+        // Remove active class from all cards
+        document.querySelectorAll('.user-type-card').forEach(card => {
+            card.classList.remove('active');
+        });
+        
+        // Add active class to selected card
+        event.currentTarget.classList.add('active');
+        
+        // Update hidden input
+        document.getElementById('user_type').value = type;
+    }
+    
+    function togglePassword(fieldId) {
+        const passwordInput = document.getElementById(fieldId);
+        const toggleIcon = event.currentTarget;
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleIcon.classList.remove('bi-eye');
+            toggleIcon.classList.add('bi-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            toggleIcon.classList.remove('bi-eye-slash');
+            toggleIcon.classList.add('bi-eye');
+        }
+    }
+</script>
+{% endblock %}

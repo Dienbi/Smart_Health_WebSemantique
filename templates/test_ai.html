@@ -1,141 +1,254 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Health AI Query Tester</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+{% extends 'base.html' %}
+
+{% block title %}AI Assistant - Smart Health{% endblock %}
+
+{% block extra_css %}
+<style>
+        .ai-page {
+            background: var(--light-gray);
+            min-height: calc(100vh - 80px);
+            padding: 2rem 0;
         }
         
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 1000px;
+        .ai-container {
+            max-width: 1200px;
             margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
         
-        h1 {
-            color: #667eea;
-            margin-bottom: 10px;
-            font-size: 2.5em;
+        .ai-header {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            color: var(--white);
+            padding: 3rem 2rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(30, 136, 229, 0.3);
+            position: relative;
+            overflow: hidden;
         }
         
-        .subtitle {
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 1.1em;
+        .ai-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+        
+        .ai-header::after {
+            content: '';
+            position: absolute;
+            bottom: -50%;
+            left: -10%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+        
+        .ai-header-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .ai-header h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .ai-header h1 i {
+            font-size: 3rem;
+            vertical-align: middle;
+            margin-right: 0.5rem;
+        }
+        
+        .ai-header p {
+            font-size: 1.2rem;
+            opacity: 0.95;
+        }
+        
+        .ai-main-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+        }
+        
+        .info-banner {
+            background: linear-gradient(135deg, var(--light-blue) 0%, rgba(30, 136, 229, 0.1) 100%);
+            border-left: 4px solid var(--primary-blue);
+            padding: 1.25rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .info-banner i {
+            font-size: 2rem;
+            color: var(--primary-blue);
+        }
+        
+        .info-banner-content h5 {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.25rem;
+        }
+        
+        .info-banner-content p {
+            color: var(--text-light);
+            margin: 0;
         }
         
         .input-section {
-            margin-bottom: 20px;
+            margin-bottom: 2rem;
         }
         
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 8px;
-            color: #333;
+        .input-label {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
         }
         
-        textarea {
+        .input-label i {
+            color: var(--primary-blue);
+        }
+        
+        .query-textarea {
             width: 100%;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            font-family: inherit;
+            padding: 1.25rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            font-size: 1.05rem;
+            font-family: 'Poppins', sans-serif;
             resize: vertical;
-            transition: border-color 0.3s;
+            min-height: 120px;
+            transition: all 0.3s ease;
         }
         
-        textarea:focus {
+        .query-textarea:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 0.2rem rgba(30, 136, 229, 0.15);
         }
         
         .button-group {
             display: flex;
-            gap: 10px;
+            gap: 1rem;
             flex-wrap: wrap;
+            margin-bottom: 2rem;
         }
         
-        button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        .btn-ai-submit {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            color: var(--white);
             border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
+            padding: 1rem 2.5rem;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(30, 136, 229, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         
-        button:hover {
+        .btn-ai-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(30, 136, 229, 0.4);
+        }
+        
+        .btn-ai-submit:active {
+            transform: translateY(-1px);
+        }
+        
+        .btn-ai-clear {
+            background: var(--white);
+            color: var(--text-dark);
+            border: 2px solid #e0e0e0;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-ai-clear:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
         
-        button:active {
-            transform: translateY(0);
+        .examples-section {
+            margin-top: 2rem;
+        }
+        
+        .examples-header {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
         }
         
         .example-btn {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            padding: 8px 15px;
-            font-size: 14px;
+            background: linear-gradient(135deg, var(--light-blue) 0%, rgba(30, 136, 229, 0.1) 100%);
+            border: 2px solid var(--primary-blue);
+            color: var(--primary-blue);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 0.95rem;
         }
         
-        .results-section {
-            margin-top: 30px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
+        .example-btn:hover {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            color: var(--white);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(30, 136, 229, 0.3);
         }
         
-        .results-section h2 {
-            color: #667eea;
-            margin-bottom: 15px;
-        }
-        
-        pre {
-            background: #2d3748;
-            color: #68d391;
-            padding: 15px;
-            border-radius: 8px;
-            overflow-x: auto;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-        
-        .loading {
+        .loading-section {
             display: none;
             text-align: center;
-            padding: 20px;
+            padding: 3rem;
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.08);
         }
         
         .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
+            border: 4px solid var(--light-blue);
+            border-top: 4px solid var(--primary-blue);
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 60px;
+            height: 60px;
             animation: spin 1s linear infinite;
-            margin: 0 auto;
+            margin: 0 auto 1.5rem;
         }
         
         @keyframes spin {
@@ -143,171 +256,419 @@
             100% { transform: rotate(360deg); }
         }
         
-        .error {
-            background: #fed7d7;
-            color: #c53030;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
+        .loading-text {
+            color: var(--primary-blue);
+            font-size: 1.2rem;
+            font-weight: 600;
         }
         
-        .success {
-            background: #c6f6d5;
-            color: #22543d;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
+        .results-section {
+            display: none;
+            background: var(--white);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.08);
+            animation: fadeInUp 0.5s ease;
         }
         
-        .info-box {
-            background: #e6fffa;
-            border-left: 4px solid #319795;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 4px;
+        .results-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--light-gray);
         }
         
-        .examples-grid {
+        .results-header h2 {
+            color: var(--text-dark);
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .results-header i {
+            font-size: 2rem;
+            color: var(--primary-blue);
+        }
+        
+        .alert-success {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            color: #2e7d32;
+            padding: 1.25rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .alert-success i {
+            font-size: 1.5rem;
+        }
+        
+        .alert-error {
+            background: #ffebee;
+            border-left: 4px solid #f44336;
+            color: #c62828;
+            padding: 1.25rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .alert-error i {
+            font-size: 1.5rem;
+        }
+        
+        .result-meta {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 10px;
-            margin-top: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .result-meta-item {
+            background: var(--light-gray);
+            padding: 1rem;
+            border-radius: 12px;
+        }
+        
+        .result-meta-label {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .result-meta-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        .query-box {
+            margin-bottom: 1.5rem;
+        }
+        
+        .query-box-header {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .query-box-header i {
+            color: var(--primary-blue);
+        }
+        
+        .code-block {
+            background: #1e293b;
+            color: #10b981;
+            padding: 1.5rem;
+            border-radius: 12px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .results-data {
+            background: var(--light-gray);
+            padding: 1.5rem;
+            border-radius: 12px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
-</head>
-<body>
+{% endblock %}
+
+{% block content %}
+<div class="ai-page">
     <div class="container">
-        <h1>🤖 Smart Health AI Query</h1>
-        <p class="subtitle">Test natural language queries to SPARQL conversion</p>
-        
-        <div class="info-box">
-            <strong>🔍 How it works:</strong> Type a natural language question below, and the AI will convert it to a SPARQL query and fetch results from your ontology.
-        </div>
-        
-        <div class="input-section">
-            <label for="prompt">Enter your question:</label>
-            <textarea id="prompt" rows="4" placeholder="e.g., Show me all users&#10;What are the activities for user 1?&#10;Show health metrics"></textarea>
-        </div>
-        
-        <div class="button-group">
-            <button onclick="sendQuery()">🚀 Send Query</button>
-            <button onclick="clearResults()" style="background: #718096;">🗑️ Clear</button>
-        </div>
-        
-        <div style="margin-top: 20px;">
-            <strong>Try these examples:</strong>
-            <div class="examples-grid">
-                <button class="example-btn" onclick="setPrompt('Show me all users')">All Users</button>
-                <button class="example-btn" onclick="setPrompt('List all activities')">All Activities</button>
-                <button class="example-btn" onclick="setPrompt('Show health metrics')">Health Metrics</button>
-                <button class="example-btn" onclick="setPrompt('What are the meals?')">Meals</button>
-                <button class="example-btn" onclick="setPrompt('Show all habits')">Habits</button>
-                <button class="example-btn" onclick="setPrompt('List all challenges')">Challenges</button>
+        <div class="ai-container">
+            <!-- Header -->
+            <div class="ai-header">
+                <div class="ai-header-content">
+                    <h1><i class="bi bi-robot"></i> Smart Health AI Assistant</h1>
+                    <p>Ask questions in natural language and get instant insights from your health data</p>
+                </div>
+            </div>
+            
+            <!-- Main Card -->
+            <div class="ai-main-card">
+                <!-- Info Banner -->
+                <div class="info-banner">
+                    <i class="bi bi-lightbulb"></i>
+                    <div class="info-banner-content">
+                        <h5>How it works</h5>
+                        <p>Type your question below in natural language. Our AI will convert it to a SPARQL query and fetch results from the Smart Health knowledge base.</p>
+                    </div>
+                </div>
+                
+                <!-- Input Section -->
+                <div class="input-section">
+                    <div class="input-label">
+                        <i class="bi bi-chat-dots"></i>
+                        <span>Your Question</span>
+                    </div>
+                    <textarea id="prompt" class="query-textarea" rows="4" placeholder="E.g., Show me all users&#10;What activities are available?&#10;List all meals&#10;Show health metrics"></textarea>
+                </div>
+                
+                <!-- Buttons -->
+                <div class="button-group">
+                    <button class="btn-ai-submit" onclick="sendQuery()">
+                        <i class="bi bi-send"></i> Send Query
+                    </button>
+                    <button class="btn-ai-clear" onclick="clearResults()">
+                        <i class="bi bi-x-circle"></i> Clear
+                    </button>
+                </div>
+                
+                <!-- Examples Section -->
+                <div class="examples-section">
+                    <div class="examples-header">
+                        <i class="bi bi-stars"></i> Try these examples:
+                    </div>
+                    <div class="examples-grid">
+                        <button class="example-btn" onclick="setPrompt('Show me all users')">
+                            <i class="bi bi-people"></i> All Users
+                        </button>
+                        <button class="example-btn" onclick="setPrompt('List all activities')">
+                            <i class="bi bi-activity"></i> All Activities
+                        </button>
+                        <button class="example-btn" onclick="setPrompt('Show health metrics')">
+                            <i class="bi bi-heart-pulse"></i> Health Metrics
+                        </button>
+                        <button class="example-btn" onclick="setPrompt('What are the meals?')">
+                            <i class="bi bi-egg-fried"></i> Meals
+                        </button>
+                        <button class="example-btn" onclick="setPrompt('Show all habits')">
+                            <i class="bi bi-book"></i> Habits
+                        </button>
+                        <button class="example-btn" onclick="setPrompt('List all challenges')">
+                            <i class="bi bi-trophy"></i> Challenges
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Loading Section -->
+            <div class="loading-section" id="loading">
+                <div class="spinner"></div>
+                <p class="loading-text"><i class="bi bi-gear-fill"></i> Processing your query...</p>
+            </div>
+            
+            <!-- Results Section -->
+            <div class="results-section" id="results">
+                <div class="results-header">
+                    <i class="bi bi-bar-chart"></i>
+                    <h2>Results</h2>
+                </div>
+                <div id="results-content"></div>
             </div>
         </div>
-        
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <p style="margin-top: 10px; color: #667eea;">Processing your query...</p>
-        </div>
-        
-        <div class="results-section" id="results" style="display: none;">
-            <h2>📊 Results</h2>
-            <div id="results-content"></div>
-        </div>
     </div>
+</div>
     
-    <script>
-        const API_URL = 'http://127.0.0.1:8000/api/ai/query/';
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const API_URL = 'http://127.0.0.1:8000/api/ai/query/';
+    
+    function setPrompt(text) {
+        document.getElementById('prompt').value = text;
+        document.getElementById('prompt').focus();
+    }
+    
+    function clearResults() {
+        document.getElementById('prompt').value = '';
+        document.getElementById('results').style.display = 'none';
+        document.getElementById('results-content').innerHTML = '';
+    }
+    
+    async function sendQuery() {
+        const prompt = document.getElementById('prompt').value.trim();
         
-        function setPrompt(text) {
-            document.getElementById('prompt').value = text;
+        if (!prompt) {
+            alert('⚠️ Please enter a question!');
+            return;
         }
         
-        function clearResults() {
-            document.getElementById('prompt').value = '';
-            document.getElementById('results').style.display = 'none';
-            document.getElementById('results-content').innerHTML = '';
-        }
+        // Show loading
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('results').style.display = 'none';
         
-        async function sendQuery() {
-            const prompt = document.getElementById('prompt').value.trim();
+        // Scroll to loading
+        document.getElementById('loading').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ prompt: prompt })
+            });
             
-            if (!prompt) {
-                alert('Please enter a question!');
-                return;
-            }
+            const data = await response.json();
             
-            // Show loading
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('results').style.display = 'none';
+            // Hide loading
+            document.getElementById('loading').style.display = 'none';
             
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ prompt: prompt })
-                });
-                
-                const data = await response.json();
-                
-                // Hide loading
-                document.getElementById('loading').style.display = 'none';
-                
-                // Show results
-                document.getElementById('results').style.display = 'block';
-                
-                let html = '';
-                
-                if (data.success) {
-                    html += '<div class="success">✅ Query executed successfully!</div>';
-                    html += `<p><strong>Intent Detected:</strong> ${data.intent || 'N/A'}</p>`;
-                    html += `<p><strong>Results Count:</strong> ${data.results_count || 0}</p>`;
-                    if (data.user_id) {
-                        html += `<p><strong>User ID:</strong> ${data.user_id}</p>`;
-                    }
-                    html += '<h3 style="margin-top: 20px; color: #667eea;">Generated SPARQL Query:</h3>';
-                    html += `<pre>${escapeHtml(data.sparql_query || 'N/A')}</pre>`;
-                    html += '<h3 style="margin-top: 20px; color: #667eea;">Results:</h3>';
-                    html += `<pre>${JSON.stringify(data.results, null, 2)}</pre>`;
-                } else {
-                    html += `<div class="error">❌ Error: ${data.error || 'Unknown error'}</div>`;
-                    html += `<p>${data.message || ''}</p>`;
-                }
-                
-                document.getElementById('results-content').innerHTML = html;
-                
-            } catch (error) {
-                // Hide loading
-                document.getElementById('loading').style.display = 'none';
-                
-                // Show error
-                document.getElementById('results').style.display = 'block';
-                document.getElementById('results-content').innerHTML = `
-                    <div class="error">
-                        <strong>❌ Connection Error</strong>
-                        <p>${error.message}</p>
-                        <p>Make sure the Django server is running at ${API_URL}</p>
+            // Show results
+            document.getElementById('results').style.display = 'block';
+            
+            let html = '';
+            
+            if (data.success) {
+                // Success Alert
+                html += `
+                    <div class="alert-success">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span><strong>Success!</strong> Query executed successfully</span>
                     </div>
                 `;
+                
+                // Meta Information
+                html += '<div class="result-meta">';
+                html += `
+                    <div class="result-meta-item">
+                        <div class="result-meta-label">Intent</div>
+                        <div class="result-meta-value"><i class="bi bi-bullseye"></i> ${data.intent || 'N/A'}</div>
+                    </div>
+                `;
+                html += `
+                    <div class="result-meta-item">
+                        <div class="result-meta-label">Results Count</div>
+                        <div class="result-meta-value"><i class="bi bi-hash"></i> ${data.results_count || 0}</div>
+                    </div>
+                `;
+                if (data.user_id) {
+                    html += `
+                        <div class="result-meta-item">
+                            <div class="result-meta-label">User ID</div>
+                            <div class="result-meta-value"><i class="bi bi-person"></i> ${data.user_id}</div>
+                        </div>
+                    `;
+                }
+                html += `
+                    <div class="result-meta-item">
+                        <div class="result-meta-label">AI Model</div>
+                        <div class="result-meta-value"><i class="bi bi-robot"></i> ${data.ai_model || 'Gemini'}</div>
+                    </div>
+                `;
+                html += '</div>';
+                
+                // SPARQL Query
+                html += `
+                    <div class="query-box">
+                        <div class="query-box-header">
+                            <i class="bi bi-code-slash"></i>
+                            <span>Generated SPARQL Query</span>
+                        </div>
+                        <pre class="code-block">${escapeHtml(data.sparql_query || 'N/A')}</pre>
+                    </div>
+                `;
+                
+                // Results Data
+                html += `
+                    <div class="query-box">
+                        <div class="query-box-header">
+                            <i class="bi bi-table"></i>
+                            <span>Query Results (${data.results_count || 0} items)</span>
+                        </div>
+                        <pre class="code-block results-data">${JSON.stringify(data.results, null, 2)}</pre>
+                    </div>
+                `;
+            } else {
+                // Error Alert
+                html += `
+                    <div class="alert-error">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <div>
+                            <strong>Error:</strong> ${data.error || 'Unknown error'}
+                            ${data.message ? '<br><small>' + data.message + '</small>' : ''}
+                        </div>
+                    </div>
+                `;
+                
+                // Error Details
+                if (data.details) {
+                    html += `
+                        <div class="query-box">
+                            <div class="query-box-header">
+                                <i class="bi bi-info-circle"></i>
+                                <span>Error Details</span>
+                            </div>
+                            <pre class="code-block">${escapeHtml(data.details)}</pre>
+                        </div>
+                    `;
+                }
             }
+            
+            document.getElementById('results-content').innerHTML = html;
+            
+            // Scroll to results
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+        } catch (error) {
+            // Hide loading
+            document.getElementById('loading').style.display = 'none';
+            
+            // Show error
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('results-content').innerHTML = `
+                <div class="alert-error">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <div>
+                        <strong>Connection Error</strong><br>
+                        <small>${error.message}</small><br>
+                        <small>Make sure the Django server is running at ${API_URL}</small>
+                    </div>
+                </div>
+            `;
+            
+            // Scroll to results
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-        
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
+    }
+    
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    // Allow Enter key to submit (Shift+Enter for new line)
+    document.getElementById('prompt').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendQuery();
         }
-        
-        // Allow Enter key to submit (Ctrl+Enter for new line)
-        document.getElementById('prompt').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey) {
-                e.preventDefault();
-                sendQuery();
-            }
-        });
-    </script>
-</body>
-</html>
+    });
+    
+    // Auto-focus on prompt
+    document.getElementById('prompt').focus();
+</script>
+{% endblock %}

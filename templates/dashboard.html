@@ -1,0 +1,609 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - Smart Health{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-page {
+        background: var(--light-gray);
+        min-height: calc(100vh - 80px);
+        padding: 2rem 0;
+    }
+    
+    .dashboard-header {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+        color: var(--white);
+        padding: 2rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(30, 136, 229, 0.3);
+    }
+    
+    .dashboard-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .dashboard-header p {
+        font-size: 1.1rem;
+        opacity: 0.95;
+        margin: 0;
+    }
+    
+    .stat-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: var(--white);
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        border-left: 4px solid var(--primary-blue);
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .stat-card-icon {
+        width: 60px;
+        height: 60px;
+        background: var(--light-blue);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: var(--primary-blue);
+        margin-bottom: 1rem;
+    }
+    
+    .stat-card-content h3 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 0.25rem;
+    }
+    
+    .stat-card-content p {
+        color: var(--text-light);
+        margin: 0;
+        font-size: 1.1rem;
+    }
+    
+    .stat-card-trend {
+        margin-top: 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    .trend-up {
+        color: #4caf50;
+    }
+    
+    .trend-down {
+        color: #f44336;
+    }
+    
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 1.5rem;
+    }
+    
+    .dashboard-card {
+        background: var(--white);
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    }
+    
+    .dashboard-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--light-gray);
+    }
+    
+    .dashboard-card-header h4 {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin: 0;
+    }
+    
+    .dashboard-card-header .btn-link {
+        color: var(--primary-blue);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .dashboard-card-header .btn-link:hover {
+        text-decoration: underline;
+    }
+    
+    .card-full {
+        grid-column: span 12;
+    }
+    
+    .card-half {
+        grid-column: span 6;
+    }
+    
+    .card-third {
+        grid-column: span 4;
+    }
+    
+    @media (max-width: 992px) {
+        .card-half,
+        .card-third {
+            grid-column: span 12;
+        }
+    }
+    
+    /* Table Styles */
+    .data-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    
+    .data-table thead th {
+        background: var(--light-gray);
+        color: var(--text-dark);
+        font-weight: 600;
+        text-align: left;
+        padding: 1rem;
+        border-bottom: 2px solid #e0e0e0;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .data-table tbody td {
+        padding: 1rem;
+        border-bottom: 1px solid #f0f0f0;
+        color: var(--text-dark);
+    }
+    
+    .data-table tbody tr:hover {
+        background: var(--light-gray);
+    }
+    
+    .data-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .badge {
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .badge-success {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+    
+    .badge-warning {
+        background: #fff3e0;
+        color: #e65100;
+    }
+    
+    .badge-danger {
+        background: #ffebee;
+        color: #c62828;
+    }
+    
+    .badge-info {
+        background: var(--light-blue);
+        color: var(--secondary-blue);
+    }
+    
+    /* Action Buttons */
+    .action-btn {
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        border: none;
+        background: var(--light-gray);
+        color: var(--text-dark);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-right: 0.25rem;
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    }
+    
+    .action-btn-edit {
+        background: #e3f2fd;
+        color: #1976d2;
+    }
+    
+    .action-btn-delete {
+        background: #ffebee;
+        color: #d32f2f;
+    }
+    
+    .action-btn-view {
+        background: #f3e5f5;
+        color: #7b1fa2;
+    }
+    
+    /* Quick Actions */
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    
+    .quick-action-btn {
+        padding: 1.5rem;
+        background: linear-gradient(135deg, var(--light-blue) 0%, rgba(30, 136, 229, 0.1) 100%);
+        border: 2px solid var(--primary-blue);
+        border-radius: 15px;
+        text-align: center;
+        color: var(--primary-blue);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .quick-action-btn:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(30, 136, 229, 0.2);
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+        color: var(--white);
+    }
+    
+    .quick-action-btn i {
+        font-size: 2.5rem;
+    }
+    
+    /* Activity Feed */
+    .activity-item {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+    
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+    
+    .activity-icon-blue {
+        background: var(--light-blue);
+        color: var(--primary-blue);
+    }
+    
+    .activity-icon-green {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+    
+    .activity-icon-orange {
+        background: #fff3e0;
+        color: #e65100;
+    }
+    
+    .activity-content {
+        flex: 1;
+    }
+    
+    .activity-content p {
+        margin: 0 0 0.25rem 0;
+        color: var(--text-dark);
+    }
+    
+    .activity-content small {
+        color: var(--text-light);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-page">
+    <div class="container-fluid">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1><i class="bi bi-speedometer2"></i> Admin Dashboard</h1>
+                    <p>Welcome back, {{ user.get_full_name|default:user.username }}! Here's what's happening with Smart Health today.</p>
+                </div>
+                <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                    <span class="badge badge-light fs-6 p-3">
+                        <i class="bi bi-calendar-check"></i> {{ current_date|date:"F d, Y" }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Statistics Cards -->
+        <div class="stat-cards">
+            <div class="stat-card">
+                <div class="stat-card-icon">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div class="stat-card-content">
+                    <h3>{{ total_users|default:0 }}</h3>
+                    <p>Total Users</p>
+                    <div class="stat-card-trend trend-up">
+                        <i class="bi bi-arrow-up"></i> +12% from last month
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-card-icon">
+                    <i class="bi bi-activity"></i>
+                </div>
+                <div class="stat-card-content">
+                    <h3>{{ total_activities|default:0 }}</h3>
+                    <p>Activities Logged</p>
+                    <div class="stat-card-trend trend-up">
+                        <i class="bi bi-arrow-up"></i> +25% this week
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-card-icon">
+                    <i class="bi bi-egg-fried"></i>
+                </div>
+                <div class="stat-card-content">
+                    <h3>{{ total_meals|default:0 }}</h3>
+                    <p>Meals Tracked</p>
+                    <div class="stat-card-trend trend-up">
+                        <i class="bi bi-arrow-up"></i> +18% this week
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-card-icon">
+                    <i class="bi bi-heart-pulse"></i>
+                </div>
+                <div class="stat-card-content">
+                    <h3>{{ total_records|default:0 }}</h3>
+                    <p>Health Records</p>
+                    <div class="stat-card-trend trend-up">
+                        <i class="bi bi-arrow-up"></i> +8% this week
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Quick Actions -->
+            <div class="dashboard-card card-full">
+                <div class="dashboard-card-header">
+                    <h4><i class="bi bi-lightning"></i> Quick Actions</h4>
+                </div>
+                <div class="quick-actions">
+                    <a href="{% url 'admin:index' %}" class="quick-action-btn">
+                        <i class="bi bi-shield-check"></i>
+                        <span>Django Admin</span>
+                    </a>
+                    <a href="{% url 'api_ai:ai-test' %}" class="quick-action-btn">
+                        <i class="bi bi-robot"></i>
+                        <span>AI Assistant</span>
+                    </a>
+                    <a href="http://localhost:3030" target="_blank" class="quick-action-btn">
+                        <i class="bi bi-database"></i>
+                        <span>Fuseki Server</span>
+                    </a>
+                    <a href="#" class="quick-action-btn">
+                        <i class="bi bi-graph-up-arrow"></i>
+                        <span>Analytics</span>
+                    </a>
+                    <a href="#" class="quick-action-btn">
+                        <i class="bi bi-people"></i>
+                        <span>User Management</span>
+                    </a>
+                    <a href="#" class="quick-action-btn">
+                        <i class="bi bi-gear"></i>
+                        <span>Settings</span>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Recent Users -->
+            <div class="dashboard-card card-half">
+                <div class="dashboard-card-header">
+                    <h4><i class="bi bi-people"></i> Recent Users</h4>
+                    <a href="{% url 'admin:users_user_changelist' %}" class="btn-link">View All <i class="bi bi-arrow-right"></i></a>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Email</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if recent_users %}
+                            {% for user in recent_users %}
+                            <tr>
+                                <td><strong>{{ user.username }}</strong></td>
+                                <td>{{ user.email }}</td>
+                                <td><span class="badge badge-info">{{ user.get_user_type|default:"User" }}</span></td>
+                                <td><span class="badge badge-success">Active</span></td>
+                                <td>
+                                    <button class="action-btn action-btn-view" title="View">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <button class="action-btn action-btn-edit" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">No users found</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Recent Activity -->
+            <div class="dashboard-card card-half">
+                <div class="dashboard-card-header">
+                    <h4><i class="bi bi-clock-history"></i> Recent Activity</h4>
+                    <a href="#" class="btn-link">View All <i class="bi bi-arrow-right"></i></a>
+                </div>
+                <div class="activity-feed">
+                    <div class="activity-item">
+                        <div class="activity-icon activity-icon-blue">
+                            <i class="bi bi-person-plus"></i>
+                        </div>
+                        <div class="activity-content">
+                            <p><strong>New user registered</strong></p>
+                            <small>john_doe joined Smart Health</small>
+                            <br><small class="text-muted">2 hours ago</small>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon activity-icon-green">
+                            <i class="bi bi-activity"></i>
+                        </div>
+                        <div class="activity-content">
+                            <p><strong>Activity logged</strong></p>
+                            <small>sarah_smith completed a 5km run</small>
+                            <br><small class="text-muted">3 hours ago</small>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon activity-icon-orange">
+                            <i class="bi bi-egg-fried"></i>
+                        </div>
+                        <div class="activity-content">
+                            <p><strong>Meal tracked</strong></p>
+                            <small>mike_jones logged breakfast</small>
+                            <br><small class="text-muted">4 hours ago</small>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon activity-icon-blue">
+                            <i class="bi bi-heart-pulse"></i>
+                        </div>
+                        <div class="activity-content">
+                            <p><strong>Health record updated</strong></p>
+                            <small>emma_wilson added new metrics</small>
+                            <br><small class="text-muted">5 hours ago</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- System Status -->
+            <div class="dashboard-card card-full">
+                <div class="dashboard-card-header">
+                    <h4><i class="bi bi-hdd"></i> System Status</h4>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="text-center p-3">
+                            <div class="mb-2">
+                                <i class="bi bi-database fs-2 text-success"></i>
+                            </div>
+                            <h5>Database</h5>
+                            <span class="badge badge-success">Online</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-3">
+                            <div class="mb-2">
+                                <i class="bi bi-hdd-network fs-2 text-success"></i>
+                            </div>
+                            <h5>Fuseki Server</h5>
+                            <span class="badge badge-success">Online</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-3">
+                            <div class="mb-2">
+                                <i class="bi bi-robot fs-2 text-success"></i>
+                            </div>
+                            <h5>AI Service</h5>
+                            <span class="badge badge-success">Active</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-3">
+                            <div class="mb-2">
+                                <i class="bi bi-server fs-2 text-success"></i>
+                            </div>
+                            <h5>API Server</h5>
+                            <span class="badge badge-success">Running</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-refresh dashboard every 5 minutes
+    setTimeout(() => {
+        location.reload();
+    }, 300000);
+    
+    // Add animation to stat cards
+    document.addEventListener('DOMContentLoaded', () => {
+        const statCards = document.querySelectorAll('.stat-card');
+        statCards.forEach((card, index) => {
+            setTimeout(() => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 50);
+            }, index * 100);
+        });
+    });
+</script>
+{% endblock %}
