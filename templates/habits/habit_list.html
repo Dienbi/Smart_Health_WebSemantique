@@ -493,7 +493,7 @@
         };
         
         try {
-            const response = await fetch('/habits/api/', {
+            const response = await fetch('/habits/api/habits/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -536,7 +536,7 @@
         };
         
         try {
-            const response = await fetch(`/habits/api/${habitId}/`, {
+            const response = await fetch(`/habits/api/habits/${habitId}/`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -560,7 +560,7 @@
     async function deleteHabit(id, name) {
         if (confirm(`Are you sure you want to delete the habit "${name}"?`)) {
             try {
-                const response = await fetch(`/habits/api/${id}/`, {
+                const response = await fetch(`/habits/api/habits/${id}/`, {
                     method: 'DELETE',
                     headers: {
                         'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value

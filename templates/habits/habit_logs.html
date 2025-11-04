@@ -19,6 +19,40 @@
         box-shadow: 0 10px 30px rgba(30, 136, 229, 0.3);
     }
     
+    .page-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .page-header p {
+        font-size: 1.1rem;
+        opacity: 0.95;
+        margin: 0;
+    }
+    
+    .stats-card {
+        background: var(--white);
+        border-radius: 15px;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    }
+    
+    .stats-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-blue);
+        margin-bottom: 0.5rem;
+    }
+    
+    .stats-label {
+        color: var(--text-light);
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
     .log-card {
         background: var(--white);
         border-radius: 15px;
@@ -26,11 +60,102 @@
         margin-bottom: 1rem;
         box-shadow: 0 5px 20px rgba(0,0,0,0.05);
         transition: all 0.3s ease;
+        border-left: 4px solid var(--primary-blue);
     }
     
     .log-card:hover {
         transform: translateY(-3px);
         box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .log-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 1rem;
+    }
+    
+    .log-date {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin: 0;
+    }
+    
+    .log-time {
+        color: var(--text-light);
+        font-size: 0.95rem;
+        margin-top: 0.25rem;
+    }
+    
+    .log-content {
+        margin: 1rem 0;
+    }
+    
+    .log-notes {
+        background: var(--light-gray);
+        padding: 1rem;
+        border-radius: 10px;
+        margin-top: 0.5rem;
+    }
+    
+    .log-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .btn-action {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .btn-edit {
+        background: #e3f2fd;
+        color: #1976d2;
+    }
+    
+    .btn-edit:hover {
+        background: #1976d2;
+        color: white;
+    }
+    
+    .btn-delete {
+        background: #ffebee;
+        color: #d32f2f;
+    }
+    
+    .btn-delete:hover {
+        background: #d32f2f;
+        color: white;
+    }
+    
+    .btn-add-log {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+        color: var(--white);
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        border: none;
+        font-weight: 600;
+        font-size: 1.1rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        box-shadow: 0 4px 15px rgba(30, 136, 229, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .btn-add-log:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(30, 136, 229, 0.4);
     }
     
     .timeline {
@@ -64,6 +189,114 @@
         border: 3px solid var(--white);
         box-shadow: 0 0 0 3px var(--primary-blue);
     }
+    
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: var(--white);
+        border-radius: 20px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    }
+    
+    .empty-state-icon {
+        font-size: 5rem;
+        color: var(--primary-blue);
+        margin-bottom: 1rem;
+    }
+    
+    .empty-state h3 {
+        font-size: 1.8rem;
+        color: var(--text-dark);
+        margin-bottom: 1rem;
+    }
+    
+    .empty-state p {
+        color: var(--text-light);
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+    
+    /* Modal Styles */
+    .modal-content {
+        border-radius: 20px;
+        border: none;
+    }
+    
+    .modal-header {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+        color: white;
+        border-radius: 20px 20px 0 0;
+        padding: 1.5rem;
+    }
+    
+    .modal-title {
+        font-weight: 700;
+    }
+    
+    .modal-body {
+        padding: 2rem;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control,
+    .form-select {
+        border-radius: 10px;
+        border: 2px solid #e0e0e0;
+        padding: 0.75rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 0.2rem rgba(30, 136, 229, 0.25);
+    }
+    
+    .form-check-input {
+        width: 1.5rem;
+        height: 1.5rem;
+        margin-right: 0.5rem;
+        cursor: pointer;
+    }
+    
+    .form-check-label {
+        font-weight: 500;
+        cursor: pointer;
+    }
+    
+    .btn-submit {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 50px;
+        border: none;
+        font-weight: 600;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(30, 136, 229, 0.3);
+    }
+    
+    .frequency-badges {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .frequency-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
 </style>
 {% endblock %}
 
@@ -72,14 +305,42 @@
     <div class="container">
         <!-- Page Header -->
         <div class="page-header">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
+            <div class="row align-items-center">
+                <div class="col-lg-6">
                     <h1><i class="bi bi-clock-history"></i> Habit Logs</h1>
                     <p>{{ habit.habit_name }} - {{ habit.get_habit_type_display }}</p>
                 </div>
-                <a href="{% url 'habits:habit-list' %}" class="btn btn-light">
-                    <i class="bi bi-arrow-left"></i> Back to Habits
-                </a>
+                <div class="col-lg-6 text-lg-end mt-3 mt-lg-0">
+                    <button class="btn-add-log me-2" data-bs-toggle="modal" data-bs-target="#addLogModal">
+                        <i class="bi bi-plus-circle"></i>
+                        Add Log Entry
+                    </button>
+                    <a href="{% url 'habits:habit-list' %}" class="btn btn-light">
+                        <i class="bi bi-arrow-left"></i> Back
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stats Section -->
+        <div class="row mb-4">
+            <div class="col-md-4 mb-3">
+                <div class="stats-card">
+                    <div class="stats-number">{{ logs|length }}</div>
+                    <div class="stats-label">Total Logs</div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="stats-card">
+                    <div class="stats-number">{{ habit.created_at|timesince }}</div>
+                    <div class="stats-label">Habit Age</div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="stats-card">
+                    <div class="stats-number">{{ habit.get_habit_type_display }}</div>
+                    <div class="stats-label">Habit Type</div>
+                </div>
             </div>
         </div>
         
@@ -87,41 +348,347 @@
         <div class="timeline">
             {% if logs %}
                 {% for log in logs %}
-                <div class="timeline-item">
+                <div class="timeline-item" data-log-id="{{ log.habit_log_id }}">
                     <div class="timeline-dot"></div>
                     <div class="log-card">
-                        <h5><i class="bi bi-calendar-event"></i> {{ log.start_date|date:"F d, Y" }}</h5>
-                        <p class="text-muted">
-                            <i class="bi bi-clock"></i> 
-                            {{ log.start_date|date:"h:i A" }}
-                            {% if log.end_date %}
-                            - {{ log.end_date|date:"h:i A" }}
+                        <div class="log-header">
+                            <div>
+                                <h5 class="log-date">
+                                    <i class="bi bi-calendar-event"></i> 
+                                    {{ log.start_date|date:"F d, Y" }}
+                                </h5>
+                                <p class="log-time">
+                                    <i class="bi bi-clock"></i> 
+                                    {{ log.start_date|date:"h:i A" }}
+                                    {% if log.end_date %}
+                                    - {{ log.end_date|date:"h:i A" }}
+                                    {% endif %}
+                                    {% if log.reminder_time %}
+                                    <span class="ms-2">
+                                        <i class="bi bi-bell"></i> Reminder: {{ log.reminder_time|date:"h:i A" }}
+                                    </span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="log-content">
+                            {% if log.frequency %}
+                            <div class="frequency-badges mb-2">
+                                {% if log.frequency.daily %}
+                                <span class="frequency-badge bg-primary text-white">
+                                    <i class="bi bi-calendar-day"></i> Daily
+                                </span>
+                                {% endif %}
+                                {% if log.frequency.weekly %}
+                                <span class="frequency-badge bg-success text-white">
+                                    <i class="bi bi-calendar-week"></i> Weekly
+                                </span>
+                                {% endif %}
+                            </div>
                             {% endif %}
-                        </p>
-                        {% if log.notes %}
-                        <p><strong>Notes:</strong> {{ log.notes.description }}</p>
-                        {% endif %}
-                        {% if log.frequency %}
-                        <div class="mt-2">
-                            {% if log.frequency.daily %}
-                            <span class="badge bg-primary">Daily</span>
-                            {% endif %}
-                            {% if log.frequency.weekly %}
-                            <span class="badge bg-success">Weekly</span>
+                            
+                            {% if log.notes %}
+                            <div class="log-notes">
+                                <strong><i class="bi bi-journal-text"></i> Notes:</strong>
+                                <p class="mb-0 mt-1">{{ log.notes.description }}</p>
+                            </div>
                             {% endif %}
                         </div>
-                        {% endif %}
+                        
+                        <div class="log-actions">
+                            <button class="btn-action btn-edit" onclick="editLog({{ log.habit_log_id }}, '{{ log.start_date|date:'Y-m-d\TH:i' }}', '{% if log.end_date %}{{ log.end_date|date:'Y-m-d\TH:i' }}{% endif %}', '{% if log.reminder_time %}{{ log.reminder_time|date:'Y-m-d\TH:i' }}{% endif %}', {% if log.frequency and log.frequency.daily %}true{% else %}false{% endif %}, {% if log.frequency and log.frequency.weekly %}true{% else %}false{% endif %}, '{% if log.notes %}{{ log.notes.description|escapejs }}{% endif %}')">
+                                <i class="bi bi-pencil"></i> Edit
+                            </button>
+                            <button class="btn-action btn-delete" onclick="deleteLog({{ log.habit_log_id }}, '{{ log.start_date|date:'M d, Y' }}')">
+                                <i class="bi bi-trash"></i> Delete
+                            </button>
+                        </div>
                     </div>
                 </div>
                 {% endfor %}
             {% else %}
-                <div class="empty-state text-center">
-                    <i class="bi bi-calendar-x" style="font-size: 4rem; color: var(--text-light);"></i>
-                    <h3 class="mt-3">No logs yet</h3>
-                    <p class="text-muted">Start tracking this habit to see your progress here</p>
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="bi bi-calendar-x"></i>
+                    </div>
+                    <h3>No Logs Yet</h3>
+                    <p>Start tracking this habit by adding your first log entry!</p>
+                    <button class="btn-add-log" data-bs-toggle="modal" data-bs-target="#addLogModal">
+                        <i class="bi bi-plus-circle"></i>
+                        Add Your First Log
+                    </button>
                 </div>
             {% endif %}
         </div>
     </div>
 </div>
+
+<!-- Add Log Modal -->
+<div class="modal fade" id="addLogModal" tabindex="-1" aria-labelledby="addLogModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addLogModalLabel">
+                    <i class="bi bi-plus-circle"></i> Add Log Entry
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addLogForm">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="startDate" class="form-label">
+                                <i class="bi bi-calendar-plus"></i> Start Date & Time
+                            </label>
+                            <input type="datetime-local" class="form-control" id="startDate" name="start_date" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="endDate" class="form-label">
+                                <i class="bi bi-calendar-check"></i> End Date & Time
+                            </label>
+                            <input type="datetime-local" class="form-control" id="endDate" name="end_date">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="reminderTime" class="form-label">
+                            <i class="bi bi-bell"></i> Reminder Time (Optional)
+                        </label>
+                        <input type="datetime-local" class="form-control" id="reminderTime" name="reminder_time">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="bi bi-arrow-repeat"></i> Frequency
+                        </label>
+                        <div class="d-flex gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="daily" name="daily">
+                                <label class="form-check-label" for="daily">
+                                    Daily
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="weekly" name="weekly">
+                                <label class="form-check-label" for="weekly">
+                                    Weekly
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">
+                            <i class="bi bi-journal-text"></i> Notes (Optional)
+                        </label>
+                        <textarea class="form-control" id="notes" name="notes" rows="4" placeholder="Add any notes about this log entry..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn-submit">
+                        <i class="bi bi-check-circle"></i> Create Log Entry
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Log Modal -->
+<div class="modal fade" id="editLogModal" tabindex="-1" aria-labelledby="editLogModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editLogModalLabel">
+                    <i class="bi bi-pencil"></i> Edit Log Entry
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editLogForm">
+                    {% csrf_token %}
+                    <input type="hidden" id="editLogId" name="log_id">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="editStartDate" class="form-label">
+                                <i class="bi bi-calendar-plus"></i> Start Date & Time
+                            </label>
+                            <input type="datetime-local" class="form-control" id="editStartDate" name="start_date" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editEndDate" class="form-label">
+                                <i class="bi bi-calendar-check"></i> End Date & Time
+                            </label>
+                            <input type="datetime-local" class="form-control" id="editEndDate" name="end_date">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="editReminderTime" class="form-label">
+                            <i class="bi bi-bell"></i> Reminder Time (Optional)
+                        </label>
+                        <input type="datetime-local" class="form-control" id="editReminderTime" name="reminder_time">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="bi bi-arrow-repeat"></i> Frequency
+                        </label>
+                        <div class="d-flex gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="editDaily" name="daily">
+                                <label class="form-check-label" for="editDaily">
+                                    Daily
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="editWeekly" name="weekly">
+                                <label class="form-check-label" for="editWeekly">
+                                    Weekly
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="editNotes" class="form-label">
+                            <i class="bi bi-journal-text"></i> Notes (Optional)
+                        </label>
+                        <textarea class="form-control" id="editNotes" name="notes" rows="4" placeholder="Add any notes about this log entry..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn-submit">
+                        <i class="bi bi-check-circle"></i> Update Log Entry
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const habitId = {{ habit.habit_id }};
+    
+    // Set default datetime to now
+    document.addEventListener('DOMContentLoaded', function() {
+        const now = new Date();
+        const formattedNow = now.toISOString().slice(0, 16);
+        document.getElementById('startDate').value = formattedNow;
+    });
+    
+    // Add log form submission
+    document.getElementById('addLogForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = {
+            habit_id: habitId,
+            start_date: document.getElementById('startDate').value,
+            end_date: document.getElementById('endDate').value || null,
+            reminder_time: document.getElementById('reminderTime').value || null,
+            daily: document.getElementById('daily').checked,
+            weekly: document.getElementById('weekly').checked,
+            notes_text: document.getElementById('notes').value || ''
+        };
+        
+        try {
+            const response = await fetch('/habits/api/logs/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify(formData)
+            });
+            
+            if (response.ok) {
+                location.reload();
+            } else {
+                const errorData = await response.json();
+                console.error('API Error:', errorData);
+                alert('Error creating log: ' + JSON.stringify(errorData));
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error creating log. Please try again.');
+        }
+    });
+    
+    // Edit log
+    function editLog(id, startDate, endDate, reminderTime, daily, weekly, notes) {
+        document.getElementById('editLogId').value = id;
+        document.getElementById('editStartDate').value = startDate;
+        document.getElementById('editEndDate').value = endDate;
+        document.getElementById('editReminderTime').value = reminderTime;
+        document.getElementById('editDaily').checked = daily;
+        document.getElementById('editWeekly').checked = weekly;
+        document.getElementById('editNotes').value = notes;
+        
+        const modal = new bootstrap.Modal(document.getElementById('editLogModal'));
+        modal.show();
+    }
+    
+    // Edit log form submission
+    document.getElementById('editLogForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const logId = document.getElementById('editLogId').value;
+        const formData = {
+            habit_id: habitId,
+            start_date: document.getElementById('editStartDate').value,
+            end_date: document.getElementById('editEndDate').value || null,
+            reminder_time: document.getElementById('editReminderTime').value || null,
+            daily: document.getElementById('editDaily').checked,
+            weekly: document.getElementById('editWeekly').checked,
+            notes_text: document.getElementById('editNotes').value || ''
+        };
+        
+        try {
+            const response = await fetch(`/habits/api/logs/${logId}/`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify(formData)
+            });
+            
+            if (response.ok) {
+                location.reload();
+            } else {
+                const errorData = await response.json();
+                console.error('API Error:', errorData);
+                alert('Error updating log: ' + JSON.stringify(errorData));
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error updating log. Please try again.');
+        }
+    });
+    
+    // Delete log
+    async function deleteLog(id, date) {
+        if (confirm(`Are you sure you want to delete the log from "${date}"?`)) {
+            try {
+                const response = await fetch(`/habits/api/logs/${id}/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                });
+                
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert('Error deleting log. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error deleting log. Please try again.');
+            }
+        }
+    }
+</script>
 {% endblock %}

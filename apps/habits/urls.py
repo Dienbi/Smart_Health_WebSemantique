@@ -7,7 +7,7 @@ from .views import (
 )
 
 router = DefaultRouter()
-router.register(r'', HabitViewSet, basename='habit')
+router.register(r'habits', HabitViewSet, basename='habit')
 router.register(r'logs', HabitLogViewSet, basename='habitlog')
 router.register(r'reading', ReadingViewSet, basename='reading')
 router.register(r'cooking', CookingViewSet, basename='cooking')
