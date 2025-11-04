@@ -3,6 +3,7 @@
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - Python 3.9+
 - Apache Jena Fuseki 5.6.0 (running on port 3030)
 - Virtual environment activated
@@ -50,6 +51,7 @@ All missing apps have been created based on the Smart Health ontology:
 ## 🔗 API Endpoints Overview
 
 ### Activities API (`/api/activities/`)
+
 ```
 GET/POST   /activities/       - List/Create activities
 GET/POST   /logs/             - List/Create activity logs
@@ -61,6 +63,7 @@ GET/POST   /natation/         - Swimming activities
 ```
 
 ### Habits API (`/api/habits/`)
+
 ```
 GET/POST   /habits/           - List/Create habits
 GET        /habits/my_habits/ - Current user's habits
@@ -73,6 +76,7 @@ GET/POST   /journaling/       - Journaling habits
 ```
 
 ### Meals API (`/api/meals/`)
+
 ```
 GET/POST   /meals/            - List/Create meals
 GET        /meals/my_meals/   - Current user's meals
@@ -86,6 +90,7 @@ GET        /snack/            - Snack meals
 ```
 
 ### Health Records API (`/api/health-records/`)
+
 ```
 GET/POST   /records/          - List/Create health records
 GET        /records/my_records/ - Current user's records
@@ -98,6 +103,7 @@ GET/POST   /teacher-records/  - Teacher health records
 ```
 
 ### Défis API (`/api/defis/`)
+
 ```
 GET/POST   /defis/            - List/Create challenges
 GET        /defis/active/     - Active challenges
@@ -115,6 +121,7 @@ POST       /participations/{id}/leave/
 ## 🧪 Testing the API
 
 ### Test All Endpoints
+
 ```powershell
 python test_api_endpoints.py
 ```
@@ -124,11 +131,13 @@ Expected output: `24/24 endpoints accessible` ✅
 ### Test with cURL (requires authentication)
 
 1. **Create a superuser**:
+
 ```powershell
 python manage.py createsuperuser
 ```
 
 2. **Test endpoint** (example):
+
 ```bash
 curl -X GET http://127.0.0.1:8000/api/activities/activities/ \
   -H "Authorization: Token YOUR_TOKEN"
@@ -141,6 +150,7 @@ curl -X GET http://127.0.0.1:8000/api/activities/activities/ \
 Access: http://127.0.0.1:8000/admin/
 
 All models are available in the admin with:
+
 - ✅ Inline forms for related models
 - ✅ Search and filter capabilities
 - ✅ Custom list displays
@@ -153,18 +163,21 @@ All models are available in the admin with:
 ### Complete Documentation Files
 
 1. **API_DOCUMENTATION.md** - Comprehensive API reference
+
    - All endpoints with examples
    - Request/response formats
    - Authentication guide
    - cURL examples
 
 2. **APPS_IMPLEMENTATION_SUMMARY.md** - Implementation details
+
    - All models and their relationships
    - Serializers and viewsets
    - Features summary
    - Testing recommendations
 
 3. **TEMPLATES_README.md** - Template system guide
+
    - All template pages
    - Styling and theme
    - Authentication flow
@@ -232,12 +245,15 @@ print(response.json())
 All API endpoints (except AI query test page) require authentication.
 
 ### Get Token (Django Admin)
+
 1. Login to admin: http://127.0.0.1:8000/admin/
 2. Go to Authentication → Tokens
 3. Create token for your user
 
 ### Use Token in Requests
+
 Include in headers:
+
 ```
 Authorization: Token YOUR_TOKEN_HERE
 ```
@@ -280,6 +296,7 @@ Smart_Health_Web/
 ## ✨ Features
 
 ### User Features
+
 - ✅ User registration and authentication
 - ✅ Healthcare-themed responsive UI
 - ✅ Activity tracking with intensity levels
@@ -290,6 +307,7 @@ Smart_Health_Web/
 - ✅ AI-powered natural language queries
 
 ### Admin Features
+
 - ✅ Complete dashboard with statistics
 - ✅ User management
 - ✅ Content moderation
@@ -297,6 +315,7 @@ Smart_Health_Web/
 - ✅ Inline editing for related models
 
 ### API Features
+
 - ✅ RESTful design
 - ✅ Token authentication
 - ✅ User-specific data filtering
@@ -309,6 +328,7 @@ Smart_Health_Web/
 ## 🐛 Troubleshooting
 
 ### Issue: Server won't start
+
 ```powershell
 # Ensure virtual environment is activated
 .\venv\Scripts\Activate.ps1
@@ -318,11 +338,13 @@ python manage.py check
 ```
 
 ### Issue: API returns 403 Forbidden
+
 - You need to authenticate
 - Create a superuser and get a token
 - Include token in Authorization header
 
 ### Issue: Fuseki connection error
+
 ```powershell
 # Start Fuseki server
 start_fuseki.bat
@@ -332,6 +354,7 @@ start_fuseki.bat
 ```
 
 ### Issue: Database errors
+
 ```powershell
 # Run migrations
 python manage.py makemigrations
@@ -343,6 +366,7 @@ python manage.py migrate
 ## 📞 Support
 
 For issues or questions:
+
 1. Check documentation files
 2. Review API_DOCUMENTATION.md for API usage
 3. Check APPS_IMPLEMENTATION_SUMMARY.md for implementation details
@@ -369,6 +393,7 @@ For issues or questions:
 ## 🚀 Next Steps
 
 1. **Create sample data**:
+
    ```powershell
    python manage.py shell
    # Then use the API or admin to add data

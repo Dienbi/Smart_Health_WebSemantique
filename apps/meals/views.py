@@ -1,3 +1,5 @@
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -148,3 +150,13 @@ class SnackViewSet(viewsets.ReadOnlyModelViewSet):
         if self.request.user.is_staff:
             return Snack.objects.all()
         return Snack.objects.filter(meal__user=self.request.user)
+
+
+# Web Interface Views
+@login_required
+def meal_list_view(request):
+    """Display list of user's meals"""
+    meals = Meal.objects.filter(user=request.user).order_by('-created_at')
+    return render(request, 'meals/meal_list.html', {
+        'meals': meals
+    })

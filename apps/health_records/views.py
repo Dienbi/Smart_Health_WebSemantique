@@ -1,3 +1,5 @@
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -138,3 +140,13 @@ class TeacherHealthRecordViewSet(viewsets.ModelViewSet):
             return TeacherHealthRecord.objects.all()
         # Teachers can only see their own records
         return TeacherHealthRecord.objects.filter(teacher__user=self.request.user)
+
+
+# Web Interface Views
+@login_required
+def health_record_list_view(request):
+    """Display list of user's health records"""
+    records = HealthRecord.objects.filter(user=request.user).order_by('-created_at')
+    return render(request, 'health_records/record_list.html', {
+        'records': records
+    })

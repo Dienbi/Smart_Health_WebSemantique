@@ -9,9 +9,11 @@ The Smart Health AI Assistant now supports full CRUD (Create, Read, Update, Dele
 ## ✨ Capabilities
 
 ### 1. **Query Data (SELECT)**
+
 Ask questions to retrieve data from the knowledge base.
 
 **Examples:**
+
 ```
 - Show me all users
 - What are the activities?
@@ -22,9 +24,11 @@ Ask questions to retrieve data from the knowledge base.
 ```
 
 ### 2. **Insert Data (CREATE)**
+
 Add new data to the knowledge base using natural language.
 
 **Examples:**
+
 ```
 - Add a new user named Alice with email alice@example.com
 - Create a cardio activity called Running
@@ -35,9 +39,11 @@ Add new data to the knowledge base using natural language.
 ```
 
 ### 3. **Update Data (MODIFY)**
+
 Modify existing data in the knowledge base.
 
 **Examples:**
+
 ```
 - Update user Alice email to newalice@example.com
 - Change Running activity duration to 45 minutes
@@ -47,9 +53,11 @@ Modify existing data in the knowledge base.
 ```
 
 ### 4. **Delete Data (REMOVE)**
+
 Remove data from the knowledge base.
 
 **Examples:**
+
 ```
 - Delete user Alice
 - Remove activity Running
@@ -83,6 +91,7 @@ Results/Confirmation
 ### Intent Detection
 
 The AI automatically detects the intent from your prompt:
+
 - **Query**: Keywords like "show", "list", "what", "display"
 - **Insert**: Keywords like "add", "create", "insert", "new"
 - **Update**: Keywords like "update", "change", "modify", "set"
@@ -91,6 +100,7 @@ The AI automatically detects the intent from your prompt:
 ### Entity Extraction
 
 The AI extracts relevant information:
+
 - User IDs and usernames
 - Email addresses
 - Numbers (calories, duration, etc.)
@@ -102,9 +112,11 @@ The AI extracts relevant information:
 ## 📝 SPARQL Examples
 
 ### SELECT Query
+
 **Natural Language:** "Show me all users"
 
 **Generated SPARQL:**
+
 ```sparql
 PREFIX sh: <http://dhia.org/ontologies/smarthealth#>
 
@@ -117,9 +129,11 @@ WHERE {
 ```
 
 ### INSERT Query
+
 **Natural Language:** "Add a new user named Alice with email alice@example.com"
 
 **Generated SPARQL:**
+
 ```sparql
 PREFIX sh: <http://dhia.org/ontologies/smarthealth#>
 
@@ -131,9 +145,11 @@ INSERT DATA {
 ```
 
 ### UPDATE Query
+
 **Natural Language:** "Update user Alice email to newalice@example.com"
 
 **Generated SPARQL:**
+
 ```sparql
 PREFIX sh: <http://dhia.org/ontologies/smarthealth#>
 
@@ -147,9 +163,11 @@ WHERE {
 ```
 
 ### DELETE Query
+
 **Natural Language:** "Delete user Alice"
 
 **Generated SPARQL:**
+
 ```sparql
 PREFIX sh: <http://dhia.org/ontologies/smarthealth#>
 
@@ -167,6 +185,7 @@ DELETE WHERE {
 ### Healthcare Data Management
 
 1. **Patient Records**
+
    ```
    Add a new student named John with class "CS101"
    Update student John class to "CS102"
@@ -175,6 +194,7 @@ DELETE WHERE {
    ```
 
 2. **Activity Tracking**
+
    ```
    Create a cardio activity called Morning Run with 250 calories burned
    Update Morning Run activity calories to 300
@@ -183,6 +203,7 @@ DELETE WHERE {
    ```
 
 3. **Meal Planning**
+
    ```
    Add a lunch meal with 800 calories
    Create a breakfast with eggs and toast
@@ -203,19 +224,22 @@ DELETE WHERE {
 ## 🚀 API Usage
 
 ### Endpoint
+
 ```
 POST http://127.0.0.1:8000/api/ai/query/
 ```
 
 ### Request Body
+
 ```json
 {
   "prompt": "Your natural language command",
-  "user_id": 1  // Optional
+  "user_id": 1 // Optional
 }
 ```
 
 ### Response for SELECT
+
 ```json
 {
   "success": true,
@@ -231,6 +255,7 @@ POST http://127.0.0.1:8000/api/ai/query/
 ```
 
 ### Response for INSERT/UPDATE/DELETE
+
 ```json
 {
   "success": true,
@@ -249,6 +274,7 @@ POST http://127.0.0.1:8000/api/ai/query/
 ## 🔐 Security Considerations
 
 ### Current Implementation
+
 - No authentication required (for testing)
 - All operations allowed
 - Direct database access
@@ -256,22 +282,26 @@ POST http://127.0.0.1:8000/api/ai/query/
 ### Production Recommendations
 
 1. **Add Authentication**
+
    ```python
    permission_classes = [IsAuthenticated]
    ```
 
 2. **Role-Based Access Control**
+
    - Query: All authenticated users
    - Insert: Users with "create" permission
    - Update: Users with "modify" permission
    - Delete: Admin users only
 
 3. **Input Validation**
+
    - Sanitize user inputs
    - Validate SPARQL queries
    - Prevent SPARQL injection
 
 4. **Audit Logging**
+
    - Log all modification operations
    - Track user actions
    - Maintain change history
@@ -288,6 +318,7 @@ POST http://127.0.0.1:8000/api/ai/query/
 ### Using cURL
 
 **Query Example:**
+
 ```bash
 curl -X POST http://127.0.0.1:8000/api/ai/query/ \
   -H "Content-Type: application/json" \
@@ -295,6 +326,7 @@ curl -X POST http://127.0.0.1:8000/api/ai/query/ \
 ```
 
 **Insert Example:**
+
 ```bash
 curl -X POST http://127.0.0.1:8000/api/ai/query/ \
   -H "Content-Type: application/json" \
@@ -302,6 +334,7 @@ curl -X POST http://127.0.0.1:8000/api/ai/query/ \
 ```
 
 **Update Example:**
+
 ```bash
 curl -X POST http://127.0.0.1:8000/api/ai/query/ \
   -H "Content-Type: application/json" \
@@ -309,6 +342,7 @@ curl -X POST http://127.0.0.1:8000/api/ai/query/ \
 ```
 
 **Delete Example:**
+
 ```bash
 curl -X POST http://127.0.0.1:8000/api/ai/query/ \
   -H "Content-Type: application/json" \
@@ -348,18 +382,22 @@ print(response.json())
 ## 💡 Best Practices
 
 1. **Be Specific**
+
    - ✅ "Add a new user named Alice with email alice@example.com"
    - ❌ "Add user"
 
 2. **Use Clear Actions**
+
    - Use action words: add, create, update, change, delete, remove
    - Be explicit about what you want to modify
 
 3. **Include Identifiers**
+
    - Reference entities by name or ID
    - Example: "Update user Alice" or "Delete activity with ID 5"
 
 4. **Check Results**
+
    - Always verify successful operations
    - Query data after modifications to confirm changes
 
@@ -372,25 +410,31 @@ print(response.json())
 ## 🐛 Troubleshooting
 
 ### AI Service Not Configured
+
 **Error:** "AI service not configured"
 
 **Solution:**
+
 1. Get API key from https://makersuite.google.com/app/apikey
 2. Add to `.env` file: `GEMINI_API_KEY=your_key_here`
 3. Restart Django server
 
 ### Invalid SPARQL Query
+
 **Error:** "Failed to execute modification query"
 
 **Solution:**
+
 - Check the generated SPARQL query
 - Verify entity exists before updating/deleting
 - Ensure proper syntax in natural language input
 
 ### No Results
+
 **Issue:** Query returns 0 results
 
 **Solution:**
+
 - Verify data exists in knowledge base
 - Check entity names and IDs
 - Try broader queries first
@@ -402,6 +446,7 @@ print(response.json())
 ### Track Operations
 
 Monitor AI operations in Django logs:
+
 ```python
 # In views.py
 import logging
@@ -413,6 +458,7 @@ logger.info(f"AI Operation: {intent} - User: {user_id} - Prompt: {prompt}")
 ### View SPARQL Queries
 
 All generated SPARQL queries are returned in the API response:
+
 ```json
 {
   "sparql_query": "PREFIX sh: <...> ..."
@@ -447,6 +493,7 @@ All generated SPARQL queries are returned in the API response:
 ## 📞 Support
 
 For issues or questions:
+
 1. Check API_DOCUMENTATION.md
 2. Review SPARQL query examples
 3. Test with simple examples first

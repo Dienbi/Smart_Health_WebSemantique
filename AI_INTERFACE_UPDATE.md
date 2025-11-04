@@ -7,34 +7,40 @@ The AI interface (`test_ai.html`) has been completely redesigned to match the Sm
 ## New Design Features
 
 ### Visual Design
+
 - **Color Scheme**: Matches the main template (Primary Blue #1e88e5, Secondary Blue #0d47a1)
 - **Typography**: Uses Poppins font family consistent with the rest of the site
 - **Layout**: Clean, professional healthcare aesthetic
 - **Responsive**: Mobile-friendly design
 
 ### Header Section
+
 - Beautiful gradient blue header with floating background circles
 - Large robot icon with "Smart Health AI Assistant" title
 - Descriptive subtitle explaining the functionality
 
 ### Info Banner
+
 - Eye-catching light blue banner with lightbulb icon
 - Clear explanation of how the AI assistant works
 - Professional border and padding
 
 ### Input Section
+
 - Large, comfortable textarea with proper padding
 - Clean label with icon
 - Smooth focus effects with blue border
 - Placeholder with example queries
 
 ### Button Design
+
 - Primary gradient button for "Send Query"
 - Secondary outlined button for "Clear"
 - Smooth hover animations with lift effect
 - Icon integration (send icon, clear icon)
 
 ### Example Buttons
+
 - 6 pre-defined example queries
 - Grid layout that adapts to screen size
 - Gradient backgrounds with icons
@@ -48,6 +54,7 @@ The AI interface (`test_ai.html`) has been completely redesigned to match the Sm
   - 🏆 Challenges (trophy icon)
 
 ### Loading State
+
 - Centered spinner with blue gradient
 - "Processing your query..." message
 - Smooth animation
@@ -56,6 +63,7 @@ The AI interface (`test_ai.html`) has been completely redesigned to match the Sm
 ### Results Display
 
 #### Success State
+
 - ✅ Green success alert with checkmark icon
 - **Meta Information Cards**:
   - Intent detected
@@ -63,8 +71,8 @@ The AI interface (`test_ai.html`) has been completely redesigned to match the Sm
   - User ID (if applicable)
   - AI Model used
   - All cards in responsive grid
-  
 - **SPARQL Query Section**:
+
   - Code icon in header
   - Dark code block with green text
   - Syntax highlighting style
@@ -77,6 +85,7 @@ The AI interface (`test_ai.html`) has been completely redesigned to match the Sm
   - Clean presentation
 
 #### Error State
+
 - ❌ Red error alert with warning icon
 - Clear error message
 - Error details section (if available)
@@ -84,6 +93,7 @@ The AI interface (`test_ai.html`) has been completely redesigned to match the Sm
 - Helpful hints for troubleshooting
 
 ### User Experience Features
+
 - **Auto-focus**: Cursor automatically in textarea
 - **Keyboard Shortcut**: Press Enter to submit (Shift+Enter for new line)
 - **Smooth Scrolling**: Auto-scroll to loading and results
@@ -93,12 +103,14 @@ The AI interface (`test_ai.html`) has been completely redesigned to match the Sm
 ## Technical Improvements
 
 ### Template Integration
+
 - Now extends `base.html` for consistent navigation and footer
 - Uses Django template blocks properly
 - Integrated with authentication system
 - Accessible from main navigation
 
 ### JavaScript Enhancements
+
 - Better error handling
 - Scroll to section functionality
 - HTML escaping for security
@@ -106,6 +118,7 @@ The AI interface (`test_ai.html`) has been completely redesigned to match the Sm
 - Cleaner code structure
 
 ### CSS Architecture
+
 - Uses CSS variables from base template
 - Consistent animations
 - Proper z-index management
@@ -146,6 +159,7 @@ Potential improvements for the AI interface:
 ## Screenshots Locations
 
 To capture screenshots:
+
 1. Visit: http://127.0.0.1:8000/api/ai/test/
 2. States to capture:
    - Initial empty state

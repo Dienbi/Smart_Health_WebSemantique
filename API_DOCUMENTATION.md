@@ -1,15 +1,19 @@
 # Smart Health Web - API Documentation
 
 ## Overview
+
 This document provides comprehensive documentation for all API endpoints in the Smart Health Web application. The API is built with Django REST Framework and follows RESTful principles.
 
 ## Base URL
+
 ```
 http://127.0.0.1:8000/api/
 ```
 
 ## Authentication
+
 Most endpoints require authentication. Include the authentication token in the Authorization header:
+
 ```
 Authorization: Token <your-token>
 ```
@@ -19,17 +23,20 @@ Authorization: Token <your-token>
 ### 1. Activities API (`/api/activities/`)
 
 #### Activity Endpoints
+
 - **List/Create Activities**: `GET/POST /api/activities/activities/`
 - **Retrieve/Update/Delete Activity**: `GET/PUT/PATCH/DELETE /api/activities/activities/{id}/`
 - **Get Activity Logs**: `GET /api/activities/activities/{id}/logs/`
 
 #### Activity Log Endpoints
+
 - **List/Create Activity Logs**: `GET/POST /api/activities/logs/`
 - **Retrieve/Update/Delete Log**: `GET/PUT/PATCH/DELETE /api/activities/logs/{id}/`
 - **My Logs**: `GET /api/activities/logs/my_logs/`
 - **Filter by Intensity**: `GET /api/activities/logs/by_intensity/?intensity=low|medium|high`
 
 **Example Activity Log Creation:**
+
 ```json
 POST /api/activities/logs/
 {
@@ -43,6 +50,7 @@ POST /api/activities/logs/
 ```
 
 #### Specific Activity Types
+
 - **Cardio**: `GET/POST /api/activities/cardio/`
 - **Musculation**: `GET/POST /api/activities/musculation/`
 - **Natation**: `GET/POST /api/activities/natation/`
@@ -52,6 +60,7 @@ POST /api/activities/logs/
 ### 2. Habits API (`/api/habits/`)
 
 #### Habit Endpoints
+
 - **List/Create Habits**: `GET/POST /api/habits/habits/`
 - **Retrieve/Update/Delete Habit**: `GET/PUT/PATCH/DELETE /api/habits/habits/{id}/`
 - **My Habits**: `GET /api/habits/habits/my_habits/`
@@ -59,6 +68,7 @@ POST /api/activities/logs/
 - **Get Habit Logs**: `GET /api/habits/habits/{id}/logs/`
 
 **Example Habit Creation:**
+
 ```json
 POST /api/habits/habits/
 {
@@ -69,11 +79,13 @@ POST /api/habits/habits/
 ```
 
 #### Habit Log Endpoints
+
 - **List/Create Habit Logs**: `GET/POST /api/habits/logs/`
 - **Retrieve/Update/Delete Log**: `GET/PUT/PATCH/DELETE /api/habits/logs/{id}/`
 - **My Logs**: `GET /api/habits/logs/my_logs/`
 
 #### Specific Habit Types
+
 - **Reading**: `GET/POST /api/habits/reading/`
 - **Cooking**: `GET/POST /api/habits/cooking/`
 - **Drawing**: `GET/POST /api/habits/drawing/`
@@ -84,6 +96,7 @@ POST /api/habits/habits/
 ### 3. Meals API (`/api/meals/`)
 
 #### Meal Endpoints
+
 - **List/Create Meals**: `GET/POST /api/meals/meals/`
 - **Retrieve/Update/Delete Meal**: `GET/PUT/PATCH/DELETE /api/meals/meals/{id}/`
 - **My Meals**: `GET /api/meals/meals/my_meals/`
@@ -92,6 +105,7 @@ POST /api/habits/habits/
 - **Get Food Items**: `GET /api/meals/meals/{id}/food_items/`
 
 **Example Meal Creation:**
+
 ```json
 POST /api/meals/meals/
 {
@@ -103,11 +117,13 @@ POST /api/meals/meals/
 ```
 
 #### Food Item Endpoints
+
 - **List/Create Food Items**: `GET/POST /api/meals/food-items/`
 - **Retrieve/Update/Delete Food Item**: `GET/PUT/PATCH/DELETE /api/meals/food-items/{id}/`
 - **Filter by Type**: `GET /api/meals/food-items/by_type/?type=protein|carbs|fats`
 
 **Example Food Item Creation:**
+
 ```json
 POST /api/meals/food-items/
 {
@@ -119,6 +135,7 @@ POST /api/meals/food-items/
 ```
 
 #### Meal Type Endpoints (Read-only)
+
 - **Breakfast**: `GET /api/meals/breakfast/`
 - **Lunch**: `GET /api/meals/lunch/`
 - **Dinner**: `GET /api/meals/dinner/`
@@ -129,6 +146,7 @@ POST /api/meals/food-items/
 ### 4. Health Records API (`/api/health-records/`)
 
 #### Health Record Endpoints
+
 - **List/Create Records**: `GET/POST /api/health-records/records/`
 - **Retrieve/Update/Delete Record**: `GET/PUT/PATCH/DELETE /api/health-records/records/{id}/`
 - **My Records**: `GET /api/health-records/records/my_records/`
@@ -136,6 +154,7 @@ POST /api/meals/food-items/
 - **Latest Record**: `GET /api/health-records/records/latest/`
 
 **Example Health Record Creation:**
+
 ```json
 POST /api/health-records/records/
 {
@@ -146,6 +165,7 @@ POST /api/health-records/records/
 ```
 
 #### Health Metric Endpoints
+
 - **List/Create Metrics**: `GET/POST /api/health-records/metrics/`
 - **Retrieve/Update/Delete Metric**: `GET/PUT/PATCH/DELETE /api/health-records/metrics/{id}/`
 - **My Metrics**: `GET /api/health-records/metrics/my_metrics/`
@@ -153,6 +173,7 @@ POST /api/health-records/records/
 - **Latest by Type**: `GET /api/health-records/metrics/latest_by_type/`
 
 **Example Health Metric Creation:**
+
 ```json
 POST /api/health-records/metrics/
 {
@@ -166,6 +187,7 @@ POST /api/health-records/metrics/
 ```
 
 #### User-Specific Records
+
 - **Student Health Records**: `GET/POST /api/health-records/student-records/`
 - **Teacher Health Records**: `GET/POST /api/health-records/teacher-records/`
 
@@ -174,6 +196,7 @@ POST /api/health-records/metrics/
 ### 5. Défis (Challenges) API (`/api/defis/`)
 
 #### Défi Endpoints
+
 - **List/Create Challenges**: `GET/POST /api/defis/defis/`
 - **Retrieve/Update/Delete Challenge**: `GET/PUT/PATCH/DELETE /api/defis/defis/{id}/`
 - **Active Challenges**: `GET /api/defis/defis/active/`
@@ -182,6 +205,7 @@ POST /api/health-records/metrics/
 - **Leaderboard**: `GET /api/defis/defis/{id}/leaderboard/`
 
 **Example Défi Creation:**
+
 ```json
 POST /api/defis/defis/
 {
@@ -191,6 +215,7 @@ POST /api/defis/defis/
 ```
 
 #### Participation Endpoints
+
 - **List/Create Participations**: `GET/POST /api/defis/participations/`
 - **Retrieve/Update/Delete Participation**: `GET/PUT/PATCH/DELETE /api/defis/participations/{id}/`
 - **My Participations**: `GET /api/defis/participations/my_participations/`
@@ -199,6 +224,7 @@ POST /api/defis/defis/
 - **Leave Challenge**: `POST /api/defis/participations/{id}/leave/`
 
 **Example Progress Update:**
+
 ```json
 POST /api/defis/participations/{id}/update_progress/
 {
@@ -211,9 +237,11 @@ POST /api/defis/participations/{id}/update_progress/
 ### 6. AI Service API (`/api/ai/`)
 
 #### AI Query Endpoint
+
 - **Natural Language Query**: `POST /api/ai/query/`
 
 **Example AI Query:**
+
 ```json
 POST /api/ai/query/
 {
@@ -222,6 +250,7 @@ POST /api/ai/query/
 ```
 
 **Response:**
+
 ```json
 {
   "sparql_query": "SELECT ?user ...",
@@ -235,6 +264,7 @@ POST /api/ai/query/
 ## Response Formats
 
 ### Success Response
+
 ```json
 {
   "id": 1,
@@ -245,6 +275,7 @@ POST /api/ai/query/
 ```
 
 ### Error Response
+
 ```json
 {
   "error": "Error message",
@@ -253,6 +284,7 @@ POST /api/ai/query/
 ```
 
 ### List Response
+
 ```json
 {
   "count": 10,
@@ -267,19 +299,23 @@ POST /api/ai/query/
 ## Common Query Parameters
 
 ### Pagination
+
 - `?page=2` - Get specific page
 - `?page_size=50` - Set items per page
 
 ### Filtering
+
 - `?type=breakfast` - Filter by type
 - `?intensity=high` - Filter by intensity
 - `?date=2025-11-04` - Filter by date
 
 ### Ordering
+
 - `?ordering=created_at` - Order ascending
 - `?ordering=-created_at` - Order descending
 
 ### Search
+
 - `?search=keyword` - Search across fields
 
 ---
@@ -311,6 +347,7 @@ POST /api/ai/query/
 ## Testing with cURL
 
 ### Example: Create an Activity Log
+
 ```bash
 curl -X POST http://127.0.0.1:8000/api/activities/logs/ \
   -H "Content-Type: application/json" \
@@ -324,6 +361,7 @@ curl -X POST http://127.0.0.1:8000/api/activities/logs/ \
 ```
 
 ### Example: Get My Meals
+
 ```bash
 curl -X GET http://127.0.0.1:8000/api/meals/meals/my_meals/ \
   -H "Authorization: Token YOUR_TOKEN"

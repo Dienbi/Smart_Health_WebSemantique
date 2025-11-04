@@ -11,7 +11,7 @@ class HabitSerializer(serializers.ModelSerializer):
     class Meta:
         model = Habit
         fields = '__all__'
-        read_only_fields = ('habit_id',)
+        read_only_fields = ('habit_id', 'user', 'created_at')
 
 
 class HabitLogFrequencySerializer(serializers.ModelSerializer):

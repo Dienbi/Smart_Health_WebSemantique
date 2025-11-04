@@ -1,3 +1,5 @@
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -133,3 +135,13 @@ class ParticipationViewSet(viewsets.ModelViewSet):
         participation.save()
         
         return Response({'message': 'Successfully left the challenge'})
+
+
+# Web Interface Views
+@login_required
+def challenge_list_view(request):
+    """Display list of challenges"""
+    challenges = Defi.objects.all().order_by('-created_at')
+    return render(request, 'defis/challenge_list.html', {
+        'challenges': challenges
+    })

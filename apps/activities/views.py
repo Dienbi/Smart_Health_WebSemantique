@@ -1,3 +1,5 @@
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -89,3 +91,22 @@ class NatationViewSet(viewsets.ModelViewSet):
     queryset = Natation.objects.all()
     serializer_class = NatationSerializer
     permission_classes = [IsAuthenticated]
+
+
+# Web Interface Views
+@login_required
+def activity_list_view(request):
+    """Display list of user's activities"""
+    activities = ActivityLog.objects.filter(user=request.user).order_by('-date')
+    return render(request, 'activities/activity_list.html', {
+        'activities': activities
+    })
+
+
+@login_required
+def activity_detail_view(request, activity_id):
+    """Display details for a specific activity"""
+    activity = get_object_or_404(ActivityLog, activity_log_id=activity_id, user=request.user)
+    return render(request, 'activities/activity_detail.html', {
+        'activity': activity
+    })

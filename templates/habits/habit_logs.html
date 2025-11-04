@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}Habit Logs - {{ habit.habit_name }} - Smart Health{% endblock %}
+
+{% block extra_css %}
+<style>
+    .logs-page {
+        background: var(--light-gray);
+        min-height: calc(100vh - 80px);
+        padding: 2rem 0;
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+        color: var(--white);
+        padding: 2rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(30, 136, 229, 0.3);
+    }
+    
+    .log-card {
+        background: var(--white);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+    }
+    
+    .log-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .timeline {
+        position: relative;
+        padding-left: 3rem;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 1rem;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: var(--primary-blue);
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 2rem;
+    }
+    
+    .timeline-dot {
+        position: absolute;
+        left: -2.5rem;
+        top: 0.5rem;
+        width: 1rem;
+        height: 1rem;
+        border-radius: 50%;
+        background: var(--primary-blue);
+        border: 3px solid var(--white);
+        box-shadow: 0 0 0 3px var(--primary-blue);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="logs-page">
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1><i class="bi bi-clock-history"></i> Habit Logs</h1>
+                    <p>{{ habit.habit_name }} - {{ habit.get_habit_type_display }}</p>
+                </div>
+                <a href="{% url 'habits:habit-list' %}" class="btn btn-light">
+                    <i class="bi bi-arrow-left"></i> Back to Habits
+                </a>
+            </div>
+        </div>
+        
+        <!-- Logs Timeline -->
+        <div class="timeline">
+            {% if logs %}
+                {% for log in logs %}
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="log-card">
+                        <h5><i class="bi bi-calendar-event"></i> {{ log.start_date|date:"F d, Y" }}</h5>
+                        <p class="text-muted">
+                            <i class="bi bi-clock"></i> 
+                            {{ log.start_date|date:"h:i A" }}
+                            {% if log.end_date %}
+                            - {{ log.end_date|date:"h:i A" }}
+                            {% endif %}
+                        </p>
+                        {% if log.notes %}
+                        <p><strong>Notes:</strong> {{ log.notes.description }}</p>
+                        {% endif %}
+                        {% if log.frequency %}
+                        <div class="mt-2">
+                            {% if log.frequency.daily %}
+                            <span class="badge bg-primary">Daily</span>
+                            {% endif %}
+                            {% if log.frequency.weekly %}
+                            <span class="badge bg-success">Weekly</span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state text-center">
+                    <i class="bi bi-calendar-x" style="font-size: 4rem; color: var(--text-light);"></i>
+                    <h3 class="mt-3">No logs yet</h3>
+                    <p class="text-muted">Start tracking this habit to see your progress here</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
