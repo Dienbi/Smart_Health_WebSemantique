@@ -1,0 +1,22 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Confirmer suppression - Admin{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Confirmer la suppression</h4>
+                    <p>Voulez-vous vraiment supprimer "{{ object }}" ?</p>
+                    <form method="post">{% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Supprimer</button>
+                        <a href="{{ request.path|slice:':-1'|add:'/'|cut:'' }}" class="btn btn-secondary ms-2">Annuler</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

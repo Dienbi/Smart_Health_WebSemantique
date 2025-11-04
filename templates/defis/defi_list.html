@@ -2,25 +2,288 @@
 
 {% block title %}Défis - Smart Health{% endblock %}
 
+{% block extra_css %}
+<style>
+    .defis-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .defis-header .section-title {
+        display: inline-block;
+        margin-bottom: 0.5rem;
+    }
+
+    .defis-header p {
+        font-size: 1.1rem;
+        color: var(--text-light);
+    }
+
+    .defi-card-wrapper {
+        perspective: 1000px;
+    }
+
+    .defi-card {
+        background: linear-gradient(135deg, #fff 0%, #fafbfc 100%);
+        border: 1px solid #e9ecef;
+        border-radius: 16px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 8px 24px rgba(44, 62, 80, 0.04);
+        overflow: hidden;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .defi-card:hover {
+        transform: translateY(-12px);
+        box-shadow: 0 20px 48px rgba(30, 136, 229, 0.15);
+        border-color: rgba(30, 136, 229, 0.2);
+    }
+
+    .defi-card-header {
+        padding: 1.5rem 1.5rem 0.75rem;
+        border-bottom: 1px solid #f1f3f5;
+    }
+
+    .defi-card-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
+        line-height: 1.3;
+    }
+
+    .defi-card-badges {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-top: 0.75rem;
+    }
+
+    .defi-card-badge {
+        padding: 0.35rem 0.8rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        border-radius: 999px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    }
+
+    .defi-card-body {
+        padding: 1.25rem 1.5rem;
+        flex-grow: 1;
+    }
+
+    .defi-card-description {
+        font-size: 0.95rem;
+        color: var(--text-light);
+        line-height: 1.5;
+        margin-bottom: 1rem;
+    }
+
+    .defi-objectives-preview {
+        background: #f9fafb;
+        border-left: 3px solid var(--primary-blue);
+        padding: 0.75rem;
+        border-radius: 6px;
+        margin-bottom: 1rem;
+        font-size: 0.85rem;
+    }
+
+    .defi-objectives-preview ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .defi-objectives-preview li {
+        padding: 0.25rem 0;
+        color: var(--text-dark);
+    }
+
+    .defi-objectives-preview li small {
+        display: block;
+        color: var(--text-light);
+        font-size: 0.75rem;
+        margin-top: 0.25rem;
+    }
+
+    .defi-card-meta {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        padding: 0.75rem;
+        background: #f9fafb;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        margin-bottom: 1rem;
+    }
+
+    .defi-card-meta-item {
+        text-align: center;
+    }
+
+    .defi-card-meta-label {
+        display: block;
+        color: var(--text-light);
+        margin-bottom: 0.25rem;
+    }
+
+    .defi-card-meta-value {
+        display: block;
+        font-weight: 700;
+        color: var(--primary-blue);
+        font-size: 1.1rem;
+    }
+
+    .defi-card-footer {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #f1f3f5;
+        background: #fafbfc;
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .defi-card-footer .btn {
+        flex: 1;
+        min-width: 100px;
+        border-radius: 8px;
+        font-weight: 600;
+        padding: 0.6rem 0.9rem;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+    .defi-card-footer .btn:hover {
+        transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+        .defi-card {
+            border-radius: 12px;
+        }
+
+        .defi-card-footer {
+            flex-direction: column;
+        }
+
+        .defi-card-footer .btn {
+            width: 100%;
+        }
+    }
+
+    .no-defis-message {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: var(--text-light);
+    }
+
+    .no-defis-message i {
+        font-size: 3rem;
+        display: block;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container section-padding">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="defis-header">
         <h2 class="section-title">Défis</h2>
+        <p>Relevez des défis pour améliorer votre santé</p>
     </div>
-    <div class="row">
+
+    <div class="row g-4">
         {% for defi in defis %}
-            <div class="col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ defi.defi_name }}</h5>
-                        <p class="card-text">{{ defi.defi_description|truncatechars:150 }}</p>
-                        <a href="{% url 'defis:detail' defi.pk %}" class="btn btn-outline-primary">Voir</a>
+            <div class="col-lg-6">
+                <div class="defi-card-wrapper">
+                    <div class="defi-card">
+                        {# Card Header #}
+                        <div class="defi-card-header">
+                            <h5 class="defi-card-title">{{ defi.defi_name }}</h5>
+                            <div class="defi-card-badges">
+                                {% if defi.status %}
+                                    {% if defi.status.completed %}
+                                        <span class="defi-card-badge bg-success"><i class="bi bi-check-circle me-1"></i>Terminé</span>
+                                    {% elif defi.status.in_progress %}
+                                        <span class="defi-card-badge bg-warning text-dark"><i class="bi bi-hourglass-split me-1"></i>En cours</span>
+                                    {% else %}
+                                        <span class="defi-card-badge bg-secondary"><i class="bi bi-clock me-1"></i>Non démarré</span>
+                                    {% endif %}
+                                {% endif %}
+                                {% if defi.badge %}
+                                    {% if defi.badge.gold %}<span class="defi-card-badge bg-primary"><i class="bi bi-star-fill me-1"></i>Or</span>{% endif %}
+                                    {% if defi.badge.silver %}<span class="defi-card-badge bg-secondary"><i class="bi bi-star me-1"></i>Argent</span>{% endif %}
+                                    {% if defi.badge.bronze %}<span class="defi-card-badge" style="background: #cd7f32; color: white;"><i class="bi bi-star me-1"></i>Bronze</span>{% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {# Card Body #}
+                        <div class="defi-card-body">
+                            <p class="defi-card-description">{{ defi.defi_description|truncatechars:150 }}</p>
+
+                            {# Objectives Preview #}
+                            {% if defi.objectives.all %}
+                                <div class="defi-objectives-preview">
+                                    <strong style="font-size: 0.8rem; color: var(--text-dark);"><i class="bi bi-target me-1"></i>Objectifs</strong>
+                                    <ul>
+                                        {% for obj in defi.objectives.all|slice:":2" %}
+                                            <li>{{ obj.description|truncatechars:80 }} <small>({{ obj.start_date|date:'SHORT_DATE_FORMAT' }})</small></li>
+                                        {% endfor %}
+                                        {% if defi.objectives.all|length > 2 %}
+                                            <li style="color: var(--primary-blue); font-weight: 600;">+{{ defi.objectives.all|length|add:"-2" }} plus...</li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+
+                            {# Meta Info Grid #}
+                            <div class="defi-card-meta">
+                                <div class="defi-card-meta-item">
+                                    <span class="defi-card-meta-label"><i class="bi bi-list-check me-1"></i>Objectifs</span>
+                                    <span class="defi-card-meta-value">{{ defi.objectives.all|length }}</span>
+                                </div>
+                                <div class="defi-card-meta-item">
+                                    <span class="defi-card-meta-label"><i class="bi bi-people me-1"></i>Participants</span>
+                                    <span class="defi-card-meta-value">{{ defi.participations.all|length }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {# Card Footer - Actions #}
+                        <div class="defi-card-footer">
+                            {% if user.is_authenticated %}
+                                {% if defi.user_participation %}
+                                    <form method="post" action="{% url 'defis:leave' defi.pk %}" style="flex: 1;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-outline-danger w-100"><i class="bi bi-box-arrow-right me-1"></i>Quitter</button>
+                                    </form>
+                                    <a href="{% url 'defis:detail' defi.pk %}" class="btn btn-primary" style="flex: 1;"><i class="bi bi-graph-up me-1"></i>Progression</a>
+                                {% else %}
+                                    <form method="post" action="{% url 'defis:join' defi.pk %}" style="flex: 1;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-success w-100"><i class="bi bi-person-plus me-1"></i>Participer</button>
+                                    </form>
+                                    <a href="{% url 'defis:detail' defi.pk %}" class="btn btn-outline-primary" style="flex: 1;"><i class="bi bi-eye me-1"></i>Détails</a>
+                                {% endif %}
+                            {% else %}
+                                <a href="{% url 'login' %}?next={% url 'defis:list' %}" class="btn btn-primary w-100"><i class="bi bi-box-arrow-in-right me-1"></i>Se connecter</a>
+                                <a href="{% url 'defis:detail' defi.pk %}" class="btn btn-outline-secondary w-100"><i class="bi bi-eye me-1"></i>Détails</a>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
         {% empty %}
             <div class="col-12">
-                <p>Aucun défi trouvé.</p>
+                <div class="no-defis-message">
+                    <i class="bi bi-inbox"></i>
+                    <h5>Aucun défi trouvé</h5>
+                    <p>Revenez bientôt pour découvrir de nouveaux défis !</p>
+                </div>
             </div>
         {% endfor %}
     </div>

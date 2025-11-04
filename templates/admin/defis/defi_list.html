@@ -2,38 +2,202 @@
 
 {% block title %}Gestion des Défis - Admin{% endblock %}
 
-{% block content %}
-<div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3>Défis</h3>
-        <a href="{% url 'defis_admin:create' %}" class="btn btn-primary">Créer un défi</a>
-    </div>
+{% block extra_css %}
+<style>
+    .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid #e9ecef;
+    }
 
+    .admin-header h3 {
+        margin: 0;
+        font-weight: 700;
+        font-size: 1.8rem;
+        color: var(--text-dark);
+    }
+
+    .btn-create-defi {
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(30, 136, 229, 0.2);
+        transition: all 0.2s ease;
+    }
+
+    .btn-create-defi:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(30, 136, 229, 0.3);
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 16px rgba(44, 62, 80, 0.06);
+    }
+
+    .data-table thead {
+        background: linear-gradient(90deg, rgba(30, 136, 229, 0.08), rgba(13, 71, 161, 0.04));
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .data-table th {
+        padding: 1rem;
+        text-align: left;
+        font-weight: 700;
+        color: var(--text-dark);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .data-table tbody tr {
+        border-bottom: 1px solid #f1f3f5;
+        transition: background-color 0.15s ease;
+    }
+
+    .data-table tbody tr:hover {
+        background-color: #fafbfc;
+    }
+
+    .data-table td {
+        padding: 1rem;
+        vertical-align: middle;
+        font-size: 0.95rem;
+    }
+
+    .defi-name-cell {
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    .defi-desc-cell {
+        color: var(--text-light);
+        font-size: 0.85rem;
+        max-width: 200px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.4rem;
+    }
+
+    .action-buttons .btn {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+        border-radius: 6px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    .action-buttons .btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: var(--text-light);
+    }
+
+    .empty-state i {
+        font-size: 2.5rem;
+        display: block;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    .badge-count {
+        display: inline-block;
+        background: rgba(30, 136, 229, 0.1);
+        color: var(--primary-blue);
+        padding: 0.25rem 0.6rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <h3><i class="bi bi-flag-fill me-2"></i>Gestion des Défis</h3>
+    <a href="{% url 'defis_admin:create' %}" class="btn btn-primary btn-create-defi">
+        <i class="bi bi-plus-circle me-1"></i>Créer un Défi
+    </a>
+</div>
+
+{% if defis %}
     <table class="data-table">
         <thead>
             <tr>
                 <th>Nom</th>
                 <th>Description</th>
-                <th>Actions</th>
+                <th>Statut</th>
+                <th>Badges</th>
+                <th style="text-align: center;">Obj.</th>
+                <th style="text-align: center;">Part.</th>
+                <th style="text-align: right;">Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for defi in defis %}
             <tr>
-                <td>{{ defi.defi_name }}</td>
-                <td>{{ defi.defi_description|truncatechars:120 }}</td>
+                <td class="defi-name-cell">{{ defi.defi_name }}</td>
+                <td class="defi-desc-cell" title="{{ defi.defi_description }}">{{ defi.defi_description }}</td>
                 <td>
-                    <a href="{% url 'defis_admin:detail' defi.pk %}" class="btn btn-sm btn-outline-primary">Voir</a>
-                    <a href="{% url 'defis_admin:edit' defi.pk %}" class="btn btn-sm btn-secondary">Modifier</a>
-                    <a href="{% url 'defis_admin:delete' defi.pk %}" class="btn btn-sm btn-danger">Supprimer</a>
+                    {% if defi.status %}
+                        {% if defi.status.completed %}
+                            <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Terminé</span>
+                        {% elif defi.status.in_progress %}
+                            <span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split me-1"></i>En cours</span>
+                        {% else %}
+                            <span class="badge bg-secondary"><i class="bi bi-clock me-1"></i>Non démarré</span>
+                        {% endif %}
+                    {% else %}
+                        <span class="text-muted small">—</span>
+                    {% endif %}
                 </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="3">Aucun défi trouvé.</td>
+                <td>
+                    {% if defi.badge %}
+                        {% if defi.badge.gold %}<span class="badge bg-primary" title="Gold"><i class="bi bi-star-fill"></i></span>{% endif %}
+                        {% if defi.badge.silver %}<span class="badge bg-secondary" title="Silver"><i class="bi bi-star"></i></span>{% endif %}
+                        {% if defi.badge.bronze %}<span class="badge" style="background: #cd7f32; color: white;" title="Bronze"><i class="bi bi-star"></i></span>{% endif %}
+                        {% if not defi.badge.gold and not defi.badge.silver and not defi.badge.bronze %}<span class="text-muted small">Aucun</span>{% endif %}
+                    {% else %}
+                        <span class="text-muted small">—</span>
+                    {% endif %}
+                </td>
+                <td style="text-align: center;"><span class="badge-count">{{ defi.objectives.all|length }}</span></td>
+                <td style="text-align: center;"><span class="badge-count">{{ defi.participations.all|length }}</span></td>
+                <td style="text-align: right;">
+                    <div class="action-buttons">
+                        <a href="{% url 'defis_admin:detail' defi.pk %}" class="btn btn-sm btn-outline-info" title="Voir"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'defis_admin:edit' defi.pk %}" class="btn btn-sm btn-outline-secondary" title="Modifier"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'defis_admin:delete' defi.pk %}" class="btn btn-sm btn-outline-danger" title="Supprimer"><i class="bi bi-trash"></i></a>
+                    </div>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-</div>
+{% else %}
+    <div class="empty-state">
+        <i class="bi bi-inbox"></i>
+        <h5>Aucun défi trouvé</h5>
+        <p>Créez votre premier défi pour commencer.</p>
+        <a href="{% url 'defis_admin:create' %}" class="btn btn-primary mt-2">
+            <i class="bi bi-plus-circle me-1"></i>Créer un Défi
+        </a>
+    </div>
+{% endif %}
 {% endblock %}

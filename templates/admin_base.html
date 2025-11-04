@@ -36,6 +36,9 @@
                     <div class="collapse mt-2" id="sidebar-defis-menu">
                         <a href="{% url 'defis_admin:list' %}" class="ps-3 d-block text-white">Gérer Défis</a>
                         <a href="{% url 'defis_admin:create' %}" class="ps-3 d-block text-white">Créer Défi</a>
+                        <hr style="border-color: rgba(255,255,255,0.06);">
+                        {# Objectifs/Badges/Statuts visibles via l'édition/affichage du Défi — cachés du menu pour simplifier l'UI #}
+                            {# Compteurs et Plages gérés via les modèles liés; cachés du menu backoffice pour éviter la confusion #}
                     </div>
                 </div>
             {% endif %}

@@ -1,0 +1,37 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Liste - Admin{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3>{{ view.model._meta.verbose_name_plural|capfirst }}</h3>
+        <a href="{{ request.path }}create/" class="btn btn-primary">Créer</a>
+    </div>
+
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for obj in objects %}
+            <tr>
+                <td>{{ obj }}</td>
+                <td>
+                    <a href="{{ request.path }}{{ obj.pk }}/" class="btn btn-sm btn-outline-primary">Voir</a>
+                    <a href="{{ request.path }}{{ obj.pk }}/edit/" class="btn btn-sm btn-secondary">Modifier</a>
+                    <a href="{{ request.path }}{{ obj.pk }}/delete/" class="btn btn-sm btn-danger">Supprimer</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="2">Aucun élément trouvé.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
