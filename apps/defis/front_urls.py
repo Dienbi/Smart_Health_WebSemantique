@@ -3,8 +3,6 @@ from .views import (
     DefiListView, DefiDetailView, JoinDefiView, LeaveDefiView, UpdateProgressView,
 )
 
-app_name = 'defis'
-
 urlpatterns = [
     # Front office: read-only views
     path('', DefiListView.as_view(), name='list'),

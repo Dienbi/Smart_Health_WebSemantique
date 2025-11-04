@@ -27,6 +27,9 @@ urlpatterns = [
     path('health/', include('apps.health_records.urls', namespace='health_records')),
     path('challenges/', include('apps.defis.urls', namespace='defis')),
     
+    # Backoffice URLs
+    path('backoffice/defis/', include(('apps.defis.back_urls', 'defis_admin'), namespace='defis_admin')),
+    
     # API endpoints
     path('api/ai/', include(('apps.ai_service.urls', 'api_ai'), namespace='api_ai')),
     path('api/users/', include('apps.users.urls')),
