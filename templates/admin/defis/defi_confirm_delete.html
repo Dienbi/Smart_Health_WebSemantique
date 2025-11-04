@@ -1,0 +1,23 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Supprimer Défi{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Confirmer la suppression</h4>
+                    <p>Voulez-vous vraiment supprimer le défi "{{ object.defi_name }}" ? Cette action est irréversible.</p>
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Supprimer</button>
+                        <a href="{% url 'defis_admin:detail' object.pk %}" class="btn btn-secondary ms-2">Annuler</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

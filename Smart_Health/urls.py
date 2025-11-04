@@ -30,6 +30,8 @@ urlpatterns = [
     path('api/defis/', include('apps.defis.urls')),
     # Frontend pages for défis (CRUD)
     path('defis/', include(('apps.defis.front_urls', 'defis'), namespace='defis')),
+    # Backoffice/admin CRUD for défis (staff only)
+    path('backoffice/defis/', include(('apps.defis.back_urls', 'defis_admin'), namespace='defis_admin')),
 ]
 
 # Serve media files in development
