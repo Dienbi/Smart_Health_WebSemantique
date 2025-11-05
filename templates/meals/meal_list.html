@@ -1,17 +1,374 @@
 {% extends 'base.html' %}
 
-{% block title %}My Meals - Smart Health{% endblock %}
+{% block title %}Mes Repas - Smart Health{% endblock %}
+
+{% block extra_css %}
+<style>
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .meals-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        padding: 2.5rem;
+        color: white;
+        margin-bottom: 2.5rem;
+        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .page-header h1 {
+        font-size: 2.5rem;
+        font-weight: 900;
+        margin: 0 0 0.5rem 0;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .page-header p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 1.1rem;
+    }
+
+    .header-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .btn-add-meal {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+        border-radius: 15px;
+        padding: 1rem 2.5rem;
+        color: white;
+        font-weight: 800;
+        font-size: 1.1rem;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .btn-add-meal:hover {
+        transform: translateY(-4px) scale(1.05);
+        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        color: white;
+    }
+
+    .meals-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .meal-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 10px 40px rgba(44, 62, 80, 0.1);
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.6s ease-out;
+        border: 2px solid transparent;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .meal-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+
+    .meal-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 50px rgba(102, 126, 234, 0.25);
+        border-color: rgba(102, 126, 234, 0.3);
+    }
+
+    .meal-type-badge {
+        display: inline-block;
+        padding: 0.5rem 1.2rem;
+        border-radius: 25px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 1rem;
+    }
+
+    .badge-breakfast { background: linear-gradient(135deg, #f093fb, #f5576c); color: white; }
+    .badge-lunch { background: linear-gradient(135deg, #fa709a, #fee140); color: white; }
+    .badge-dinner { background: linear-gradient(135deg, #30cfd0, #330867); color: white; }
+    .badge-snack { background: linear-gradient(135deg, #a8edea, #fed6e3); color: #764ba2; }
+
+    .meal-card h3 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin: 0 0 1rem 0;
+        color: #2c3e50;
+    }
+
+    .meal-info {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin: 1.5rem 0;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+
+    .info-item i {
+        font-size: 1.2rem;
+        color: #667eea;
+    }
+
+    .info-item strong {
+        color: #2c3e50;
+        font-weight: 700;
+    }
+
+    .food-items-summary {
+        background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+        border-radius: 12px;
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+
+    .food-items-summary h4 {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #667eea;
+        margin: 0 0 0.5rem 0;
+        text-transform: uppercase;
+    }
+
+    .food-items-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .food-item-pill {
+        background: white;
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        border: 1px solid #e9ecef;
+        color: #2c3e50;
+    }
+
+    .meal-actions {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 2px solid #f1f3f5;
+    }
+
+    .btn-meal-action {
+        flex: 1;
+        padding: 0.75rem 1rem;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-view {
+        background: linear-gradient(135deg, #17a2b8, #138496);
+        color: white;
+    }
+
+    .btn-view:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(23, 162, 184, 0.4);
+        color: white;
+    }
+
+    .btn-edit {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+    }
+
+    .btn-edit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+
+    .btn-delete {
+        background: linear-gradient(135deg, #f5576c, #f093fb);
+        color: white;
+    }
+
+    .btn-delete:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(245, 87, 108, 0.4);
+        color: white;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 5rem 2rem;
+        background: linear-gradient(145deg, #f8f9fa, white);
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(44, 62, 80, 0.08);
+    }
+
+    .empty-state i {
+        font-size: 5rem;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1.5rem;
+        display: block;
+    }
+
+    .empty-state h3 {
+        font-weight: 800;
+        font-size: 1.8rem;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state p {
+        color: #6c757d;
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-12">
-            <div class="alert alert-info">
-                <h4><i class="bi bi-egg-fried"></i> Meals Module</h4>
-                <p>Full meal management interface coming soon! For now, use the <a href="{% url 'api_ai:ai-test' %}">AI Assistant</a> or <a href="{% url 'admin:index' %}">Django Admin</a>.</p>
-                <a href="{% url 'home' %}" class="btn btn-primary">Back to Home</a>
-            </div>
-        </div>
+<div class="meals-container">
+    <div class="page-header">
+        <h1><i class="bi bi-egg-fried"></i> Mes Repas</h1>
+        <p>Gérez vos repas quotidiens et suivez vos apports nutritionnels</p>
     </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="header-actions">
+        <h2 style="margin: 0; color: #2c3e50; font-weight: 800;">
+            <i class="bi bi-list-ul"></i> Tous mes repas
+        </h2>
+        <a href="{% url 'meals:meal-create' %}" class="btn-add-meal">
+            <i class="bi bi-plus-circle-fill"></i>
+            Créer un repas
+        </a>
+    </div>
+
+    {% if meals %}
+        <div class="meals-grid">
+            {% for meal in meals %}
+            <div class="meal-card">
+                <span class="meal-type-badge badge-{{ meal.meal_type|lower }}">
+                    {% if meal.meal_type == 'BREAKFAST' %}
+                        <i class="bi bi-sunrise"></i> Petit-déjeuner
+                    {% elif meal.meal_type == 'LUNCH' %}
+                        <i class="bi bi-sun"></i> Déjeuner
+                    {% elif meal.meal_type == 'DINNER' %}
+                        <i class="bi bi-moon-stars"></i> Dîner
+                    {% else %}
+                        <i class="bi bi-cup-hot"></i> Snack
+                    {% endif %}
+                </span>
+                
+                <h3>{{ meal.meal_name }}</h3>
+                
+                <div class="meal-info">
+                    <div class="info-item">
+                        <i class="bi bi-calendar3"></i>
+                        <span>{{ meal.meal_date|date:"d/m/Y H:i" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="bi bi-fire"></i>
+                        <strong>{{ meal.total_calories }}</strong> cal
+                    </div>
+                </div>
+
+                {% if meal.food_items.all %}
+                <div class="food-items-summary">
+                    <h4><i class="bi bi-egg"></i> Aliments ({{ meal.food_items.count }})</h4>
+                    <div class="food-items-list">
+                        {% for item in meal.food_items.all|slice:":5" %}
+                            <span class="food-item-pill">{{ item.food_item_name }}</span>
+                        {% endfor %}
+                        {% if meal.food_items.count > 5 %}
+                            <span class="food-item-pill">+{{ meal.food_items.count|add:"-5" }} autres</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% else %}
+                <div class="food-items-summary">
+                    <p style="margin: 0; color: #6c757d; font-size: 0.9rem;">
+                        <i class="bi bi-info-circle"></i> Aucun aliment ajouté
+                    </p>
+                </div>
+                {% endif %}
+
+                <div class="meal-actions">
+                    <a href="{% url 'meals:meal-detail' meal.meal_id %}" class="btn-meal-action btn-view">
+                        <i class="bi bi-eye-fill"></i> Voir
+                    </a>
+                    <a href="{% url 'meals:meal-edit' meal.meal_id %}" class="btn-meal-action btn-edit">
+                        <i class="bi bi-pencil-fill"></i> Modifier
+                    </a>
+                    <a href="{% url 'meals:meal-delete' meal.meal_id %}" class="btn-meal-action btn-delete">
+                        <i class="bi bi-trash-fill"></i> Supprimer
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="bi bi-inbox"></i>
+            <h3>Aucun repas enregistré</h3>
+            <p>Commencez à suivre vos repas en créant votre premier repas !</p>
+            <a href="{% url 'meals:meal-create' %}" class="btn-add-meal">
+                <i class="bi bi-plus-circle-fill"></i>
+                Créer mon premier repas
+            </a>
+        </div>
+    {% endif %}
 </div>
 {% endblock %}

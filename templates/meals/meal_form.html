@@ -1,0 +1,834 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if is_create %}Créer un repas{% else %}Modifier un repas{% endif %} - Smart Health{% endblock %}
+
+{% block extra_css %}
+<style>
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .form-header {
+        margin-bottom: 3rem;
+        padding: 2.5rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .form-header h1 {
+        font-size: 2.2rem;
+        font-weight: 900;
+        color: white;
+        margin: 0;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .form-section {
+        background: linear-gradient(145deg, #ffffff, #f8f9fa);
+        border: 2px solid transparent;
+        border-radius: 20px;
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.15);
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .form-section-title {
+        font-size: 1.3rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 3px solid;
+        border-image: linear-gradient(90deg, #667eea, #764ba2, transparent) 1;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1rem;
+    }
+
+    .form-control, .form-select {
+        border-radius: 12px;
+        border: 2px solid #e9ecef;
+        padding: 1rem 3.5rem 1rem 1.25rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+        width: 100%;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 5px rgba(102, 126, 234, 0.15);
+        transform: translateY(-2px);
+        outline: none;
+    }
+
+    /* Validation Styles */
+    .field-wrapper {
+        position: relative;
+    }
+
+    .field-wrapper .success-icon,
+    .field-wrapper .error-icon {
+        position: absolute;
+        right: 1.25rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.3rem;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .field-wrapper .success-icon {
+        color: #28a745;
+    }
+
+    .field-wrapper .error-icon {
+        color: #f5576c;
+    }
+
+    .form-control.is-valid,
+    .form-select.is-valid {
+        border-color: #28a745;
+        background-image: none;
+    }
+
+    .form-control.is-valid ~ .success-icon {
+        opacity: 1;
+    }
+
+    .form-control.is-invalid,
+    .form-select.is-invalid {
+        border-color: #f5576c;
+        background-image: none;
+        animation: shake 0.3s ease;
+    }
+
+    .form-control.is-invalid ~ .error-icon {
+        opacity: 1;
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
+    }
+
+    .error-message {
+        display: none;
+        color: #f5576c;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-top: 0.5rem;
+        padding: 0.75rem 1rem;
+        background: linear-gradient(145deg, #fff5f5, #ffe5e5);
+        border-left: 4px solid #f5576c;
+        border-radius: 8px;
+        animation: fadeInUp 0.3s ease;
+    }
+
+    .error-message i {
+        margin-right: 0.5rem;
+    }
+
+    /* Food Items Selection */
+    .food-items-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1rem;
+        max-height: 600px;
+        overflow-y: auto;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 12px;
+    }
+
+    .food-item-checkbox {
+        position: relative;
+    }
+
+    .food-item-checkbox input[type="checkbox"] {
+        position: absolute;
+        opacity: 0;
+    }
+
+    .food-item-label {
+        display: block;
+        background: white;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 1.25rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .food-item-checkbox input[type="checkbox"]:checked + .food-item-label {
+        border-color: #667eea;
+        background: linear-gradient(145deg, #f0f4ff, #ffffff);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+        transform: scale(1.02);
+    }
+
+    .food-item-label:hover {
+        border-color: #764ba2;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .food-item-name {
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+    }
+
+    .food-item-type {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+    }
+
+    .type-protein { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+    .type-carbs { background: linear-gradient(135deg, #f093fb, #f5576c); color: white; }
+    .type-fats { background: linear-gradient(135deg, #fa709a, #fee140); color: white; }
+    .type-vegetables { background: linear-gradient(135deg, #30cfd0, #330867); color: white; }
+    .type-fruits { background: linear-gradient(135deg, #a8edea, #fed6e3); color: #764ba2; }
+
+    .food-item-nutrition {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        font-size: 0.85rem;
+    }
+
+    .nutrition-badge {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.35rem 0.6rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        color: #6c757d;
+    }
+
+    .nutrition-badge strong {
+        color: #667eea;
+        font-weight: 800;
+    }
+
+    .check-icon {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+        background: #667eea;
+        color: white;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+    }
+
+    .food-item-checkbox input[type="checkbox"]:checked ~ .food-item-label .check-icon {
+        display: flex;
+    }
+
+    .selected-count {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+        font-weight: 700;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .search-box {
+        margin-bottom: 1rem;
+        position: relative;
+    }
+
+    .search-box input {
+        width: 100%;
+        padding-left: 3rem;
+    }
+
+    .search-box i {
+        position: absolute;
+        left: 1.25rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #667eea;
+        font-size: 1.2rem;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 3px solid;
+        border-image: linear-gradient(90deg, #667eea, #764ba2, transparent) 1;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+        border-radius: 15px;
+        padding: 1rem 2.5rem;
+        color: white;
+        font-weight: 800;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-4px) scale(1.05);
+        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+    }
+
+    .btn-cancel {
+        border: 2px solid #667eea;
+        background: transparent;
+        color: #667eea;
+        border-radius: 15px;
+        padding: 1rem 2.5rem;
+        font-weight: 800;
+        font-size: 1.1rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-cancel:hover {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        transform: translateY(-4px);
+    }
+
+    .total-calories-display {
+        background: linear-gradient(135deg, #f093fb, #f5576c);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 15px;
+        text-align: center;
+        margin-top: 1rem;
+    }
+
+    .total-calories-display h3 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.2rem;
+        font-weight: 700;
+    }
+
+    .total-calories-display .calories-value {
+        font-size: 2.5rem;
+        font-weight: 900;
+    }
+
+    .error-message {
+        display: none;
+        color: #f5576c;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-top: 0.5rem;
+        padding: 0.75rem 1rem;
+        background: linear-gradient(145deg, #fff5f5, #ffe5e5);
+        border-left: 4px solid #f5576c;
+        border-radius: 8px;
+    }
+
+    .no-items-message {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: #6c757d;
+    }
+
+    .no-items-message i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        display: block;
+        color: #667eea;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-header">
+        <h1>
+            <i class="bi bi-egg-fried"></i>
+            {% if is_create %}Créer un nouveau repas{% else %}Modifier le repas{% endif %}
+        </h1>
+    </div>
+
+    <form method="post" id="mealForm" novalidate>
+        {% csrf_token %}
+
+        <!-- Basic Information -->
+        <div class="form-section">
+            <div class="form-section-title">
+                <i class="bi bi-info-circle"></i>
+                Informations du repas
+            </div>
+
+            <div class="form-group">
+                <label for="meal_name">
+                    <i class="bi bi-tag-fill"></i>
+                    Nom du repas <span style="color: #f5576c;">*</span>
+                </label>
+                <div class="field-wrapper">
+                    <input type="text" 
+                           class="form-control {% if errors.meal_name %}is-invalid{% endif %}" 
+                           id="meal_name" 
+                           name="meal_name" 
+                           value="{% if form_data.meal_name %}{{ form_data.meal_name }}{% elif not is_create %}{{ meal.meal_name }}{% endif %}"
+                           placeholder="Ex: Petit-déjeuner équilibré"
+                           required
+                           minlength="3"
+                           maxlength="200">
+                    <i class="bi bi-check-circle-fill success-icon"></i>
+                    <i class="bi bi-exclamation-circle-fill error-icon"></i>
+                </div>
+                <div class="error-message" id="error-meal_name" {% if errors.meal_name %}style="display: block;"{% endif %}>
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <span class="error-text">{% if errors.meal_name %}{{ errors.meal_name }}{% endif %}</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="meal_type">
+                    <i class="bi bi-collection"></i>
+                    Type de repas <span style="color: #f5576c;">*</span>
+                </label>
+                <div class="field-wrapper">
+                    <select class="form-select {% if errors.meal_type %}is-invalid{% endif %}" 
+                            id="meal_type" 
+                            name="meal_type"
+                            required>
+                        <option value="">-- Sélectionnez un type --</option>
+                        {% for type_code, type_label in meal_types %}
+                            <option value="{{ type_code }}" 
+                                    {% if form_data.meal_type == type_code %}selected
+                                    {% elif not is_create and not form_data and meal.meal_type == type_code %}selected{% endif %}>
+                                {{ type_label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <i class="bi bi-check-circle-fill success-icon"></i>
+                    <i class="bi bi-exclamation-circle-fill error-icon"></i>
+                </div>
+                <div class="error-message" id="error-meal_type" {% if errors.meal_type %}style="display: block;"{% endif %}>
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <span class="error-text">{% if errors.meal_type %}{{ errors.meal_type }}{% endif %}</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="meal_date">
+                    <i class="bi bi-calendar3"></i>
+                    Date et heure <span style="color: #f5576c;">*</span>
+                </label>
+                <div class="field-wrapper">
+                    <input type="datetime-local" 
+                           class="form-control {% if errors.meal_date %}is-invalid{% endif %}" 
+                           id="meal_date" 
+                           name="meal_date" 
+                           value="{% if form_data.meal_date %}{{ form_data.meal_date }}{% elif not is_create %}{{ meal.meal_date|date:'Y-m-d\TH:i' }}{% endif %}"
+                           required>
+                    <i class="bi bi-check-circle-fill success-icon"></i>
+                    <i class="bi bi-exclamation-circle-fill error-icon"></i>
+                </div>
+                <div class="error-message" id="error-meal_date" {% if errors.meal_date %}style="display: block;"{% endif %}>
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <span class="error-text">{% if errors.meal_date %}{{ errors.meal_date }}{% endif %}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Food Items Selection -->
+        <div class="form-section">
+            <div class="form-section-title">
+                <i class="bi bi-egg"></i>
+                Sélectionner les aliments
+            </div>
+
+            <div class="selected-count" id="selectedCount">
+                <span><i class="bi bi-check-circle-fill"></i> <span id="countText">0 aliment sélectionné</span></span>
+                <span id="totalCalDisplay">0 cal</span>
+            </div>
+
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input type="text" class="form-control" id="searchFood" 
+                       placeholder="Rechercher un aliment...">
+            </div>
+
+            {% if food_items %}
+                <div class="food-items-grid" id="foodItemsGrid">
+                    {% for item in food_items %}
+                    <div class="food-item-checkbox" data-food-name="{{ item.food_item_name|lower }}" 
+                         data-calories="{{ item.calories.calories_value|default:0 }}">
+                        <input type="checkbox" id="food_{{ item.food_item_id }}" 
+                               name="food_items" value="{{ item.food_item_id }}"
+                               {% if form_data.selected_food_items and item.food_item_id|stringformat:"s" in form_data.selected_food_items %}checked
+                               {% elif not is_create and not form_data and item.food_item_id in current_food_items_ids %}checked{% endif %}>
+                        <label class="food-item-label" for="food_{{ item.food_item_id }}">
+                            <span class="check-icon"><i class="bi bi-check-lg"></i></span>
+                            <div class="food-item-name">{{ item.food_item_name }}</div>
+                            <span class="food-item-type type-{{ item.food_type|lower }}">
+                                {{ item.get_food_type_display }}
+                            </span>
+                            <div class="food-item-nutrition">
+                                {% if item.calories %}
+                                    <span class="nutrition-badge">
+                                        <i class="bi bi-fire"></i>
+                                        <strong>{{ item.calories.calories_value }}</strong> cal
+                                    </span>
+                                {% endif %}
+                                {% if item.protein %}
+                                    <span class="nutrition-badge">
+                                        <strong>{{ item.protein.protein_value }}g</strong> prot.
+                                    </span>
+                                {% endif %}
+                                {% if item.carbs %}
+                                    <span class="nutrition-badge">
+                                        <strong>{{ item.carbs.carbs_value }}g</strong> glucides
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="total-calories-display">
+                    <h3><i class="bi bi-fire"></i> Total Calories</h3>
+                    <div class="calories-value" id="totalCalories">0</div>
+                </div>
+            {% else %}
+                <div class="no-items-message">
+                    <i class="bi bi-inbox"></i>
+                    <h4>Aucun aliment disponible</h4>
+                    <p>Veuillez d'abord ajouter des aliments dans le système.</p>
+                    <a href="{% url 'meals_admin:create' %}" class="btn-submit">
+                        <i class="bi bi-plus-circle"></i> Ajouter un aliment
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button type="submit" class="btn-submit">
+                <i class="bi bi-check-lg"></i>
+                {% if is_create %}Créer le repas{% else %}Mettre à jour{% endif %}
+            </button>
+            <a href="{% url 'meals:meal-list' %}" class="btn-cancel">
+                <i class="bi bi-x-lg"></i>
+                Annuler
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Calculate total calories
+    function updateCaloriesTotal() {
+        let total = 0;
+        let count = 0;
+        
+        document.querySelectorAll('.food-item-checkbox input[type="checkbox"]:checked').forEach(checkbox => {
+            count++;
+            const parent = checkbox.closest('.food-item-checkbox');
+            const calories = parseInt(parent.dataset.calories) || 0;
+            total += calories;
+        });
+        
+        document.getElementById('totalCalories').textContent = total;
+        document.getElementById('totalCalDisplay').textContent = total + ' cal';
+        document.getElementById('countText').textContent = count + (count > 1 ? ' aliments sélectionnés' : ' aliment sélectionné');
+    }
+
+    // Search functionality
+    document.getElementById('searchFood')?.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        document.querySelectorAll('.food-item-checkbox').forEach(item => {
+            const foodName = item.dataset.foodName;
+            if (foodName.includes(searchTerm)) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    });
+
+    // ========== VALIDATION SYSTEM ==========
+    const validationRules = {
+        meal_name: {
+            required: true,
+            minLength: 3,
+            maxLength: 200,
+            pattern: /^[a-zA-ZÀ-ÿ0-9\s\-']+$/,
+            messages: {
+                required: "Le nom du repas est obligatoire",
+                minLength: "Le nom doit contenir au moins 3 caractères",
+                maxLength: "Le nom ne peut pas dépasser 200 caractères",
+                pattern: "Le nom ne peut contenir que des lettres, chiffres, espaces et tirets"
+            }
+        },
+        meal_type: {
+            required: true,
+            messages: {
+                required: "Veuillez sélectionner un type de repas"
+            }
+        },
+        meal_date: {
+            required: true,
+            validateDate: true,
+            messages: {
+                required: "La date et l'heure sont obligatoires",
+                invalid: "Format de date invalide",
+                tooOld: "La date ne peut pas être antérieure à 1 an",
+                tooFuture: "La date ne peut pas être postérieure à 1 semaine"
+            }
+        }
+    };
+
+    function validateField(fieldName, value) {
+        const rules = validationRules[fieldName];
+        if (!rules) return { valid: true };
+
+        // Required validation
+        if (rules.required && (!value || value.trim() === '')) {
+            return { valid: false, message: rules.messages.required };
+        }
+
+        // Skip other validations if empty and not required
+        if (!value || value.trim() === '') {
+            return { valid: true };
+        }
+
+        const trimmedValue = value.trim();
+
+        // MinLength validation
+        if (rules.minLength && trimmedValue.length < rules.minLength) {
+            return { valid: false, message: rules.messages.minLength };
+        }
+
+        // MaxLength validation
+        if (rules.maxLength && trimmedValue.length > rules.maxLength) {
+            return { valid: false, message: rules.messages.maxLength };
+        }
+
+        // Pattern validation
+        if (rules.pattern && !rules.pattern.test(trimmedValue)) {
+            return { valid: false, message: rules.messages.pattern };
+        }
+
+        // Date validation
+        if (rules.validateDate && fieldName === 'meal_date') {
+            try {
+                const selectedDate = new Date(trimmedValue);
+                if (isNaN(selectedDate.getTime())) {
+                    return { valid: false, message: rules.messages.invalid };
+                }
+
+                const now = new Date();
+                const oneYearAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+                const oneWeekFuture = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+                if (selectedDate < oneYearAgo) {
+                    return { valid: false, message: rules.messages.tooOld };
+                }
+
+                if (selectedDate > oneWeekFuture) {
+                    return { valid: false, message: rules.messages.tooFuture };
+                }
+            } catch (e) {
+                return { valid: false, message: rules.messages.invalid };
+            }
+        }
+
+        return { valid: true };
+    }
+
+    function showError(fieldName, message) {
+        const field = document.getElementById(fieldName);
+        const errorDiv = document.getElementById(`error-${fieldName}`);
+        const errorText = errorDiv.querySelector('.error-text');
+
+        field.classList.remove('is-valid');
+        field.classList.add('is-invalid');
+        errorText.textContent = message;
+        errorDiv.style.display = 'block';
+    }
+
+    function showSuccess(fieldName) {
+        const field = document.getElementById(fieldName);
+        const errorDiv = document.getElementById(`error-${fieldName}`);
+
+        field.classList.remove('is-invalid');
+        field.classList.add('is-valid');
+        errorDiv.style.display = 'none';
+    }
+
+    function clearValidation(fieldName) {
+        const field = document.getElementById(fieldName);
+        const errorDiv = document.getElementById(`error-${fieldName}`);
+
+        field.classList.remove('is-valid', 'is-invalid');
+        errorDiv.style.display = 'none';
+    }
+
+    function validateForm() {
+        let isValid = true;
+        const fieldsToValidate = ['meal_name', 'meal_type', 'meal_date'];
+
+        fieldsToValidate.forEach(fieldName => {
+            const field = document.getElementById(fieldName);
+            const value = field.value;
+            const result = validateField(fieldName, value);
+
+            if (!result.valid) {
+                showError(fieldName, result.message);
+                isValid = false;
+            } else {
+                showSuccess(fieldName);
+            }
+        });
+
+        return isValid;
+    }
+
+    // ========== INITIALIZATION ==========
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('mealForm');
+        
+        // Initialize calories total
+        updateCaloriesTotal();
+        
+        // Set default datetime if creating (and if no value is present)
+        {% if is_create %}
+        const mealDateField = document.getElementById('meal_date');
+        if (!mealDateField.value) {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            mealDateField.value = now.toISOString().slice(0, 16);
+        }
+        {% endif %}
+        
+        // Scroll to first error if they exist
+        {% if errors %}
+        setTimeout(function() {
+            const firstError = document.querySelector('.form-control.is-invalid, .form-select.is-invalid');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstError.focus();
+            }
+        }, 100);
+        {% endif %}
+
+        // Update calories on checkbox change
+        document.querySelectorAll('.food-item-checkbox input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', updateCaloriesTotal);
+        });
+        
+        // Form submission validation
+        form.addEventListener('submit', function(e) {
+            if (!validateForm()) {
+                e.preventDefault();
+                
+                // Scroll to first error
+                const firstError = document.querySelector('.error-message[style*="display: block"]');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                
+                // Show alert
+                alert('⚠️ Veuillez corriger les erreurs avant de soumettre le formulaire.');
+            }
+        });
+
+        // Real-time validation for each field
+        Object.keys(validationRules).forEach(fieldName => {
+            const field = document.getElementById(fieldName);
+            if (!field) return;
+
+            // Validate on blur
+            field.addEventListener('blur', function() {
+                const value = this.value;
+                const result = validateField(fieldName, value);
+
+                if (result.valid) {
+                    showSuccess(fieldName);
+                } else {
+                    showError(fieldName, result.message);
+                }
+            });
+
+            // Clear validation on focus
+            field.addEventListener('focus', function() {
+                if (!this.classList.contains('is-invalid')) {
+                    clearValidation(fieldName);
+                }
+            });
+
+            // Validate on change for select fields
+            if (field.tagName === 'SELECT') {
+                field.addEventListener('change', function() {
+                    const value = this.value;
+                    const result = validateField(fieldName, value);
+
+                    if (result.valid) {
+                        showSuccess(fieldName);
+                    } else {
+                        showError(fieldName, result.message);
+                    }
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}
+

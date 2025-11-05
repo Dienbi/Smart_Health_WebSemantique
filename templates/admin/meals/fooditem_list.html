@@ -1,0 +1,538 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Gestion des Aliments - Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2.5rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .admin-header h3 {
+        margin: 0;
+        font-weight: 800;
+        font-size: 2rem;
+        color: white;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .admin-header h3 i {
+        font-size: 2.5rem;
+        animation: slideInRight 0.6s ease-out;
+    }
+
+    .btn-create {
+        background: white;
+        color: #667eea;
+        border: none;
+        border-radius: 12px;
+        padding: 0.9rem 2rem;
+        font-weight: 700;
+        font-size: 1rem;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-create::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(102, 126, 234, 0.1);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+
+    .btn-create:hover::before {
+        width: 300px;
+        height: 300px;
+    }
+
+    .btn-create:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+    }
+
+    .filters-section {
+        background: linear-gradient(145deg, #ffffff, #f8f9fa);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2.5rem;
+        box-shadow: 0 8px 30px rgba(44, 62, 80, 0.08);
+        border: 1px solid rgba(102, 126, 234, 0.1);
+        animation: fadeInUp 0.6s ease-out 0.1s both;
+    }
+
+    .filters-section .row {
+        align-items: end;
+    }
+
+    .filters-section .form-label {
+        font-weight: 700;
+        color: #667eea;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.75rem;
+    }
+
+    .filters-section .form-control,
+    .filters-section .form-select {
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 0.85rem 1.2rem;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .filters-section .form-control:focus,
+    .filters-section .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .filters-section .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 12px;
+        padding: 0.85rem 1.5rem;
+        font-weight: 700;
+        transition: all 0.3s ease;
+    }
+
+    .filters-section .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background: #fff;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(44, 62, 80, 0.1);
+        animation: fadeInUp 0.6s ease-out 0.2s both;
+    }
+
+    .data-table thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .data-table th {
+        padding: 1.5rem 1.25rem;
+        text-align: left;
+        font-weight: 800;
+        color: white;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .data-table tbody tr {
+        border-bottom: 1px solid #f1f3f5;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .data-table tbody tr::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 4px;
+        height: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        transition: height 0.3s ease;
+    }
+
+    .data-table tbody tr:hover {
+        background: linear-gradient(90deg, rgba(102, 126, 234, 0.05), transparent);
+        transform: scale(1.01);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.1);
+    }
+
+    .data-table tbody tr:hover::before {
+        height: 100%;
+    }
+
+    .data-table td {
+        padding: 1.5rem 1.25rem;
+        vertical-align: middle;
+        font-size: 0.95rem;
+    }
+
+    .food-name-cell {
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    .food-desc-cell {
+        color: #6c757d;
+        font-size: 0.85rem;
+        max-width: 250px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .food-type-badge {
+        display: inline-block;
+        padding: 0.5rem 1.2rem;
+        border-radius: 25px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        transition: all 0.3s ease;
+    }
+
+    .food-type-badge:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    }
+
+    .type-protein { 
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+    }
+    .type-carbs { 
+        background: linear-gradient(135deg, #f093fb, #f5576c);
+        color: white;
+    }
+    .type-fats { 
+        background: linear-gradient(135deg, #fa709a, #fee140);
+        color: white;
+    }
+    .type-vegetables { 
+        background: linear-gradient(135deg, #30cfd0, #330867);
+        color: white;
+    }
+    .type-fruits { 
+        background: linear-gradient(135deg, #a8edea, #fed6e3);
+        color: #764ba2;
+    }
+
+    .nutrition-info {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .nutrition-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        color: #495057;
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+
+    .nutrition-badge:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        border-color: #667eea;
+    }
+
+    .nutrition-badge i {
+        font-size: 0.9rem;
+    }
+
+    .nutrition-badge strong {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 800;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.4rem;
+    }
+
+    .action-buttons .btn {
+        padding: 0.6rem 0.85rem;
+        font-size: 0.9rem;
+        border-radius: 10px;
+        font-weight: 700;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 2px solid transparent;
+    }
+
+    .action-buttons .btn-outline-info {
+        border-color: #17a2b8;
+        color: #17a2b8;
+    }
+
+    .action-buttons .btn-outline-info:hover {
+        background: linear-gradient(135deg, #17a2b8, #138496);
+        color: white;
+        transform: translateY(-3px) scale(1.1);
+        box-shadow: 0 6px 20px rgba(23, 162, 184, 0.4);
+    }
+
+    .action-buttons .btn-outline-secondary:hover {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-color: #667eea;
+        transform: translateY(-3px) scale(1.1);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .action-buttons .btn-outline-danger:hover {
+        background: linear-gradient(135deg, #f5576c, #f093fb);
+        color: white;
+        border-color: #f5576c;
+        transform: translateY(-3px) scale(1.1);
+        box-shadow: 0 6px 20px rgba(245, 87, 108, 0.4);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 5rem 2rem;
+        background: linear-gradient(145deg, #f8f9fa, white);
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(44, 62, 80, 0.08);
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .empty-state i {
+        font-size: 5rem;
+        display: block;
+        margin-bottom: 1.5rem;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.8; transform: scale(1.05); }
+    }
+
+    .empty-state h5 {
+        font-weight: 800;
+        font-size: 1.5rem;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state p {
+        color: #6c757d;
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+
+    .empty-state .btn {
+        padding: 1rem 2.5rem;
+        font-size: 1.1rem;
+        border-radius: 15px;
+        font-weight: 700;
+    }
+
+    .pagination {
+        margin-top: 2rem;
+        justify-content: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <h3><i class="bi bi-egg-fried me-2"></i>Gestion des Aliments</h3>
+    <a href="{% url 'meals_admin:create' %}" class="btn btn-primary btn-create">
+        <i class="bi bi-plus-circle me-1"></i>Ajouter un Aliment
+    </a>
+</div>
+
+<!-- Filters Section -->
+<div class="filters-section">
+    <form method="get" class="row g-3">
+        <div class="col-md-5">
+            <label for="search" class="form-label">Rechercher</label>
+            <input type="text" class="form-control" id="search" name="search" 
+                   placeholder="Nom de l'aliment..." value="{{ current_search }}">
+        </div>
+        <div class="col-md-4">
+            <label for="type" class="form-label">Type d'aliment</label>
+            <select class="form-select" id="type" name="type">
+                <option value="">Tous les types</option>
+                {% for type_code, type_label in food_types %}
+                    <option value="{{ type_code }}" {% if current_type == type_code %}selected{% endif %}>
+                        {{ type_label }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-search me-1"></i>Filtrer
+            </button>
+        </div>
+    </form>
+</div>
+
+{% if fooditems %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th>Description</th>
+                <th>Type</th>
+                <th>Nutrition</th>
+                <th style="text-align: right;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in fooditems %}
+            <tr>
+                <td><span class="badge bg-secondary">#{{ item.food_item_id }}</span></td>
+                <td class="food-name-cell">{{ item.food_item_name }}</td>
+                <td class="food-desc-cell" title="{{ item.food_item_description }}">
+                    {{ item.food_item_description|truncatewords:10 }}
+                </td>
+                <td>
+                    <span class="food-type-badge type-{{ item.food_type|lower }}">
+                        {{ item.get_food_type_display }}
+                    </span>
+                </td>
+                <td>
+                    <div class="nutrition-info">
+                        {% if item.calories %}
+                            <span class="nutrition-badge">
+                                <i class="bi bi-fire"></i>
+                                <strong>{{ item.calories.calories_value }}</strong> cal
+                            </span>
+                        {% endif %}
+                        {% if item.protein %}
+                            <span class="nutrition-badge">
+                                <strong>{{ item.protein.protein_value }}g</strong> prot.
+                            </span>
+                        {% endif %}
+                        {% if item.carbs %}
+                            <span class="nutrition-badge">
+                                <strong>{{ item.carbs.carbs_value }}g</strong> glucides
+                            </span>
+                        {% endif %}
+                    </div>
+                </td>
+                <td style="text-align: right;">
+                    <div class="action-buttons">
+                        <a href="{% url 'meals_admin:detail' item.pk %}" class="btn btn-sm btn-outline-info" title="Voir">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="{% url 'meals_admin:edit' item.pk %}" class="btn btn-sm btn-outline-secondary" title="Modifier">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="{% url 'meals_admin:delete' item.pk %}" class="btn btn-sm btn-outline-danger" title="Supprimer">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if current_search %}&search={{ current_search }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}">
+                        <i class="bi bi-chevron-double-left"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if current_search %}&search={{ current_search }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+            {% endif %}
+
+            <li class="page-item active">
+                <span class="page-link">Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+            </li>
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if current_search %}&search={{ current_search }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if current_search %}&search={{ current_search }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}">
+                        <i class="bi bi-chevron-double-right"></i>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+{% else %}
+    <div class="empty-state">
+        <i class="bi bi-inbox"></i>
+        <h5>Aucun aliment trouvé</h5>
+        <p>Ajoutez votre premier aliment pour commencer.</p>
+        <a href="{% url 'meals_admin:create' %}" class="btn btn-primary mt-2">
+            <i class="bi bi-plus-circle me-1"></i>Ajouter un Aliment
+        </a>
+    </div>
+{% endif %}
+{% endblock %}
+

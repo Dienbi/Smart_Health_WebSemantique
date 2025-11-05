@@ -37,7 +37,7 @@ class FoodItem(models.Model):
     ]
     
     food_item_id = models.AutoField(primary_key=True)
-    meal = models.ForeignKey(Meal, on_delete=models.CASCADE, related_name='food_items')
+    meal = models.ForeignKey(Meal, on_delete=models.CASCADE, related_name='food_items', null=True, blank=True)
     food_item_name = models.CharField(max_length=200)
     food_item_description = models.TextField()
     food_type = models.CharField(max_length=20, choices=FOOD_TYPE_CHOICES)

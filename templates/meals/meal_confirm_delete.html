@@ -1,0 +1,245 @@
+{% extends 'base.html' %}
+
+{% block title %}Supprimer {{ meal.meal_name }} - Smart Health{% endblock %}
+
+{% block extra_css %}
+<style>
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .delete-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .delete-warning {
+        background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+        color: white;
+        border-radius: 20px;
+        padding: 2.5rem;
+        text-align: center;
+        margin-bottom: 2.5rem;
+        box-shadow: 0 10px 40px rgba(245, 87, 108, 0.3);
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .delete-warning i {
+        font-size: 4rem;
+        display: block;
+        margin-bottom: 1.5rem;
+        animation: shake 0.5s ease-in-out;
+    }
+
+    .delete-warning h1 {
+        font-size: 2rem;
+        font-weight: 900;
+        margin: 0 0 1rem 0;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .delete-warning p {
+        margin: 0;
+        font-size: 1.1rem;
+        opacity: 0.95;
+    }
+
+    .meal-details {
+        background: white;
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 10px 40px rgba(44, 62, 80, 0.1);
+        margin-bottom: 2rem;
+        animation: fadeInUp 0.6s ease-out 0.1s both;
+    }
+
+    .meal-details h2 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #2c3e50;
+        margin: 0 0 1.5rem 0;
+        padding-bottom: 1rem;
+        border-bottom: 3px solid #e9ecef;
+    }
+
+    .detail-row {
+        display: grid;
+        grid-template-columns: 150px 1fr;
+        padding: 1rem 0;
+        border-bottom: 1px solid #f1f3f5;
+    }
+
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+
+    .detail-label {
+        font-weight: 700;
+        color: #6c757d;
+        font-size: 0.95rem;
+    }
+
+    .detail-value {
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+    .meal-type-badge {
+        display: inline-block;
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .badge-breakfast { background: linear-gradient(135deg, #f093fb, #f5576c); color: white; }
+    .badge-lunch { background: linear-gradient(135deg, #fa709a, #fee140); color: white; }
+    .badge-dinner { background: linear-gradient(135deg, #30cfd0, #330867); color: white; }
+    .badge-snack { background: linear-gradient(135deg, #a8edea, #fed6e3); color: #764ba2; }
+
+    .warning-message {
+        background: linear-gradient(145deg, #fff5f5, #ffe5e5);
+        border-left: 4px solid #f5576c;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        animation: fadeInUp 0.6s ease-out 0.2s both;
+    }
+
+    .warning-message i {
+        font-size: 1.5rem;
+        color: #f5576c;
+        margin-right: 0.75rem;
+    }
+
+    .warning-message p {
+        margin: 0;
+        color: #721c24;
+        font-weight: 600;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+
+    .btn-action {
+        padding: 1rem 2.5rem;
+        border-radius: 15px;
+        font-weight: 800;
+        font-size: 1.1rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        min-width: 200px;
+        justify-content: center;
+    }
+
+    .btn-cancel {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+    }
+
+    .btn-cancel:hover {
+        transform: translateY(-4px) scale(1.05);
+        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        color: white;
+    }
+
+    .btn-confirm-delete {
+        background: linear-gradient(135deg, #f5576c, #f093fb);
+        color: white;
+    }
+
+    .btn-confirm-delete:hover {
+        transform: translateY(-4px) scale(1.05);
+        box-shadow: 0 15px 40px rgba(245, 87, 108, 0.6);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="delete-container">
+    <div class="delete-warning">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <h1>Confirmer la suppression</h1>
+        <p>Cette action est irréversible. Le repas sera définitivement supprimé.</p>
+    </div>
+
+    <div class="meal-details">
+        <h2><i class="bi bi-egg-fried"></i> Détails du repas à supprimer</h2>
+        
+        <div class="detail-row">
+            <div class="detail-label">Nom :</div>
+            <div class="detail-value">{{ meal.meal_name }}</div>
+        </div>
+
+        <div class="detail-row">
+            <div class="detail-label">Type :</div>
+            <div class="detail-value">
+                <span class="meal-type-badge badge-{{ meal.meal_type|lower }}">
+                    {{ meal.get_meal_type_display }}
+                </span>
+            </div>
+        </div>
+
+        <div class="detail-row">
+            <div class="detail-label">Date :</div>
+            <div class="detail-value">{{ meal.meal_date|date:"d/m/Y à H:i" }}</div>
+        </div>
+
+        <div class="detail-row">
+            <div class="detail-label">Calories :</div>
+            <div class="detail-value">
+                <i class="bi bi-fire" style="color: #f5576c;"></i>
+                <strong>{{ meal.total_calories }}</strong> cal
+            </div>
+        </div>
+
+        <div class="detail-row">
+            <div class="detail-label">Aliments :</div>
+            <div class="detail-value">
+                <i class="bi bi-egg"></i>
+                {{ meal.food_items.count }} aliment{{ meal.food_items.count|pluralize }}
+            </div>
+        </div>
+    </div>
+
+    <div class="warning-message">
+        <i class="bi bi-info-circle-fill"></i>
+        <p>
+            <strong>Note :</strong> Les aliments associés à ce repas seront automatiquement dissociés mais ne seront pas supprimés. 
+            Ils resteront disponibles pour d'autres repas.
+        </p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="action-buttons">
+            <a href="{% url 'meals:meal-list' %}" class="btn-action btn-cancel">
+                <i class="bi bi-x-lg"></i>
+                Annuler
+            </a>
+            <button type="submit" class="btn-action btn-confirm-delete">
+                <i class="bi bi-trash-fill"></i>
+                Supprimer définitivement
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

@@ -1,0 +1,305 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Détails Aliment - Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .detail-header {
+        background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+        color: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 16px rgba(30, 136, 229, 0.2);
+    }
+
+    .detail-header h2 {
+        margin: 0 0 0.5rem 0;
+        font-weight: 700;
+        font-size: 2rem;
+    }
+
+    .detail-header .subtitle {
+        opacity: 0.9;
+        font-size: 1rem;
+    }
+
+    .detail-actions {
+        margin-top: 1.5rem;
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .detail-actions .btn {
+        border-radius: 8px;
+        padding: 0.6rem 1.25rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    .detail-actions .btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .info-section {
+        background: #fff;
+        border: 1px solid #e9ecef;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 8px rgba(44, 62, 80, 0.04);
+    }
+
+    .info-section-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #e9ecef;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-row {
+        display: grid;
+        grid-template-columns: 180px 1fr;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f1f3f5;
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: #6c757d;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-value {
+        color: var(--text-dark);
+        font-weight: 500;
+    }
+
+    .food-type-badge {
+        display: inline-block;
+        padding: 0.4rem 0.9rem;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .type-protein { background: #e3f2fd; color: #1976d2; }
+    .type-carbs { background: #fff3e0; color: #f57c00; }
+    .type-fats { background: #fce4ec; color: #c2185b; }
+    .type-vegetables { background: #e8f5e9; color: #388e3c; }
+    .type-fruits { background: #f3e5f5; color: #7b1fa2; }
+
+    .nutrition-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .nutrition-card {
+        background: linear-gradient(135deg, #f8f9fa, #fff);
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 1.25rem;
+        text-align: center;
+        transition: all 0.2s ease;
+    }
+
+    .nutrition-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px rgba(44, 62, 80, 0.1);
+    }
+
+    .nutrition-card-icon {
+        font-size: 2rem;
+        color: var(--primary-blue);
+        margin-bottom: 0.5rem;
+    }
+
+    .nutrition-card-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0.5rem 0;
+    }
+
+    .nutrition-card-label {
+        font-size: 0.85rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    .no-data {
+        text-align: center;
+        padding: 2rem;
+        color: #6c757d;
+        font-style: italic;
+    }
+
+    .meal-link {
+        color: var(--primary-blue);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    .meal-link:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header Section -->
+<div class="detail-header">
+    <h2><i class="bi bi-egg-fried me-2"></i>{{ fooditem.food_item_name }}</h2>
+    <div class="subtitle">
+        <i class="bi bi-hash"></i> ID: {{ fooditem.food_item_id }}
+        {% if fooditem.meal %}
+        | <i class="bi bi-plate-fill"></i> Repas: {{ fooditem.meal.meal_name }}
+        {% endif %}
+    </div>
+    <div class="detail-actions">
+        <a href="{% url 'meals_admin:list' %}" class="btn btn-light">
+            <i class="bi bi-arrow-left me-1"></i>Retour à la liste
+        </a>
+        <a href="{% url 'meals_admin:edit' fooditem.pk %}" class="btn btn-warning">
+            <i class="bi bi-pencil me-1"></i>Modifier
+        </a>
+        <a href="{% url 'meals_admin:delete' fooditem.pk %}" class="btn btn-danger">
+            <i class="bi bi-trash me-1"></i>Supprimer
+        </a>
+    </div>
+</div>
+
+<!-- Basic Information -->
+<div class="info-section">
+    <div class="info-section-title">
+        <i class="bi bi-info-circle"></i>Informations de base
+    </div>
+
+    <div class="info-row">
+        <div class="info-label">
+            <i class="bi bi-tag-fill"></i>
+            Nom
+        </div>
+        <div class="info-value">{{ fooditem.food_item_name }}</div>
+    </div>
+
+    <div class="info-row">
+        <div class="info-label">
+            <i class="bi bi-text-paragraph"></i>
+            Description
+        </div>
+        <div class="info-value">{{ fooditem.food_item_description }}</div>
+    </div>
+
+    <div class="info-row">
+        <div class="info-label">
+            <i class="bi bi-collection"></i>
+            Type d'aliment
+        </div>
+        <div class="info-value">
+            <span class="food-type-badge type-{{ fooditem.food_type|lower }}">
+                {{ fooditem.get_food_type_display }}
+            </span>
+        </div>
+    </div>
+
+    {% if fooditem.meal %}
+    <div class="info-row">
+        <div class="info-label">
+            <i class="bi bi-plate-fill"></i>
+            Repas associé
+        </div>
+        <div class="info-value">
+            <a href="#" class="meal-link">{{ fooditem.meal.meal_name }}</a>
+            <small class="text-muted d-block">
+                Type: {{ fooditem.meal.get_meal_type_display }} | 
+                Utilisateur: {{ fooditem.meal.user.username }}
+            </small>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Nutritional Information -->
+<div class="info-section">
+    <div class="info-section-title">
+        <i class="bi bi-heart-pulse"></i>Informations nutritionnelles
+    </div>
+
+    {% if calories or protein or carbs or fiber or sugar %}
+        <div class="nutrition-cards">
+            {% if calories %}
+            <div class="nutrition-card">
+                <div class="nutrition-card-icon">
+                    <i class="bi bi-fire"></i>
+                </div>
+                <div class="nutrition-card-value">{{ calories.calories_value }}</div>
+                <div class="nutrition-card-label">Calories</div>
+            </div>
+            {% endif %}
+
+            {% if protein %}
+            <div class="nutrition-card">
+                <div class="nutrition-card-icon">
+                    <i class="bi bi-egg"></i>
+                </div>
+                <div class="nutrition-card-value">{{ protein.protein_value }}g</div>
+                <div class="nutrition-card-label">Protéines</div>
+            </div>
+            {% endif %}
+
+            {% if carbs %}
+            <div class="nutrition-card">
+                <div class="nutrition-card-icon">
+                    <i class="bi bi-bread-slice"></i>
+                </div>
+                <div class="nutrition-card-value">{{ carbs.carbs_value }}g</div>
+                <div class="nutrition-card-label">Glucides</div>
+            </div>
+            {% endif %}
+
+            {% if fiber %}
+            <div class="nutrition-card">
+                <div class="nutrition-card-icon">
+                    <i class="bi bi-flower2"></i>
+                </div>
+                <div class="nutrition-card-value">{{ fiber.fiber_value }}g</div>
+                <div class="nutrition-card-label">Fibres</div>
+            </div>
+            {% endif %}
+
+            {% if sugar %}
+            <div class="nutrition-card">
+                <div class="nutrition-card-icon">
+                    <i class="bi bi-droplet-fill"></i>
+                </div>
+                <div class="nutrition-card-value">{{ sugar.sugar_value }}g</div>
+                <div class="nutrition-card-label">Sucres</div>
+            </div>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="no-data">
+            <i class="bi bi-exclamation-circle" style="font-size: 2rem; display: block; margin-bottom: 0.5rem;"></i>
+            Aucune information nutritionnelle disponible pour cet aliment.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+

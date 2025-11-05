@@ -1,0 +1,888 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}{% if is_create %}Créer Aliment{% else %}Modifier Aliment{% endif %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes shimmer {
+        0% { background-position: -1000px 0; }
+        100% { background-position: 1000px 0; }
+    }
+
+    .form-section {
+        background: linear-gradient(145deg, #ffffff, #f8f9fa);
+        border: 2px solid transparent;
+        background-clip: padding-box;
+        border-radius: 20px;
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.15);
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.6s ease-out;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .form-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.05), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .form-section:hover::before {
+        left: 100%;
+    }
+
+    .form-section:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 50px rgba(102, 126, 234, 0.25);
+        border-color: rgba(102, 126, 234, 0.2);
+    }
+
+    .form-section-title {
+        font-size: 1.3rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 3px solid;
+        border-image: linear-gradient(90deg, #667eea, #764ba2, transparent) 1;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .form-section-title i {
+        font-size: 1.5rem;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .form-control, .form-select {
+        border-radius: 12px;
+        border: 2px solid #e9ecef;
+        padding: 1rem 1.25rem;
+        font-size: 1rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: white;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 5px rgba(102, 126, 234, 0.15);
+        transform: translateY(-2px);
+        background: linear-gradient(145deg, #ffffff, #fafbfc);
+    }
+
+    .form-control:hover, .form-select:hover {
+        border-color: #764ba2;
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .nutrition-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .nutrition-input-group {
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .nutrition-input-group:hover {
+        transform: scale(1.02);
+    }
+
+    .nutrition-input-group .input-suffix {
+        position: absolute;
+        right: 1.25rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-size: 0.9rem;
+        font-weight: 800;
+        pointer-events: none;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .nutrition-input-group input {
+        padding-right: 4rem;
+        font-weight: 600;
+    }
+
+    .nutrition-input-group input:focus + .input-suffix {
+        animation: pulse 0.5s ease-in-out;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: translateY(-50%) scale(1); }
+        50% { transform: translateY(-50%) scale(1.2); }
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 3px solid;
+        border-image: linear-gradient(90deg, #667eea, #764ba2, transparent) 1;
+    }
+
+    .action-buttons .btn {
+        border-radius: 15px;
+        padding: 1rem 2.5rem;
+        font-weight: 800;
+        font-size: 1.1rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .action-buttons .btn::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.5s, height 0.5s;
+    }
+
+    .action-buttons .btn:hover::before {
+        width: 300px;
+        height: 300px;
+    }
+
+    .action-buttons .btn-primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .action-buttons .btn-primary:hover {
+        transform: translateY(-4px) scale(1.05);
+        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+    }
+
+    .action-buttons .btn-outline-secondary {
+        border: 2px solid #667eea;
+        color: #667eea;
+        background: transparent;
+    }
+
+    .action-buttons .btn-outline-secondary:hover {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-color: transparent;
+        transform: translateY(-4px) scale(1.05);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    }
+
+    .form-header {
+        margin-bottom: 3rem;
+        padding: 2.5rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .form-header h2 {
+        font-size: 2.2rem;
+        font-weight: 900;
+        color: white;
+        margin: 0;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .form-header h2 i {
+        font-size: 2.5rem;
+    }
+
+    .info-help {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-top: 0.5rem;
+        padding: 0.75rem 1rem;
+        background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+        border-radius: 10px;
+        border-left: 4px solid #667eea;
+        font-style: italic;
+    }
+
+    .icon-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+    .icon-label i {
+        font-size: 1.2rem;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .form-group label {
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 0.75rem;
+        display: block;
+        font-size: 1rem;
+    }
+
+    /* Validation Styles */
+    .error-message {
+        display: none;
+        color: #f5576c;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-top: 0.5rem;
+        padding: 0.75rem 1rem;
+        background: linear-gradient(145deg, #fff5f5, #ffe5e5);
+        border-left: 4px solid #f5576c;
+        border-radius: 8px;
+        animation: shake 0.5s ease-in-out;
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
+    }
+
+    .error-message i {
+        margin-right: 0.5rem;
+    }
+
+    .form-control.error,
+    .form-select.error {
+        border-color: #f5576c !important;
+        background: linear-gradient(145deg, #fff5f5, #ffffff);
+        animation: shake 0.5s ease-in-out;
+    }
+
+    .form-control.success,
+    .form-select.success {
+        border-color: #30cfd0 !important;
+        background: linear-gradient(145deg, #f0fff4, #ffffff);
+    }
+
+    .form-control.error:focus,
+    .form-select.error:focus {
+        box-shadow: 0 0 0 5px rgba(245, 87, 108, 0.2) !important;
+    }
+
+    .form-control.success:focus,
+    .form-select.success:focus {
+        box-shadow: 0 0 0 5px rgba(48, 207, 208, 0.2) !important;
+    }
+
+    .success-icon,
+    .error-icon {
+        position: absolute;
+        right: 1.25rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.2rem;
+        display: none;
+    }
+
+    .success-icon {
+        color: #30cfd0;
+    }
+
+    .error-icon {
+        color: #f5576c;
+    }
+
+    .form-group {
+        position: relative;
+    }
+
+    .field-wrapper {
+        position: relative;
+    }
+
+    .char-counter {
+        position: absolute;
+        right: 1rem;
+        bottom: 0.5rem;
+        font-size: 0.8rem;
+        color: #6c757d;
+        font-weight: 600;
+    }
+
+    .char-counter.warning {
+        color: #f57c00;
+    }
+
+    .char-counter.danger {
+        color: #f5576c;
+    }
+
+    textarea.form-control {
+        padding-bottom: 2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-header">
+    <h2>
+        <i class="bi bi-egg-fried me-2"></i>
+        {% if is_create %}Ajouter un Aliment{% else %}Modifier un Aliment{% endif %}
+    </h2>
+</div>
+
+<form method="post" id="foodItemForm" novalidate>
+    {% csrf_token %}
+
+    {# Basic Info Section #}
+    <div class="form-section">
+        <div class="form-section-title">
+            <i class="bi bi-info-circle"></i>Informations de base
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.food_item_name.id_for_label }}">
+                <span class="icon-label">
+                    <i class="bi bi-tag-fill"></i>
+                    {{ form.food_item_name.label }} <span style="color: #f5576c;">*</span>
+                </span>
+            </label>
+            <div class="field-wrapper">
+                {{ form.food_item_name }}
+                <i class="bi bi-check-circle-fill success-icon"></i>
+                <i class="bi bi-exclamation-circle-fill error-icon"></i>
+            </div>
+            <div class="error-message" id="error-food_item_name">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <span class="error-text"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.food_item_description.id_for_label }}">
+                <span class="icon-label">
+                    <i class="bi bi-text-paragraph"></i>
+                    {{ form.food_item_description.label }} <span style="color: #f5576c;">*</span>
+                </span>
+            </label>
+            <div class="field-wrapper">
+                {{ form.food_item_description }}
+                <div class="char-counter">
+                    <span id="char-count">0</span> / 500
+                </div>
+            </div>
+            <div class="error-message" id="error-food_item_description">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <span class="error-text"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.food_type.id_for_label }}">
+                <span class="icon-label">
+                    <i class="bi bi-collection"></i>
+                    {{ form.food_type.label }} <span style="color: #f5576c;">*</span>
+                </span>
+            </label>
+            <div class="field-wrapper">
+                {{ form.food_type }}
+                <i class="bi bi-check-circle-fill success-icon"></i>
+                <i class="bi bi-exclamation-circle-fill error-icon"></i>
+            </div>
+            <div class="error-message" id="error-food_type">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <span class="error-text"></span>
+            </div>
+        </div>
+    </div>
+
+    {# Nutrition Section #}
+    <div class="form-section">
+        <div class="form-section-title">
+            <i class="bi bi-heart-pulse"></i>Informations nutritionnelles
+        </div>
+
+        <div class="nutrition-grid">
+            <div class="form-group">
+                <label for="calories_value">
+                    <span class="icon-label">
+                        <i class="bi bi-fire"></i>
+                        Calories
+                    </span>
+                </label>
+                <div class="nutrition-input-group">
+                    <input type="number" class="form-control nutrition-field" id="calories_value" 
+                           name="calories_value" value="{{ calories_value }}" 
+                           placeholder="0" min="0" max="9999">
+                    <span class="input-suffix">cal</span>
+                </div>
+                <div class="error-message" id="error-calories_value">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <span class="error-text"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="protein_value">
+                    <span class="icon-label">
+                        <i class="bi bi-egg"></i>
+                        Protéines
+                    </span>
+                </label>
+                <div class="nutrition-input-group">
+                    <input type="number" class="form-control nutrition-field" id="protein_value" 
+                           name="protein_value" value="{{ protein_value }}" 
+                           placeholder="0" min="0" max="999" step="0.1">
+                    <span class="input-suffix">g</span>
+                </div>
+                <div class="error-message" id="error-protein_value">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <span class="error-text"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="carbs_value">
+                    <span class="icon-label">
+                        <i class="bi bi-bread-slice"></i>
+                        Glucides
+                    </span>
+                </label>
+                <div class="nutrition-input-group">
+                    <input type="number" class="form-control nutrition-field" id="carbs_value" 
+                           name="carbs_value" value="{{ carbs_value }}" 
+                           placeholder="0" min="0" max="999" step="0.1">
+                    <span class="input-suffix">g</span>
+                </div>
+                <div class="error-message" id="error-carbs_value">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <span class="error-text"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="fiber_value">
+                    <span class="icon-label">
+                        <i class="bi bi-flower2"></i>
+                        Fibres
+                    </span>
+                </label>
+                <div class="nutrition-input-group">
+                    <input type="number" class="form-control nutrition-field" id="fiber_value" 
+                           name="fiber_value" value="{{ fiber_value }}" 
+                           placeholder="0" min="0" max="999" step="0.1">
+                    <span class="input-suffix">g</span>
+                </div>
+                <div class="error-message" id="error-fiber_value">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <span class="error-text"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="sugar_value">
+                    <span class="icon-label">
+                        <i class="bi bi-droplet-fill"></i>
+                        Sucres
+                    </span>
+                </label>
+                <div class="nutrition-input-group">
+                    <input type="number" class="form-control nutrition-field" id="sugar_value" 
+                           name="sugar_value" value="{{ sugar_value }}" 
+                           placeholder="0" min="0" max="999" step="0.1">
+                    <span class="input-suffix">g</span>
+                </div>
+                <div class="error-message" id="error-sugar_value">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <span class="error-text"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-help mt-3">
+            <i class="bi bi-info-circle me-1"></i>
+            Les valeurs nutritionnelles sont optionnelles mais recommandées pour un suivi précis.
+        </div>
+    </div>
+
+    {# Action Buttons #}
+    <div class="action-buttons">
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i>
+            {% if is_create %}Créer{% else %}Mettre à jour{% endif %}
+        </button>
+        <a href="{% url 'meals_admin:list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-x-lg me-1"></i>Annuler
+        </a>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // ========== VALIDATION SYSTEM ==========
+    
+    const validationRules = {
+        food_item_name: {
+            required: true,
+            minLength: 3,
+            maxLength: 200,
+            pattern: /^[a-zA-ZÀ-ÿ0-9\s\-']+$/,
+            messages: {
+                required: "Le nom de l'aliment est obligatoire",
+                minLength: "Le nom doit contenir au moins 3 caractères",
+                maxLength: "Le nom ne peut pas dépasser 200 caractères",
+                pattern: "Le nom ne peut contenir que des lettres, chiffres, espaces et tirets"
+            }
+        },
+        food_item_description: {
+            required: true,
+            minLength: 10,
+            maxLength: 500,
+            messages: {
+                required: "La description est obligatoire",
+                minLength: "La description doit contenir au moins 10 caractères",
+                maxLength: "La description ne peut pas dépasser 500 caractères"
+            }
+        },
+        food_type: {
+            required: true,
+            messages: {
+                required: "Veuillez sélectionner un type d'aliment"
+            }
+        },
+        calories_value: {
+            required: false,
+            min: 0,
+            max: 9999,
+            integer: true,
+            messages: {
+                min: "Les calories ne peuvent pas être négatives",
+                max: "Les calories ne peuvent pas dépasser 9999",
+                integer: "Les calories doivent être un nombre entier"
+            }
+        },
+        protein_value: {
+            required: false,
+            min: 0,
+            max: 999,
+            decimal: true,
+            messages: {
+                min: "Les protéines ne peuvent pas être négatives",
+                max: "Les protéines ne peuvent pas dépasser 999g",
+                decimal: "Les protéines doivent être un nombre valide"
+            }
+        },
+        carbs_value: {
+            required: false,
+            min: 0,
+            max: 999,
+            decimal: true,
+            messages: {
+                min: "Les glucides ne peuvent pas être négatifs",
+                max: "Les glucides ne peuvent pas dépasser 999g",
+                decimal: "Les glucides doivent être un nombre valide"
+            }
+        },
+        fiber_value: {
+            required: false,
+            min: 0,
+            max: 999,
+            decimal: true,
+            messages: {
+                min: "Les fibres ne peuvent pas être négatives",
+                max: "Les fibres ne peuvent pas dépasser 999g",
+                decimal: "Les fibres doivent être un nombre valide"
+            }
+        },
+        sugar_value: {
+            required: false,
+            min: 0,
+            max: 999,
+            decimal: true,
+            messages: {
+                min: "Les sucres ne peuvent pas être négatifs",
+                max: "Les sucres ne peuvent pas dépasser 999g",
+                decimal: "Les sucres doivent être un nombre valide"
+            }
+        }
+    };
+
+    // Validate single field
+    function validateField(fieldName, value) {
+        const rules = validationRules[fieldName];
+        if (!rules) return { valid: true };
+
+        // Required validation
+        if (rules.required && (!value || value.trim() === '')) {
+            return { valid: false, message: rules.messages.required };
+        }
+
+        // Skip other validations if field is optional and empty
+        if (!rules.required && (!value || value.trim() === '')) {
+            return { valid: true };
+        }
+
+        // MinLength validation
+        if (rules.minLength && value.length < rules.minLength) {
+            return { valid: false, message: rules.messages.minLength };
+        }
+
+        // MaxLength validation
+        if (rules.maxLength && value.length > rules.maxLength) {
+            return { valid: false, message: rules.messages.maxLength };
+        }
+
+        // Pattern validation
+        if (rules.pattern && !rules.pattern.test(value)) {
+            return { valid: false, message: rules.messages.pattern };
+        }
+
+        // Number validations
+        if (rules.min !== undefined || rules.max !== undefined) {
+            const numValue = parseFloat(value);
+            
+            if (isNaN(numValue)) {
+                return { valid: false, message: rules.messages.decimal || rules.messages.integer };
+            }
+
+            if (rules.min !== undefined && numValue < rules.min) {
+                return { valid: false, message: rules.messages.min };
+            }
+
+            if (rules.max !== undefined && numValue > rules.max) {
+                return { valid: false, message: rules.messages.max };
+            }
+
+            if (rules.integer && !Number.isInteger(numValue)) {
+                return { valid: false, message: rules.messages.integer };
+            }
+        }
+
+        return { valid: true };
+    }
+
+    // Show error message
+    function showError(fieldName, message) {
+        const field = document.getElementById(`id_${fieldName}`) || document.getElementById(fieldName);
+        const errorDiv = document.getElementById(`error-${fieldName}`);
+        const errorText = errorDiv.querySelector('.error-text');
+        const successIcon = field.parentElement.querySelector('.success-icon');
+        const errorIcon = field.parentElement.querySelector('.error-icon');
+
+        field.classList.add('error');
+        field.classList.remove('success');
+        errorDiv.style.display = 'block';
+        errorText.textContent = message;
+
+        if (successIcon) successIcon.style.display = 'none';
+        if (errorIcon) errorIcon.style.display = 'block';
+    }
+
+    // Show success state
+    function showSuccess(fieldName) {
+        const field = document.getElementById(`id_${fieldName}`) || document.getElementById(fieldName);
+        const errorDiv = document.getElementById(`error-${fieldName}`);
+        const successIcon = field.parentElement.querySelector('.success-icon');
+        const errorIcon = field.parentElement.querySelector('.error-icon');
+
+        field.classList.remove('error');
+        field.classList.add('success');
+        errorDiv.style.display = 'none';
+
+        if (successIcon) successIcon.style.display = 'block';
+        if (errorIcon) errorIcon.style.display = 'none';
+    }
+
+    // Clear validation state
+    function clearValidation(fieldName) {
+        const field = document.getElementById(`id_${fieldName}`) || document.getElementById(fieldName);
+        const errorDiv = document.getElementById(`error-${fieldName}`);
+        const successIcon = field.parentElement.querySelector('.success-icon');
+        const errorIcon = field.parentElement.querySelector('.error-icon');
+
+        field.classList.remove('error', 'success');
+        errorDiv.style.display = 'none';
+
+        if (successIcon) successIcon.style.display = 'none';
+        if (errorIcon) errorIcon.style.display = 'none';
+    }
+
+    // Validate form on submit
+    function validateForm() {
+        let isValid = true;
+        const fields = Object.keys(validationRules);
+
+        fields.forEach(fieldName => {
+            const field = document.getElementById(`id_${fieldName}`) || document.getElementById(fieldName);
+            if (!field) return;
+
+            const value = field.value;
+            const result = validateField(fieldName, value);
+
+            if (!result.valid) {
+                showError(fieldName, result.message);
+                isValid = false;
+            } else {
+                if (value.trim() !== '') {
+                    showSuccess(fieldName);
+                } else {
+                    clearValidation(fieldName);
+                }
+            }
+        });
+
+        return isValid;
+    }
+
+    // Character counter for description
+    function updateCharCounter() {
+        const description = document.getElementById('id_food_item_description');
+        const counter = document.getElementById('char-count');
+        const charCounter = document.querySelector('.char-counter');
+        
+        if (description && counter) {
+            const length = description.value.length;
+            counter.textContent = length;
+            
+            charCounter.classList.remove('warning', 'danger');
+            if (length > 450) {
+                charCounter.classList.add('danger');
+            } else if (length > 400) {
+                charCounter.classList.add('warning');
+            }
+        }
+    }
+
+    // Initialize validation on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('foodItemForm');
+        
+        // Update char counter on load
+        updateCharCounter();
+        
+        // Form submit validation
+        form.addEventListener('submit', function(e) {
+            if (!validateForm()) {
+                e.preventDefault();
+                
+                // Scroll to first error
+                const firstError = document.querySelector('.error-message[style*="display: block"]');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                
+                // Show notification
+                alert('⚠️ Veuillez corriger les erreurs avant de soumettre le formulaire.');
+            }
+        });
+
+        // Real-time validation for all fields
+        Object.keys(validationRules).forEach(fieldName => {
+            const field = document.getElementById(`id_${fieldName}`) || document.getElementById(fieldName);
+            if (!field) return;
+
+            // Validate on blur
+            field.addEventListener('blur', function() {
+                const value = this.value;
+                const result = validateField(fieldName, value);
+
+                if (!result.valid) {
+                    showError(fieldName, result.message);
+                } else if (value.trim() !== '') {
+                    showSuccess(fieldName);
+                }
+            });
+
+            // Clear error on input
+            field.addEventListener('input', function() {
+                if (this.classList.contains('error')) {
+                    clearValidation(fieldName);
+                }
+                
+                // Update char counter for description
+                if (fieldName === 'food_item_description') {
+                    updateCharCounter();
+                }
+            });
+
+            // Validate on change for select
+            if (field.tagName === 'SELECT') {
+                field.addEventListener('change', function() {
+                    const value = this.value;
+                    const result = validateField(fieldName, value);
+
+                    if (!result.valid) {
+                        showError(fieldName, result.message);
+                    } else {
+                        showSuccess(fieldName);
+                    }
+                });
+            }
+        });
+
+        // Prevent negative values in number inputs
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            input.addEventListener('keydown', function(e) {
+                if (e.key === '-' || e.key === 'e' || e.key === 'E') {
+                    e.preventDefault();
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
+

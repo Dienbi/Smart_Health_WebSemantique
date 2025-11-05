@@ -1,0 +1,214 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Supprimer Aliment - Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .delete-container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .delete-warning {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        color: white;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 16px rgba(220, 53, 69, 0.2);
+    }
+
+    .delete-warning i {
+        font-size: 3rem;
+        display: block;
+        margin-bottom: 1rem;
+        animation: shake 0.5s ease-in-out;
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
+    }
+
+    .delete-warning h2 {
+        margin: 0 0 0.5rem 0;
+        font-weight: 700;
+        font-size: 1.75rem;
+    }
+
+    .delete-warning p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 1rem;
+    }
+
+    .item-details {
+        background: #fff;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 8px rgba(44, 62, 80, 0.04);
+    }
+
+    .item-details h5 {
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .detail-row {
+        display: grid;
+        grid-template-columns: 140px 1fr;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f8f9fa;
+    }
+
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+
+    .detail-label {
+        font-weight: 600;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .detail-value {
+        color: var(--text-dark);
+        font-weight: 500;
+    }
+
+    .food-type-badge {
+        display: inline-block;
+        padding: 0.3rem 0.7rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .type-protein { background: #e3f2fd; color: #1976d2; }
+    .type-carbs { background: #fff3e0; color: #f57c00; }
+    .type-fats { background: #fce4ec; color: #c2185b; }
+    .type-vegetables { background: #e8f5e9; color: #388e3c; }
+    .type-fruits { background: #f3e5f5; color: #7b1fa2; }
+
+    .alert-info {
+        background: #e7f3ff;
+        border: 1px solid #b3d9ff;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .alert-info i {
+        color: #0066cc;
+        margin-right: 0.5rem;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+
+    .action-buttons .btn {
+        border-radius: 8px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+        min-width: 150px;
+    }
+
+    .action-buttons .btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .btn-delete-confirm {
+        background: #dc3545;
+        border-color: #dc3545;
+        color: white;
+        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    }
+
+    .btn-delete-confirm:hover {
+        background: #c82333;
+        border-color: #bd2130;
+        box-shadow: 0 6px 16px rgba(220, 53, 69, 0.4);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="delete-container">
+    <!-- Warning Header -->
+    <div class="delete-warning">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <h2>Confirmer la suppression</h2>
+        <p>Cette action est irréversible et supprimera définitivement cet aliment.</p>
+    </div>
+
+    <!-- Item Details -->
+    <div class="item-details">
+        <h5><i class="bi bi-egg-fried me-2"></i>Détails de l'aliment à supprimer</h5>
+        
+        <div class="detail-row">
+            <div class="detail-label">Nom:</div>
+            <div class="detail-value">{{ fooditem.food_item_name }}</div>
+        </div>
+
+        <div class="detail-row">
+            <div class="detail-label">Description:</div>
+            <div class="detail-value">{{ fooditem.food_item_description|truncatewords:15 }}</div>
+        </div>
+
+        <div class="detail-row">
+            <div class="detail-label">Type:</div>
+            <div class="detail-value">
+                <span class="food-type-badge type-{{ fooditem.food_type|lower }}">
+                    {{ fooditem.get_food_type_display }}
+                </span>
+            </div>
+        </div>
+
+        {% if fooditem.meal %}
+        <div class="detail-row">
+            <div class="detail-label">Repas:</div>
+            <div class="detail-value">{{ fooditem.meal.meal_name }}</div>
+        </div>
+        {% endif %}
+
+        <div class="detail-row">
+            <div class="detail-label">ID:</div>
+            <div class="detail-value"><span class="badge bg-secondary">#{{ fooditem.food_item_id }}</span></div>
+        </div>
+    </div>
+
+    <!-- Info Alert -->
+    <div class="alert-info">
+        <i class="bi bi-info-circle-fill"></i>
+        <strong>Note:</strong> Toutes les informations nutritionnelles associées (calories, protéines, glucides, fibres, sucres) seront également supprimées.
+    </div>
+
+    <!-- Confirmation Form -->
+    <form method="post">
+        {% csrf_token %}
+        <div class="action-buttons">
+            <a href="{% url 'meals_admin:list' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-x-lg me-1"></i>Annuler
+            </a>
+            <button type="submit" class="btn btn-delete-confirm">
+                <i class="bi bi-trash me-1"></i>Supprimer définitivement
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
