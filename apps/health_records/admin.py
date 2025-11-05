@@ -5,9 +5,7 @@ from .models import (
 )
 
 
-class HealthMetricInline(admin.TabularInline):
-    model = HealthMetric
-    extra = 1
+# HealthMetricInline removed - HealthMetric no longer has ForeignKey to HealthRecord
 
 
 class HeartRateInline(admin.StackedInline):
@@ -42,19 +40,25 @@ class WeightInline(admin.StackedInline):
 
 @admin.register(HealthRecord)
 class HealthRecordAdmin(admin.ModelAdmin):
-    list_display = ('health_record_id', 'user', 'health_record_name', 'start_date', 'end_date')
-    search_fields = ('user__username', 'health_record_name')
-    list_filter = ('start_date', 'created_at')
-    inlines = [HealthMetricInline]
+    list_display = ('health_record_id', 'user', 'health_metric', 'value', 'start_date', 'end_date')
+    search_fields = ('user__username', 'health_metric__metric_name', 'description')
+    list_filter = ('start_date', 'created_at', 'health_metric')
     date_hierarchy = 'start_date'
+    fields = ('user', 'health_metric', 'value', 'description', 'start_date', 'end_date')
 
 
 @admin.register(HealthMetric)
 class HealthMetricAdmin(admin.ModelAdmin):
-    list_display = ('health_metric_id', 'health_record', 'metric_name', 'metric_value', 'metric_unit', 'recorded_at')
-    search_fields = ('metric_name', 'health_record__user__username')
-    list_filter = ('recorded_at',)
+    list_display = ('health_metric_id', 'metric_name', 'metric_unit', 'recorded_at', 'get_health_records_count')
+    search_fields = ('metric_name', 'health_records__user__username', 'health_records__health_record_name')
+    list_filter = ('recorded_at', 'metric_name')
     inlines = [HeartRateInline, CholesterolInline, SugarLevelInline, OxygenInline, HeightInline, WeightInline]
+    readonly_fields = ('health_metric_id',)
+    
+    def get_health_records_count(self, obj):
+        """Get count of health records using this metric"""
+        return obj.health_records.count()
+    get_health_records_count.short_description = 'Health Records'
 
 
 @admin.register(StudentHealthRecord)

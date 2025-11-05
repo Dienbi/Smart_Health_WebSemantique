@@ -57,7 +57,7 @@ class HealthMetricSerializer(serializers.ModelSerializer):
 
 class HealthRecordSerializer(serializers.ModelSerializer):
     user_username = serializers.CharField(source='user.username', read_only=True)
-    metrics = HealthMetricSerializer(many=True, read_only=True)
+    health_metric_detail = HealthMetricSerializer(source='health_metric', read_only=True)
     
     class Meta:
         model = HealthRecord

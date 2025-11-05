@@ -61,10 +61,17 @@ pip install -r requirements.txt
 
 ### 3. Configure Environment Variables
 
-```powershell
-copy .env.example .env
-# Edit .env with your configuration
+Create a `.env` file in the project root with the following:
+
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
+FUSEKI_ENDPOINT=http://localhost:3030/smarthealth/sparql
+FUSEKI_UPDATE_ENDPOINT=http://localhost:3030/smarthealth/update
 ```
+
+**Important:** Get your free Gemini API key at: https://makersuite.google.com/app/apikey
+
+For detailed AI service setup instructions, see [AI_SETUP_GUIDE.md](AI_SETUP_GUIDE.md)
 
 ### 4. Run Migrations
 

@@ -1,0 +1,254 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Gestion des Health Metrics - Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .admin-header h3 {
+        margin: 0;
+        font-weight: 700;
+        font-size: 1.8rem;
+        color: var(--text-dark);
+    }
+
+    .btn-create-metric {
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(30, 136, 229, 0.2);
+        transition: all 0.2s ease;
+    }
+
+    .btn-create-metric:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(30, 136, 229, 0.3);
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 16px rgba(44, 62, 80, 0.06);
+    }
+
+    .data-table thead {
+        background: linear-gradient(90deg, rgba(30, 136, 229, 0.08), rgba(13, 71, 161, 0.04));
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .data-table th {
+        padding: 1rem;
+        text-align: left;
+        font-weight: 700;
+        color: var(--text-dark);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .data-table tbody tr {
+        border-bottom: 1px solid #f1f3f5;
+        transition: background-color 0.15s ease;
+    }
+
+    .data-table tbody tr:hover {
+        background-color: #fafbfc;
+    }
+
+    .data-table td {
+        padding: 1rem;
+        vertical-align: middle;
+        font-size: 0.95rem;
+    }
+
+    .metric-name-cell {
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    .metric-unit-cell {
+        color: var(--text-light);
+        font-size: 0.85rem;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.4rem;
+    }
+
+    .action-buttons .btn {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+        border-radius: 6px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    .action-buttons .btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: var(--text-light);
+    }
+
+    .empty-state i {
+        font-size: 2.5rem;
+        display: block;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    .filter-section {
+        background: #fff;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 8px rgba(44, 62, 80, 0.04);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <h3><i class="bi bi-heart-pulse-fill me-2"></i>Gestion des Health Metrics</h3>
+    <a href="{% url 'health_metrics_admin:create' %}" class="btn btn-primary btn-create-metric">
+        <i class="bi bi-plus-circle me-1"></i>Créer un Metric
+    </a>
+</div>
+
+<!-- Filter Section -->
+<div class="filter-section">
+    <form method="get" class="d-flex gap-2 align-items-end">
+        <div class="flex-grow-1">
+            <label for="health_record_id" class="form-label small">Filtrer par Health Record:</label>
+            <select name="health_record_id" id="health_record_id" class="form-select form-select-sm">
+                <option value="">Tous les Health Records</option>
+                {% for record in health_records %}
+                    <option value="{{ record.health_record_id }}" {% if request.GET.health_record_id == record.health_record_id|stringformat:"s" %}selected{% endif %}>
+                        {{ record.health_record_name }} ({{ record.user.username }})
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-sm btn-outline-primary">Filtrer</button>
+        {% if request.GET.health_record_id %}
+        <a href="{% url 'health_metrics_admin:list' %}" class="btn btn-sm btn-outline-secondary">Réinitialiser</a>
+        {% endif %}
+    </form>
+</div>
+
+{% if metrics %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom du Metric</th>
+                <th>Unité</th>
+                <th>Description</th>
+                <th>Health Records</th>
+                <th>Date d'enregistrement</th>
+                <th style="text-align: right;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for metric in metrics %}
+            <tr>
+                <td><span class="badge bg-secondary">#{{ metric.health_metric_id }}</span></td>
+                <td class="metric-name-cell">{{ metric.metric_name }}</td>
+                <td class="metric-unit-cell">{{ metric.metric_unit|default:"—" }}</td>
+                <td>
+                    {% if metric.metric_description %}
+                        <span title="{{ metric.metric_description }}">{{ metric.metric_description|truncatewords:8 }}</span>
+                    {% else %}
+                        <span class="text-muted">—</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if metric.health_records.exists %}
+                        <span class="badge bg-primary">{{ metric.health_records.count }} record{{ metric.health_records.count|pluralize }}</span>
+                        <br>
+                        <small class="text-muted">
+                            {% for record in metric.health_records.all|slice:":3" %}
+                                {{ record.health_record_name }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                            {% if metric.health_records.count > 3 %}...{% endif %}
+                        </small>
+                    {% else %}
+                        <span class="text-muted">Aucun</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <small>{{ metric.recorded_at|date:"d/m/Y H:i" }}</small>
+                </td>
+                <td style="text-align: right;">
+                    <div class="action-buttons">
+                        <a href="{% url 'health_metrics_admin:detail' metric.health_metric_id %}" class="btn btn-sm btn-outline-info" title="Voir">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="{% url 'health_metrics_admin:edit' metric.health_metric_id %}" class="btn btn-sm btn-outline-secondary" title="Modifier">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="{% url 'health_metrics_admin:delete' metric.health_metric_id %}" class="btn btn-sm btn-outline-danger" title="Supprimer">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <nav aria-label="Page navigation" class="mt-3">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1{% if request.GET.health_record_id %}&health_record_id={{ request.GET.health_record_id }}{% endif %}">Premier</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.health_record_id %}&health_record_id={{ request.GET.health_record_id }}{% endif %}">Précédent</a>
+            </li>
+            {% endif %}
+            
+            <li class="page-item active">
+                <span class="page-link">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</span>
+            </li>
+            
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.health_record_id %}&health_record_id={{ request.GET.health_record_id }}{% endif %}">Suivant</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.health_record_id %}&health_record_id={{ request.GET.health_record_id }}{% endif %}">Dernier</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+{% else %}
+    <div class="empty-state">
+        <i class="bi bi-inbox"></i>
+        <h5>Aucun metric trouvé</h5>
+        <p>Créez votre premier metric pour commencer.</p>
+        <a href="{% url 'health_metrics_admin:create' %}" class="btn btn-primary mt-2">
+            <i class="bi bi-plus-circle me-1"></i>Créer un Metric
+        </a>
+    </div>
+{% endif %}
+{% endblock %}
+

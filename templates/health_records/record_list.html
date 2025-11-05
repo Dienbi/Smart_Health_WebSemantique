@@ -2,16 +2,561 @@
 
 {% block title %}My Health Records - Smart Health{% endblock %}
 
+{% block extra_css %}
+<style>
+    .health-records-page {
+        background: var(--light-gray);
+        min-height: calc(100vh - 200px);
+        padding: 2rem 0;
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+        color: var(--white);
+        padding: 2rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(30, 136, 229, 0.3);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .page-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .btn-add-record {
+        background: var(--white);
+        color: var(--primary-blue);
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .btn-add-record:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    }
+    
+    .records-container {
+        background: var(--white);
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    }
+    
+    .record-card {
+        background: var(--white);
+        border: 2px solid #e9ecef;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .record-card:hover {
+        border-color: var(--primary-blue);
+        box-shadow: 0 5px 20px rgba(30, 136, 229, 0.1);
+        transform: translateY(-2px);
+    }
+    
+    .record-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+    
+    .record-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
+    }
+    
+    .record-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .btn-action {
+        padding: 0.5rem 0.75rem;
+        border-radius: 8px;
+        border: none;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-edit {
+        background: var(--light-blue);
+        color: var(--primary-blue);
+    }
+    
+    .btn-edit:hover {
+        background: var(--primary-blue);
+        color: var(--white);
+    }
+    
+    .btn-delete {
+        background: #fee;
+        color: #d32f2f;
+    }
+    
+    .btn-delete:hover {
+        background: #d32f2f;
+        color: var(--white);
+    }
+    
+    .record-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    .info-label {
+        font-size: 0.85rem;
+        color: var(--text-light);
+        font-weight: 500;
+    }
+    
+    .info-value {
+        font-size: 1.1rem;
+        color: var(--text-dark);
+        font-weight: 600;
+    }
+    
+    .record-description {
+        color: var(--text-light);
+        font-size: 0.95rem;
+        margin-top: 0.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--text-light);
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        color: var(--primary-blue);
+        opacity: 0.5;
+    }
+    
+    .modal-content {
+        border-radius: 20px;
+        border: none;
+    }
+    
+    .modal-header {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+        color: var(--white);
+        border-radius: 20px 20px 0 0;
+        padding: 1.5rem;
+    }
+    
+    .modal-header .btn-close {
+        filter: brightness(0) invert(1);
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 0.2rem rgba(30, 136, 229, 0.1);
+    }
+    
+    .alert {
+        border-radius: 12px;
+        border: none;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-12">
-            <div class="alert alert-info">
-                <h4><i class="bi bi-heart-pulse"></i> Health Records Module</h4>
-                <p>Full health records management interface coming soon! For now, use the <a href="{% url 'api_ai:ai-test' %}">AI Assistant</a> or <a href="{% url 'admin:index' %}">Django Admin</a>.</p>
-                <a href="{% url 'home' %}" class="btn btn-primary">Back to Home</a>
+<div class="health-records-page">
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>
+                <i class="bi bi-heart-pulse-fill"></i>
+                My Health Records
+            </h1>
+            <button type="button" class="btn btn-add-record" data-bs-toggle="modal" data-bs-target="#addRecordModal">
+                <i class="bi bi-plus-circle"></i> Add New Record
+            </button>
+        </div>
+        
+        <!-- Records Container -->
+        <div class="records-container">
+            {% if records %}
+                <div id="recordsList">
+                    {% for record in records %}
+                    <div class="record-card" data-record-id="{{ record.health_record_id }}">
+                        <div class="record-header">
+                            <div>
+                                {% if record.health_metric %}
+                                <h3 class="record-title">{{ record.health_metric.metric_name }}</h3>
+                                <span class="badge bg-primary mt-2">{{ record.health_metric.metric_unit }}</span>
+                                {% else %}
+                                <h3 class="record-title">Health Record</h3>
+                                {% endif %}
+                            </div>
+                            <div class="record-actions">
+                                <button class="btn btn-action btn-edit" onclick="editRecord({{ record.health_record_id }})">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </button>
+                                <button class="btn btn-action btn-delete" onclick="deleteRecord({{ record.health_record_id }}, '{{ record.health_metric.metric_name|default:"Health Record" }}')">
+                                    <i class="bi bi-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="record-info">
+                            {% if record.value %}
+                            <div class="info-item">
+                                <span class="info-label">Value</span>
+                                <span class="info-value">{{ record.value }}</span>
+                            </div>
+                            {% endif %}
+                            <div class="info-item">
+                                <span class="info-label">Start Date</span>
+                                <span class="info-value">{{ record.start_date|date:"d/m/Y H:i" }}</span>
+                            </div>
+                            {% if record.end_date %}
+                            <div class="info-item">
+                                <span class="info-label">End Date</span>
+                                <span class="info-value">{{ record.end_date|date:"d/m/Y H:i" }}</span>
+                            </div>
+                            {% endif %}
+                            <div class="info-item">
+                                <span class="info-label">Created</span>
+                                <span class="info-value">{{ record.created_at|date:"d/m/Y" }}</span>
+                            </div>
+                        </div>
+                        
+                        {% if record.description %}
+                        <div class="record-description">
+                            {{ record.description }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-clipboard-data"></i>
+                    <h3>No Health Records Yet</h3>
+                    <p>Start tracking your health by adding your first health record!</p>
+                    <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#addRecordModal">
+                        <i class="bi bi-plus-circle"></i> Add Your First Record
+                    </button>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Record Modal -->
+<div class="modal fade" id="addRecordModal" tabindex="-1" aria-labelledby="addRecordModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addRecordModalLabel">
+                    <i class="bi bi-plus-circle"></i> <span id="modalTitle">Add New Health Record</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="alertContainer"></div>
+                <form id="recordForm">
+                    <input type="hidden" id="recordId" name="record_id">
+                    
+                    <div class="mb-3">
+                        <label for="health_metric_id" class="form-label">Health Metric</label>
+                        <select class="form-select" id="health_metric_id" name="health_metric_id">
+                            <option value="">Select a metric...</option>
+                            {% for metric in metrics %}
+                            <option value="{{ metric.health_metric_id }}" data-unit="{{ metric.metric_unit }}">
+                                {{ metric.metric_name }} ({{ metric.metric_unit }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="value" class="form-label">Value</label>
+                        <input type="number" step="0.01" class="form-control" id="value" name="value" placeholder="Enter the value">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3" placeholder="Enter a description..."></textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="start_date" class="form-label">Start Date *</label>
+                            <input type="datetime-local" class="form-control" id="start_date" name="start_date" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="end_date" class="form-label">End Date</label>
+                            <input type="datetime-local" class="form-control" id="end_date" name="end_date">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveRecord()">
+                    <i class="bi bi-check-circle"></i> Save Record
+                </button>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteModalLabel">
+                    <i class="bi bi-exclamation-triangle"></i> Confirm Delete
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the health record <strong id="deleteRecordName"></strong>?</p>
+                <p class="text-danger small">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" onclick="confirmDelete()">
+                    <i class="bi bi-trash"></i> Delete
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+let currentRecordId = null;
+let deleteRecordId = null;
+
+// Set current date as default for start_date
+document.addEventListener('DOMContentLoaded', function() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const dateTimeString = `${year}-${month}-${day}T${hours}:${minutes}`;
+    document.getElementById('start_date').value = dateTimeString;
+});
+
+function showAlert(message, type = 'success') {
+    const alertContainer = document.getElementById('alertContainer');
+    alertContainer.innerHTML = `
+        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    `;
+    setTimeout(() => {
+        const alert = alertContainer.querySelector('.alert');
+        if (alert) {
+            alert.remove();
+        }
+    }, 5000);
+}
+
+function resetForm() {
+    document.getElementById('recordForm').reset();
+    document.getElementById('recordId').value = '';
+    currentRecordId = null;
+    document.getElementById('modalTitle').textContent = 'Add New Health Record';
+    const alertContainer = document.getElementById('alertContainer');
+    alertContainer.innerHTML = '';
+}
+
+function editRecord(recordId) {
+    currentRecordId = recordId;
+    fetch(`/health/${recordId}/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                showAlert(data.error, 'danger');
+                return;
+            }
+            
+            document.getElementById('recordId').value = data.health_record_id;
+            document.getElementById('description').value = data.description || '';
+            document.getElementById('value').value = data.value || '';
+            document.getElementById('health_metric_id').value = data.health_metric_id || '';
+            
+            if (data.start_date) {
+                const startDate = new Date(data.start_date);
+                document.getElementById('start_date').value = startDate.toISOString().slice(0, 16);
+            }
+            
+            if (data.end_date) {
+                const endDate = new Date(data.end_date);
+                document.getElementById('end_date').value = endDate.toISOString().slice(0, 16);
+            }
+            
+            document.getElementById('modalTitle').textContent = 'Edit Health Record';
+            const modal = new bootstrap.Modal(document.getElementById('addRecordModal'));
+            modal.show();
+        })
+        .catch(error => {
+            showAlert('Error loading record: ' + error.message, 'danger');
+        });
+}
+
+function deleteRecord(recordId, recordName) {
+    deleteRecordId = recordId;
+    document.getElementById('deleteRecordName').textContent = recordName;
+    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    modal.show();
+}
+
+function confirmDelete() {
+    if (!deleteRecordId) return;
+    
+    fetch(`/health/${deleteRecordId}/delete/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert(data.message, 'success');
+            // Remove the record card from DOM
+            const recordCard = document.querySelector(`[data-record-id="${deleteRecordId}"]`);
+            if (recordCard) {
+                recordCard.remove();
+                
+                // Check if no records left
+                const recordsList = document.getElementById('recordsList');
+                if (recordsList && recordsList.children.length === 0) {
+                    location.reload();
+                }
+            }
+            const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+            modal.hide();
+            deleteRecordId = null;
+        } else {
+            showAlert(data.error || 'Error deleting record', 'danger');
+        }
+    })
+    .catch(error => {
+        showAlert('Error deleting record: ' + error.message, 'danger');
+    });
+}
+
+function saveRecord() {
+    const form = document.getElementById('recordForm');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+    
+    const formData = {
+        description: document.getElementById('description').value,
+        value: document.getElementById('value').value || null,
+        health_metric_id: document.getElementById('health_metric_id').value || null,
+        start_date: document.getElementById('start_date').value,
+        end_date: document.getElementById('end_date').value || null
+    };
+    
+    const recordId = document.getElementById('recordId').value;
+    const url = recordId ? `/health/${recordId}/update/` : '/health/create/';
+    
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert(data.message, 'success');
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        } else {
+            showAlert(data.error || 'Error saving record', 'danger');
+        }
+    })
+    .catch(error => {
+        showAlert('Error saving record: ' + error.message, 'danger');
+    });
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Reset form when modal is closed
+document.addEventListener('DOMContentLoaded', function() {
+    const addRecordModal = document.getElementById('addRecordModal');
+    if (addRecordModal) {
+        addRecordModal.addEventListener('hidden.bs.modal', function () {
+            resetForm();
+        });
+    }
+});
+</script>
 {% endblock %}

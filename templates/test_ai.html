@@ -694,6 +694,30 @@
                     </div>
                 `;
                 
+                // Show setup instructions if AI service is not configured
+                if (data.error && data.error.includes('not configured') && data.setup_instructions) {
+                    html += `
+                        <div class="query-box" style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem;">
+                            <div class="query-box-header" style="color: #856404;">
+                                <i class="bi bi-gear-fill"></i>
+                                <span>Setup Instructions</span>
+                            </div>
+                            <ol style="margin: 1rem 0; padding-left: 1.5rem; color: #856404;">
+                                ${data.setup_instructions.map(instruction => `<li style="margin-bottom: 0.5rem;">${escapeHtml(instruction)}</li>`).join('')}
+                            </ol>
+                            <div style="margin-top: 1rem; padding: 1rem; background: white; border-radius: 8px; border: 1px solid #ffc107;">
+                                <strong style="color: #856404;">Quick Setup:</strong>
+                                <ol style="margin: 0.5rem 0; padding-left: 1.5rem; color: #856404;">
+                                    <li>Get your free API key: <a href="https://makersuite.google.com/app/apikey" target="_blank" style="color: #1e88e5;">https://makersuite.google.com/app/apikey</a></li>
+                                    <li>Create a <code style="background: #f0f0f0; padding: 0.2rem 0.4rem; border-radius: 4px;">.env</code> file in the project root</li>
+                                    <li>Add this line: <code style="background: #f0f0f0; padding: 0.2rem 0.4rem; border-radius: 4px;">GEMINI_API_KEY=your_key_here</code></li>
+                                    <li>Restart the Django server</li>
+                                </ol>
+                            </div>
+                        </div>
+                    `;
+                }
+                
                 // Error Details
                 if (data.details) {
                     html += `
@@ -751,5 +775,46 @@
     
     // Auto-focus on prompt
     document.getElementById('prompt').focus();
+    
+    // Check AI service status on page load
+    async function checkAIStatus() {
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ prompt: 'test' })
+            });
+            
+            const data = await response.json();
+            
+            // If AI service is not configured, show a warning banner
+            if (!data.success && data.error && data.error.includes('not configured')) {
+                const infoBanner = document.querySelector('.info-banner');
+                if (infoBanner) {
+                    infoBanner.style.background = 'linear-gradient(135deg, #fff3cd 0%, rgba(255, 193, 7, 0.1) 100%)';
+                    infoBanner.style.borderLeftColor = '#ffc107';
+                    infoBanner.innerHTML = `
+                        <i class="bi bi-exclamation-triangle-fill" style="color: #856404; font-size: 2rem;"></i>
+                        <div class="info-banner-content">
+                            <h5 style="color: #856404;">⚠️ AI Service Not Configured</h5>
+                            <p style="color: #856404;">
+                                The AI service requires a Gemini API key. 
+                                <a href="https://makersuite.google.com/app/apikey" target="_blank" style="color: #1e88e5; font-weight: 600;">Get your free API key here</a>, 
+                                then add <code style="background: rgba(0,0,0,0.1); padding: 0.2rem 0.4rem; border-radius: 4px;">GEMINI_API_KEY=your_key</code> to a <code style="background: rgba(0,0,0,0.1); padding: 0.2rem 0.4rem; border-radius: 4px;">.env</code> file in the project root and restart the server.
+                            </p>
+                        </div>
+                    `;
+                }
+            }
+        } catch (error) {
+            // Silently fail - server might not be running
+            console.log('Could not check AI status:', error.message);
+        }
+    }
+    
+    // Check status when page loads
+    checkAIStatus();
 </script>
 {% endblock %}

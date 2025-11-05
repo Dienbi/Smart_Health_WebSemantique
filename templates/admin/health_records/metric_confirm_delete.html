@@ -1,0 +1,139 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Supprimer Health Metric{% endblock %}
+
+{% block extra_css %}
+<style>
+    .delete-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 16px rgba(44, 62, 80, 0.06);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .delete-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .delete-header i {
+        font-size: 3rem;
+        color: #d32f2f;
+        margin-bottom: 1rem;
+    }
+
+    .delete-header h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    .metric-info {
+        background: #f9fafb;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .metric-info-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .metric-info-item:last-child {
+        border-bottom: none;
+    }
+
+    .metric-info-label {
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    .metric-info-value {
+        color: var(--text-light);
+    }
+
+    .warning-box {
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+    }
+
+    .warning-box i {
+        color: #856404;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: center;
+    }
+
+    .action-buttons .btn {
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        border-radius: 8px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="delete-card">
+    <div class="delete-header">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <h3>Confirmer la suppression</h3>
+    </div>
+
+    <div class="warning-box">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        <strong>Attention !</strong> Cette action est irréversible. Le metric sera définitivement supprimé.
+    </div>
+
+    <div class="metric-info">
+        <div class="metric-info-item">
+            <span class="metric-info-label">Nom du Metric:</span>
+            <span class="metric-info-value">{{ metric.metric_name }}</span>
+        </div>
+        <div class="metric-info-item">
+            <span class="metric-info-label">Unité:</span>
+            <span class="metric-info-value">{{ metric.metric_unit|default:"—" }}</span>
+        </div>
+        <div class="metric-info-item">
+            <span class="metric-info-label">Health Records associés:</span>
+            <span class="metric-info-value">
+                {% if metric.health_records.exists %}
+                    {{ metric.health_records.count }} record{{ metric.health_records.count|pluralize }}
+                {% else %}
+                    Aucun
+                {% endif %}
+            </span>
+        </div>
+        <div class="metric-info-item">
+            <span class="metric-info-label">Date d'enregistrement:</span>
+            <span class="metric-info-value">{{ metric.recorded_at|date:"d/m/Y à H:i" }}</span>
+        </div>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="action-buttons">
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-trash me-1"></i>Oui, supprimer
+            </button>
+            <a href="{% url 'health_metrics_admin:list' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-x-lg me-1"></i>Annuler
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

@@ -1,0 +1,146 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}{% if form.instance.pk %}Modifier Health Metric{% else %}Créer Health Metric{% endif %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-section {
+        background: #fff;
+        border: 1px solid #e9ecef;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 8px rgba(44, 62, 80, 0.04);
+    }
+
+    .form-section-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #e9ecef;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.1);
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 2px solid #e9ecef;
+    }
+
+    .action-buttons .btn {
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    .action-buttons .btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .form-header {
+        margin-bottom: 2rem;
+    }
+
+    .form-header h2 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-header">
+    <h2>
+        <i class="bi bi-heart-pulse-fill me-2"></i>
+        {% if form.instance.pk %}Modifier un Health Metric{% else %}Créer un Health Metric{% endif %}
+    </h2>
+</div>
+
+<form method="post">
+    {% csrf_token %}
+
+    {# Basic Info Section #}
+    <div class="form-section">
+        <div class="form-section-title">
+            <i class="bi bi-info-circle"></i>Informations du Metric
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.metric_name.id_for_label }}">{{ form.metric_name.label }}</label>
+            {{ form.metric_name }}
+            {% if form.metric_name.errors %}
+                <div class="text-danger small mt-1">{{ form.metric_name.errors }}</div>
+            {% endif %}
+            <small class="text-muted">Exemples: Heart Rate, Blood Pressure, Cholesterol, Weight, etc.</small>
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.metric_unit.id_for_label }}">{{ form.metric_unit.label }}</label>
+            {{ form.metric_unit }}
+            {% if form.metric_unit.errors %}
+                <div class="text-danger small mt-1">{{ form.metric_unit.errors }}</div>
+            {% endif %}
+            <small class="text-muted">Exemples: bpm, mmHg, mg/dL, kg, cm, %, etc.</small>
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.metric_description.id_for_label }}">{{ form.metric_description.label }}</label>
+            {{ form.metric_description }}
+            {% if form.metric_description.errors %}
+                <div class="text-danger small mt-1">{{ form.metric_description.errors }}</div>
+            {% endif %}
+            <small class="text-muted">Description optionnelle du metric.</small>
+        </div>
+    </div>
+
+    {# Action Buttons #}
+    <div class="action-buttons">
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i>
+            {% if form.instance.pk %}Mettre à jour{% else %}Créer{% endif %}
+        </button>
+        <a href="{% url 'health_metrics_admin:list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-x-lg me-1"></i>Annuler
+        </a>
+    </div>
+</form>
+{% endblock %}
+

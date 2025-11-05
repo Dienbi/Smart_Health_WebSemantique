@@ -2,11 +2,27 @@ from django.db import models
 from apps.users.models import User, Student, Teacher
 
 
+class HealthMetric(models.Model):
+    """Health Metric model"""
+    health_metric_id = models.AutoField(primary_key=True)
+    metric_name = models.CharField(max_length=200)
+    metric_description = models.TextField()
+    metric_unit = models.CharField(max_length=50)
+    recorded_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'health_metrics'
+    
+    def __str__(self):
+        return f"{self.metric_name} ({self.metric_unit})"
+
+
 class HealthRecord(models.Model):
     """Base Health Record model"""
     health_record_id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='health_records')
-    health_record_name = models.CharField(max_length=200)
+    health_metric = models.ForeignKey(HealthMetric, on_delete=models.CASCADE, related_name='health_records', null=True, blank=True)
+    value = models.FloatField(null=True, blank=True, help_text="Valeur du metric")
     description = models.TextField()
     start_date = models.DateTimeField()
     end_date = models.DateTimeField(null=True, blank=True)
@@ -16,7 +32,8 @@ class HealthRecord(models.Model):
         db_table = 'health_records'
     
     def __str__(self):
-        return f"{self.user.username} - {self.health_record_name}"
+        metric_name = self.health_metric.metric_name if self.health_metric else "Health Record"
+        return f"{self.user.username} - {metric_name}"
 
 
 class StudentHealthRecord(models.Model):
@@ -43,21 +60,6 @@ class TeacherHealthRecord(models.Model):
         return f"Teacher Health Record: {self.teacher.user.username}"
 
 
-class HealthMetric(models.Model):
-    """Health Metric model"""
-    health_metric_id = models.AutoField(primary_key=True)
-    health_record = models.ForeignKey(HealthRecord, on_delete=models.CASCADE, related_name='metrics')
-    metric_name = models.CharField(max_length=200)
-    metric_description = models.TextField()
-    metric_value = models.FloatField()
-    metric_unit = models.CharField(max_length=50)
-    recorded_at = models.DateTimeField(auto_now_add=True)
-    
-    class Meta:
-        db_table = 'health_metrics'
-    
-    def __str__(self):
-        return f"{self.metric_name}: {self.metric_value} {self.metric_unit}"
 
 
 class HeartRate(models.Model):

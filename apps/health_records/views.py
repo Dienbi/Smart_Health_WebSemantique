@@ -4,11 +4,21 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from django.views import generic
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import HealthRecord, HealthMetric, StudentHealthRecord, TeacherHealthRecord
 from .serializers import (
     HealthRecordSerializer, HealthMetricSerializer,
     StudentHealthRecordSerializer, TeacherHealthRecordSerializer
 )
+
+
+# Staff Required Mixin
+class StaffRequiredMixin(UserPassesTestMixin):
+    """Require staff status for admin views"""
+    def test_func(self):
+        return self.request.user.is_staff
 
 
 class HealthRecordViewSet(viewsets.ModelViewSet):
@@ -37,12 +47,16 @@ class HealthRecordViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
     
     @action(detail=True, methods=['get'])
-    def metrics(self, request, pk=None):
-        """Get all metrics for a specific health record"""
+    def metric(self, request, pk=None):
+        """Get the metric for a specific health record"""
         record = self.get_object()
-        metrics = record.metrics.all()
-        serializer = HealthMetricSerializer(metrics, many=True)
-        return Response(serializer.data)
+        if record.health_metric:
+            serializer = HealthMetricSerializer(record.health_metric)
+            return Response(serializer.data)
+        return Response(
+            {'message': 'No metric found for this health record'},
+            status=status.HTTP_404_NOT_FOUND
+        )
     
     @action(detail=False, methods=['get'])
     def latest(self, request):
@@ -69,12 +83,12 @@ class HealthMetricViewSet(viewsets.ModelViewSet):
         """Filter metrics by user's health records if not staff"""
         if self.request.user.is_staff:
             return HealthMetric.objects.all()
-        return HealthMetric.objects.filter(health_record__user=self.request.user)
+        return HealthMetric.objects.filter(health_records__user=self.request.user).distinct()
     
     @action(detail=False, methods=['get'])
     def my_metrics(self, request):
         """Get metrics for current user"""
-        metrics = HealthMetric.objects.filter(health_record__user=request.user)
+        metrics = HealthMetric.objects.filter(health_records__user=request.user).distinct()
         serializer = self.get_serializer(metrics, many=True)
         return Response(serializer.data)
     
@@ -96,13 +110,13 @@ class HealthMetricViewSet(viewsets.ModelViewSet):
         from django.db.models import Max
         
         metric_names = HealthMetric.objects.filter(
-            health_record__user=request.user
+            health_records__user=request.user
         ).values_list('metric_name', flat=True).distinct()
         
         latest_metrics = []
         for name in metric_names:
             metric = HealthMetric.objects.filter(
-                health_record__user=request.user,
+                health_records__user=request.user,
                 metric_name=name
             ).order_by('-recorded_at').first()
             if metric:
@@ -146,7 +160,289 @@ class TeacherHealthRecordViewSet(viewsets.ModelViewSet):
 @login_required
 def health_record_list_view(request):
     """Display list of user's health records"""
-    records = HealthRecord.objects.filter(user=request.user).order_by('-created_at')
+    records = HealthRecord.objects.filter(user=request.user).select_related('health_metric').order_by('-created_at')
+    metrics = HealthMetric.objects.all().order_by('metric_name')
     return render(request, 'health_records/record_list.html', {
-        'records': records
+        'records': records,
+        'metrics': metrics
     })
+
+
+@login_required
+def health_record_create_view(request):
+    """Create a new health record"""
+    from django.http import JsonResponse
+    if request.method == 'POST':
+        from django.utils.dateparse import parse_datetime
+        import json
+        
+        try:
+            data = json.loads(request.body)
+            
+            # Parse dates
+            start_date_str = data.get('start_date')
+            end_date_str = data.get('end_date')
+            
+            start_date = None
+            end_date = None
+            
+            if start_date_str:
+                start_date = parse_datetime(start_date_str)
+                if not start_date:
+                    # Try parsing as datetime-local format (YYYY-MM-DDTHH:mm)
+                    from datetime import datetime
+                    try:
+                        start_date = datetime.strptime(start_date_str, '%Y-%m-%dT%H:%M')
+                    except:
+                        try:
+                            start_date = datetime.strptime(start_date_str, '%Y-%m-%d %H:%M:%S')
+                        except:
+                            try:
+                                start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+                            except:
+                                pass
+            
+            if end_date_str:
+                end_date = parse_datetime(end_date_str)
+                if not end_date:
+                    # Try parsing as datetime-local format (YYYY-MM-DDTHH:mm)
+                    from datetime import datetime
+                    try:
+                        end_date = datetime.strptime(end_date_str, '%Y-%m-%dT%H:%M')
+                    except:
+                        try:
+                            end_date = datetime.strptime(end_date_str, '%Y-%m-%d %H:%M:%S')
+                        except:
+                            try:
+                                end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+                            except:
+                                pass
+            
+            # Get health_metric if provided
+            health_metric = None
+            if data.get('health_metric_id'):
+                try:
+                    health_metric = HealthMetric.objects.get(health_metric_id=data.get('health_metric_id'))
+                except HealthMetric.DoesNotExist:
+                    pass
+            
+            # Create health record
+            record = HealthRecord.objects.create(
+                user=request.user,
+                health_metric=health_metric,
+                value=data.get('value') if data.get('value') else None,
+                description=data.get('description', ''),
+                start_date=start_date,
+                end_date=end_date
+            )
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Health record created successfully',
+                'record_id': record.health_record_id
+            })
+        except Exception as e:
+            import traceback
+            return JsonResponse({
+                'success': False,
+                'error': str(e),
+                'traceback': traceback.format_exc() if request.user.is_staff else None
+            }, status=400)
+    
+    return JsonResponse({'error': 'GET method not allowed'}, status=405)
+
+
+@login_required
+def health_record_update_view(request, record_id):
+    """Update a health record"""
+    try:
+        record = HealthRecord.objects.get(health_record_id=record_id, user=request.user)
+    except HealthRecord.DoesNotExist:
+        from django.http import JsonResponse
+        return JsonResponse({'error': 'Record not found'}, status=404)
+    
+    if request.method == 'POST':
+        from django.http import JsonResponse
+        from django.utils.dateparse import parse_datetime
+        import json
+        
+        try:
+            data = json.loads(request.body)
+            
+            # Update fields
+            if 'description' in data:
+                record.description = data.get('description', '')
+            
+            if 'value' in data:
+                record.value = data.get('value') if data.get('value') else None
+            
+            # Update health_metric if provided
+            if 'health_metric_id' in data:
+                if data.get('health_metric_id'):
+                    try:
+                        record.health_metric = HealthMetric.objects.get(health_metric_id=data.get('health_metric_id'))
+                    except HealthMetric.DoesNotExist:
+                        record.health_metric = None
+                else:
+                    record.health_metric = None
+            
+            # Parse and update dates
+            if 'start_date' in data and data.get('start_date'):
+                start_date = parse_datetime(data.get('start_date'))
+                if not start_date:
+                    # Try parsing as datetime-local format (YYYY-MM-DDTHH:mm)
+                    from datetime import datetime
+                    try:
+                        start_date = datetime.strptime(data.get('start_date'), '%Y-%m-%dT%H:%M')
+                    except:
+                        try:
+                            start_date = datetime.strptime(data.get('start_date'), '%Y-%m-%d %H:%M:%S')
+                        except:
+                            try:
+                                start_date = datetime.strptime(data.get('start_date'), '%Y-%m-%d')
+                            except:
+                                pass
+                    if start_date:
+                        record.start_date = start_date
+            else:
+                record.start_date = None
+            
+            if 'end_date' in data:
+                if data.get('end_date'):
+                    end_date = parse_datetime(data.get('end_date'))
+                    if not end_date:
+                        # Try parsing as datetime-local format (YYYY-MM-DDTHH:mm)
+                        from datetime import datetime
+                        try:
+                            end_date = datetime.strptime(data.get('end_date'), '%Y-%m-%dT%H:%M')
+                        except:
+                            try:
+                                end_date = datetime.strptime(data.get('end_date'), '%Y-%m-%d %H:%M:%S')
+                            except:
+                                try:
+                                    end_date = datetime.strptime(data.get('end_date'), '%Y-%m-%d')
+                                except:
+                                    pass
+                        if end_date:
+                            record.end_date = end_date
+                else:
+                    record.end_date = None
+            
+            record.save()
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Health record updated successfully',
+                'record_id': record.health_record_id
+            })
+        except Exception as e:
+            import traceback
+            return JsonResponse({
+                'success': False,
+                'error': str(e),
+                'traceback': traceback.format_exc() if request.user.is_staff else None
+            }, status=400)
+    
+    return JsonResponse({'error': 'GET method not allowed'}, status=405)
+
+
+@login_required
+def health_record_delete_view(request, record_id):
+    """Delete a health record"""
+    try:
+        record = HealthRecord.objects.get(health_record_id=record_id, user=request.user)
+    except HealthRecord.DoesNotExist:
+        from django.http import JsonResponse
+        return JsonResponse({'error': 'Record not found'}, status=404)
+    
+    if request.method == 'POST':
+        from django.http import JsonResponse
+        record_id_deleted = record.health_record_id
+        record.delete()
+        return JsonResponse({
+            'success': True,
+            'message': 'Health record deleted successfully',
+            'record_id': record_id_deleted
+        })
+    
+    from django.http import JsonResponse
+    return JsonResponse({'error': 'GET method not allowed'}, status=405)
+
+
+@login_required
+def health_record_detail_view(request, record_id):
+    """Get details of a health record"""
+    try:
+        record = HealthRecord.objects.select_related('health_metric').get(health_record_id=record_id, user=request.user)
+    except HealthRecord.DoesNotExist:
+        from django.http import JsonResponse
+        return JsonResponse({'error': 'Record not found'}, status=404)
+    
+    from django.http import JsonResponse
+    from django.core.serializers.json import DjangoJSONEncoder
+    import json
+    from datetime import datetime
+    
+    data = {
+        'health_record_id': record.health_record_id,
+        'description': record.description,
+        'value': record.value,
+        'health_metric_id': record.health_metric.health_metric_id if record.health_metric else None,
+        'health_metric_name': record.health_metric.metric_name if record.health_metric else None,
+        'start_date': record.start_date.isoformat() if record.start_date else None,
+        'end_date': record.end_date.isoformat() if record.end_date else None,
+        'created_at': record.created_at.isoformat() if record.created_at else None,
+    }
+    
+    return JsonResponse(data)
+
+
+# Admin CRUD Views for Health Metrics
+class AdminHealthMetricListView(StaffRequiredMixin, generic.ListView):
+    model = HealthMetric
+    template_name = 'admin/health_records/metric_list.html'
+    context_object_name = 'metrics'
+    paginate_by = 20
+    
+    def get_queryset(self):
+        queryset = HealthMetric.objects.prefetch_related('health_records', 'health_records__user').order_by('-recorded_at')
+        # Optional filtering by health record
+        health_record_id = self.request.GET.get('health_record_id')
+        if health_record_id:
+            queryset = queryset.filter(health_records__health_record_id=health_record_id).distinct()
+        return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Get all health records for the filter dropdown
+        context['health_records'] = HealthRecord.objects.select_related('user', 'health_metric').order_by('-created_at')
+        return context
+
+
+class AdminHealthMetricDetailView(StaffRequiredMixin, generic.DetailView):
+    model = HealthMetric
+    template_name = 'admin/health_records/metric_detail.html'
+    context_object_name = 'metric'
+    pk_url_kwarg = 'pk'
+
+
+class AdminHealthMetricCreateView(StaffRequiredMixin, generic.CreateView):
+    model = HealthMetric
+    fields = ['metric_name', 'metric_description', 'metric_unit']
+    template_name = 'admin/health_records/metric_form.html'
+    success_url = reverse_lazy('health_metrics_admin:list')
+
+
+class AdminHealthMetricUpdateView(StaffRequiredMixin, generic.UpdateView):
+    model = HealthMetric
+    fields = ['metric_name', 'metric_description', 'metric_unit']
+    template_name = 'admin/health_records/metric_form.html'
+    success_url = reverse_lazy('health_metrics_admin:list')
+    pk_url_kwarg = 'pk'
+
+
+class AdminHealthMetricDeleteView(StaffRequiredMixin, generic.DeleteView):
+    model = HealthMetric
+    template_name = 'admin/health_records/metric_confirm_delete.html'
+    success_url = reverse_lazy('health_metrics_admin:list')
+    pk_url_kwarg = 'pk'

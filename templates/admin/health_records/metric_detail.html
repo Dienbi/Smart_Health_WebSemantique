@@ -1,0 +1,165 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}{{ metric.metric_name }} - Détail{% endblock %}
+
+{% block extra_css %}
+<style>
+    .detail-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 16px rgba(44, 62, 80, 0.06);
+        margin-bottom: 2rem;
+    }
+
+    .detail-header {
+        border-bottom: 2px solid #e9ecef;
+        padding-bottom: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .detail-header h3 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    .detail-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .info-item {
+        padding: 1rem;
+        background: #f9fafb;
+        border-radius: 8px;
+        border-left: 4px solid var(--primary-blue);
+    }
+
+    .info-item-label {
+        font-size: 0.85rem;
+        color: var(--text-light);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+
+    .info-item-value {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    .metric-value-display {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary-blue);
+        text-align: center;
+        padding: 2rem;
+        background: linear-gradient(135deg, rgba(30, 136, 229, 0.1), rgba(13, 71, 161, 0.05));
+        border-radius: 12px;
+        margin: 2rem 0;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 2px solid #e9ecef;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-card">
+    <div class="detail-header">
+        <h3>
+            <i class="bi bi-heart-pulse-fill me-2"></i>{{ metric.metric_name }}
+        </h3>
+    </div>
+
+    <div class="metric-value-display">
+        {{ metric.metric_name }} <span style="font-size: 1.2rem; color: var(--text-light);">({{ metric.metric_unit|default:"unit" }})</span>
+    </div>
+
+    <div class="detail-info">
+        <div class="info-item">
+            <div class="info-item-label">Nom du Metric</div>
+            <div class="info-item-value">{{ metric.metric_name }}</div>
+        </div>
+
+        <div class="info-item">
+            <div class="info-item-label">Unité</div>
+            <div class="info-item-value">{{ metric.metric_unit|default:"—" }}</div>
+        </div>
+
+        <div class="info-item">
+            <div class="info-item-label">Date d'enregistrement</div>
+            <div class="info-item-value">{{ metric.recorded_at|date:"d/m/Y à H:i" }}</div>
+        </div>
+
+        <div class="info-item">
+            <div class="info-item-label">ID du Metric</div>
+            <div class="info-item-value">#{{ metric.health_metric_id }}</div>
+        </div>
+        
+        <div class="info-item">
+            <div class="info-item-label">Health Records</div>
+            <div class="info-item-value">
+                {% if metric.health_records.exists %}
+                    <span class="badge bg-primary">{{ metric.health_records.count }} record{{ metric.health_records.count|pluralize }}</span>
+                {% else %}
+                    <span class="text-muted">Aucun</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    {% if metric.health_records.exists %}
+    <div class="mt-4">
+        <h5><i class="bi bi-file-medical me-2"></i>Health Records associés</h5>
+        <div class="list-group">
+            {% for record in metric.health_records.all %}
+            <div class="list-group-item">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ record.health_record_name }}</strong>
+                        <br>
+                        <small class="text-muted">{{ record.user.username }} - {{ record.created_at|date:"d/m/Y" }}</small>
+                    </div>
+                    <a href="{% url 'admin:health_records_healthrecord_change' record.health_record_id %}" class="btn btn-sm btn-outline-primary" target="_blank">
+                        <i class="bi bi-box-arrow-up-right"></i> Voir dans Admin
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if metric.metric_description %}
+    <div class="mt-4">
+        <h5><i class="bi bi-file-text me-2"></i>Description</h5>
+        <p class="text-muted">{{ metric.metric_description }}</p>
+    </div>
+    {% endif %}
+
+    <div class="action-buttons">
+        <a href="{% url 'health_metrics_admin:list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Retour à la liste
+        </a>
+        <a href="{% url 'health_metrics_admin:edit' metric.health_metric_id %}" class="btn btn-secondary">
+            <i class="bi bi-pencil me-1"></i>Modifier
+        </a>
+        <a href="{% url 'health_metrics_admin:delete' metric.health_metric_id %}" class="btn btn-danger">
+            <i class="bi bi-trash me-1"></i>Supprimer
+        </a>
+    </div>
+</div>
+{% endblock %}
+

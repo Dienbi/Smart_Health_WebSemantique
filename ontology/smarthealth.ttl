@@ -1,5 +1,4 @@
-@prefix : <http://www.semanticweb.org/dihaib/ontologies/2025/9/untitled-ontology-5/> .
-
+@prefix : <http://www.semanticweb.org/dhiab/ontologies/2025/9/untitled-ontology-5/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
@@ -646,14 +645,14 @@ smarthealth:healthMetricName rdf:type owl:DatatypeProperty ;
 smarthealth:healthMetricUnit rdf:type owl:DatatypeProperty ;
                              rdfs:subPropertyOf smarthealth:HealthMetric ;
                              rdfs:domain smarthealth:HealthMetric ;
-                             rdfs:range xsd:int .
+                             rdfs:range xsd:string .
 
 
-###  http://dhia.org/ontologies/smarthealth#healthMetricValue
-smarthealth:healthMetricValue rdf:type owl:DatatypeProperty ;
-                              rdfs:subPropertyOf smarthealth:HealthMetric ;
-                              rdfs:domain smarthealth:HealthMetric ;
-                              rdfs:range xsd:int .
+###  http://dhia.org/ontologies/smarthealth#healthMetricRecordedAt
+smarthealth:healthMetricRecordedAt rdf:type owl:DatatypeProperty ;
+                                    rdfs:subPropertyOf smarthealth:HealthMetric ;
+                                    rdfs:domain smarthealth:HealthMetric ;
+                                    rdfs:range xsd:dateTime .
 
 
 ###  http://dhia.org/ontologies/smarthealth#healthRecordId
@@ -663,11 +662,11 @@ smarthealth:healthRecordId rdf:type owl:DatatypeProperty ;
                            rdfs:range xsd:int .
 
 
-###  http://dhia.org/ontologies/smarthealth#healthRecordName
-smarthealth:healthRecordName rdf:type owl:DatatypeProperty ;
-                             rdfs:subPropertyOf smarthealth:HealthRecord ;
-                             rdfs:domain smarthealth:HealthRecord ;
-                             rdfs:range xsd:string .
+###  http://dhia.org/ontologies/smarthealth#healthRecordValue
+smarthealth:healthRecordValue rdf:type owl:DatatypeProperty ;
+                              rdfs:subPropertyOf smarthealth:HealthRecord ;
+                              rdfs:domain smarthealth:HealthRecord ;
+                              rdfs:range xsd:float .
 
 
 ###  http://dhia.org/ontologies/smarthealth#healthRecord_endDate
@@ -684,18 +683,32 @@ smarthealth:heartRate-cardio rdf:type owl:DatatypeProperty ;
                              rdfs:range xsd:int .
 
 
-###  http://dhia.org/ontologies/smarthealth#helathRecordDescription
-smarthealth:helathRecordDescription rdf:type owl:DatatypeProperty ;
+###  http://dhia.org/ontologies/smarthealth#healthRecordDescription
+smarthealth:healthRecordDescription rdf:type owl:DatatypeProperty ;
                                     rdfs:subPropertyOf smarthealth:HealthRecord ;
                                     rdfs:domain smarthealth:HealthRecord ;
                                     rdfs:range xsd:string .
 
 
-###  http://dhia.org/ontologies/smarthealth#helthRecord_startDate
-smarthealth:helthRecord_startDate rdf:type owl:DatatypeProperty ;
+###  http://dhia.org/ontologies/smarthealth#healthRecord_startDate
+smarthealth:healthRecord_startDate rdf:type owl:DatatypeProperty ;
+                                   rdfs:subPropertyOf smarthealth:HealthRecord ;
+                                   rdfs:domain smarthealth:HealthRecord ;
+                                   rdfs:range xsd:dateTime .
+
+
+###  http://dhia.org/ontologies/smarthealth#healthRecordCreatedAt
+smarthealth:healthRecordCreatedAt rdf:type owl:DatatypeProperty ;
                                   rdfs:subPropertyOf smarthealth:HealthRecord ;
                                   rdfs:domain smarthealth:HealthRecord ;
                                   rdfs:range xsd:dateTime .
+
+
+###  http://dhia.org/ontologies/smarthealth#healthRecordDate
+smarthealth:healthRecordDate rdf:type owl:DatatypeProperty ;
+                             rdfs:subPropertyOf smarthealth:HealthRecord ;
+                             rdfs:domain smarthealth:HealthRecord ;
+                             rdfs:range xsd:dateTime .
 
 
 ###  http://dhia.org/ontologies/smarthealth#hight
@@ -1330,7 +1343,7 @@ smarthealth:healthMetric rdf:type owl:NamedIndividual ,
                          smarthealth:healthMetricId 1 ;
                          smarthealth:healthMetricName "heartbeats" ;
                          smarthealth:healthMetricUnit "BPS" ;
-                         smarthealth:healthMetricValue 10 .
+                         smarthealth:healthMetricRecordedAt "2025-11-05T12:00:00Z"^^xsd:dateTime .
 
 
 ###  http://dhia.org/ontologies/smarthealth#journaling
