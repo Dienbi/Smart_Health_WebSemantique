@@ -2071,5 +2071,3 @@ smarthealth:reading rdf:type owl:NamedIndividual ,
                              smarthealth:Reading ;
                     smarthealth:Bookname "la rousse" ;
                     smarthealth:nbr_pages 240 .
-
-
