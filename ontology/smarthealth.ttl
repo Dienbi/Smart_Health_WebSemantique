@@ -1,1378 +1,915 @@
-@prefix : <http://www.semanticweb.org/dhiab/ontologies/2025/9/untitled-ontology-5/> .
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix xml: <http://www.w3.org/XML/1998/namespace> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix smarthealth: <http://dhia.org/ontologies/smarthealth#> .
-@base <http://www.semanticweb.org/dhiab/ontologies/2025/9/untitled-ontology-5/> .
-
-<http://dhia.org/ontologies/smarthealth#> rdf:type owl:Ontology .
-
-#################################################################
-#    Object Properties
-#################################################################
-
-###  http://dhia.org/ontologies/smarthealth#CreatesActivity
-smarthealth:CreatesActivity rdf:type owl:ObjectProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#CreatesActivityLog
-smarthealth:CreatesActivityLog rdf:type owl:ObjectProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#CreatesDefis
-smarthealth:CreatesDefis rdf:type owl:ObjectProperty ;
-                         rdfs:subPropertyOf owl:topObjectProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#CreatesFoodItem
-smarthealth:CreatesFoodItem rdf:type owl:ObjectProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#CreatesHabit
-smarthealth:CreatesHabit rdf:type owl:ObjectProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#CreatesHealthRecord
-smarthealth:CreatesHealthRecord rdf:type owl:ObjectProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#PerformedBy
-smarthealth:PerformedBy rdf:type owl:ObjectProperty ;
-                        owl:inverseOf smarthealth:PerformsActivity ;
-                        rdfs:domain smarthealth:Activity ;
-                        rdfs:range smarthealth:User .
-
-
-###  http://dhia.org/ontologies/smarthealth#PerformsActivity
-smarthealth:PerformsActivity rdf:type owl:ObjectProperty ;
-                             rdfs:domain smarthealth:User ;
-                             rdfs:range smarthealth:ActivityLog .
-
-
-###  http://dhia.org/ontologies/smarthealth#containsMetric
-smarthealth:containsMetric rdf:type owl:ObjectProperty ;
-                           rdfs:domain smarthealth:HealthRecord ;
-                           rdfs:range smarthealth:HealthMetric .
-
-
-###  http://dhia.org/ontologies/smarthealth#forUser
-smarthealth:forUser rdf:type owl:ObjectProperty ;
-                    rdfs:domain smarthealth:ActivityLog ,
-                                smarthealth:Habit ;
-                    rdfs:range smarthealth:User .
-
-
-###  http://dhia.org/ontologies/smarthealth#hasActivityLog
-smarthealth:hasActivityLog rdf:type owl:ObjectProperty ;
-                           rdfs:domain smarthealth:Activity ;
-                           rdfs:range smarthealth:ActivityLog .
-
-
-###  http://dhia.org/ontologies/smarthealth#hasFoodItem
-smarthealth:hasFoodItem rdf:type owl:ObjectProperty ;
-                        rdfs:domain smarthealth:Meal ;
-                        rdfs:range smarthealth:FoodItem .
-
-
-###  http://dhia.org/ontologies/smarthealth#hasHealthRecord
-smarthealth:hasHealthRecord rdf:type owl:ObjectProperty ;
-                            rdfs:domain smarthealth:User ;
-                            rdfs:range smarthealth:HealthRecord .
-
-
-###  http://dhia.org/ontologies/smarthealth#hasMeal
-smarthealth:hasMeal rdf:type owl:ObjectProperty ;
-                    rdfs:domain smarthealth:User ;
-                    rdfs:range smarthealth:Meal .
-
-
-###  http://dhia.org/ontologies/smarthealth#hasParticipation
-smarthealth:hasParticipation rdf:type owl:ObjectProperty ;
-                             rdfs:domain smarthealth:Defi ;
-                             rdfs:range smarthealth:Participation .
-
-
-###  http://dhia.org/ontologies/smarthealth#hashabit
-smarthealth:hashabit rdf:type owl:ObjectProperty ;
-                     rdfs:domain smarthealth:User ;
-                     rdfs:range smarthealth:Habit .
-
-
-###  http://dhia.org/ontologies/smarthealth#hashabitLog
-smarthealth:hashabitLog rdf:type owl:ObjectProperty ;
-                        rdfs:domain smarthealth:Habit ;
-                        rdfs:range smarthealth:HabitLog .
-
-
-#################################################################
-#    Data properties
-#################################################################
-
-###  http://dhia.org/ontologies/smarthealth#Activity
-smarthealth:Activity rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#ActivityLog
-smarthealth:ActivityLog rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#ActivityLogId
-smarthealth:ActivityLogId rdf:type owl:DatatypeProperty ;
-                          rdfs:subPropertyOf smarthealth:ActivityLog ;
-                          rdfs:domain smarthealth:ActivityLog ;
-                          rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#Belongs_To
-smarthealth:Belongs_To rdf:type owl:DatatypeProperty ;
-                       rdfs:subPropertyOf smarthealth:Teacher_HealthRecord ;
-                       rdfs:domain smarthealth:Teacher_HealthRecord ;
-                       rdfs:range xsd:string .
-
-
-###  http://dhia.org/ontologies/smarthealth#Belongs_To_Student
-smarthealth:Belongs_To_Student rdf:type owl:DatatypeProperty ;
-                               rdfs:subPropertyOf smarthealth:Student_HealthRecord ;
-                               rdfs:domain smarthealth:Student_HealthRecord ;
-                               rdfs:range xsd:string .
-
-
-###  http://dhia.org/ontologies/smarthealth#Bookname
-smarthealth:Bookname rdf:type owl:DatatypeProperty ;
-                     rdfs:subPropertyOf smarthealth:Reading ;
-                     rdfs:domain smarthealth:Reading ;
-                     rdfs:range xsd:string .
-
-
-###  http://dhia.org/ontologies/smarthealth#Cardio
-smarthealth:Cardio rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#Cholesterol
-smarthealth:Cholesterol rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#Cholesterol_value
-smarthealth:Cholesterol_value rdf:type owl:DatatypeProperty ;
-                              rdfs:subPropertyOf smarthealth:Cholesterol ;
-                              rdfs:domain smarthealth:Cholesterol ;
-                              rdfs:range xsd:float .
-
-
-###  http://dhia.org/ontologies/smarthealth#Cooking
-smarthealth:Cooking rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#Defi
-smarthealth:Defi rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#Defi_Status
-smarthealth:Defi_Status rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#Defis_Badge
-smarthealth:Defis_Badge rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#Defis_Objectifs
-smarthealth:Defis_Objectifs rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#Drawing
-smarthealth:Drawing rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#FoodItem
-smarthealth:FoodItem rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#Habit
-smarthealth:Habit rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#HabitLog
-smarthealth:HabitLog rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#HabitLog_Notes
-smarthealth:HabitLog_Notes rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#Habitlog_Frequency
-smarthealth:Habitlog_Frequency rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#HealthMetric
-smarthealth:HealthMetric rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#HealthRecord
-smarthealth:HealthRecord rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#Heart_Rate
-smarthealth:Heart_Rate rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#Heart_Rate_value
-smarthealth:Heart_Rate_value rdf:type owl:DatatypeProperty ;
-                             rdfs:subPropertyOf smarthealth:Heart_Rate ;
-                             rdfs:domain smarthealth:Heart_Rate ;
-                             rdfs:range xsd:float .
-
-
-###  http://dhia.org/ontologies/smarthealth#High
-smarthealth:High rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#Journaling
-smarthealth:Journaling rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#Low
-smarthealth:Low rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#Meal
-smarthealth:Meal rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#Medium
-smarthealth:Medium rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#Musculation
-smarthealth:Musculation rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#Natation
-smarthealth:Natation rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#Oxygen
-smarthealth:Oxygen rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#Participation
-smarthealth:Participation rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#Reading
-smarthealth:Reading rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#Student
-smarthealth:Student rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#Student_HealthRecord
-smarthealth:Student_HealthRecord rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#SugarLevel
-smarthealth:SugarLevel rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#SugarLevel_value
-smarthealth:SugarLevel_value rdf:type owl:DatatypeProperty ;
-                             rdfs:subPropertyOf smarthealth:SugarLevel ;
-                             rdfs:domain smarthealth:SugarLevel ;
-                             rdfs:range xsd:float .
-
-
-###  http://dhia.org/ontologies/smarthealth#Teacher_HealthRecord
-smarthealth:Teacher_HealthRecord rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#User
-smarthealth:User rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#UserId
-smarthealth:UserId rdf:type owl:DatatypeProperty ;
-                   rdfs:subPropertyOf smarthealth:User ;
-                   rdfs:domain smarthealth:User ;
-                   rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#UserName
-smarthealth:UserName rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#activeTime
-smarthealth:activeTime rdf:type owl:DatatypeProperty ;
-                       rdfs:subPropertyOf smarthealth:Medium ;
-                       rdfs:domain smarthealth:Medium ;
-                       rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#activityId
-smarthealth:activityId rdf:type owl:DatatypeProperty ;
-                       rdfs:subPropertyOf smarthealth:Activity ;
-                       rdfs:domain smarthealth:Activity ;
-                       rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#activity_description
-smarthealth:activity_description rdf:type owl:DatatypeProperty ;
-                                 rdfs:subPropertyOf smarthealth:Activity ;
-                                 rdfs:domain smarthealth:Activity ;
-                                 rdfs:range xsd:string .
-
-
-###  http://dhia.org/ontologies/smarthealth#activity_name
-smarthealth:activity_name rdf:type owl:DatatypeProperty ;
-                          rdfs:subPropertyOf smarthealth:Activity ;
-                          rdfs:domain smarthealth:Activity ;
-                          rdfs:range xsd:string .
-
-
-###  http://dhia.org/ontologies/smarthealth#breakfast
-smarthealth:breakfast rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#breakfast_score
-smarthealth:breakfast_score rdf:type owl:DatatypeProperty ;
-                            rdfs:subPropertyOf smarthealth:breakfast ;
-                            rdfs:domain smarthealth:Breakfast ;
-                            rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#breaksTaken
-smarthealth:breaksTaken rdf:type owl:DatatypeProperty ;
-                        rdfs:subPropertyOf smarthealth:Medium ;
-                        rdfs:domain smarthealth:Medium ;
-                        rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#breathingRate
-smarthealth:breathingRate rdf:type owl:DatatypeProperty ;
-                          rdfs:subPropertyOf smarthealth:Low ;
-                          rdfs:domain smarthealth:Low ;
-                          rdfs:range xsd:string .
-
-
-###  http://dhia.org/ontologies/smarthealth#bronze
-smarthealth:bronze rdf:type owl:DatatypeProperty ;
-                   rdfs:subPropertyOf smarthealth:Defis_Badge ;
-                   rdfs:domain smarthealth:Defis_Badge ;
-                   rdfs:range xsd:boolean .
-
-
-###  http://dhia.org/ontologies/smarthealth#calorie
-smarthealth:calorie rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#caloriesBurned
-smarthealth:caloriesBurned rdf:type owl:DatatypeProperty ;
-                           rdfs:subPropertyOf smarthealth:Cardio ;
-                           rdfs:domain smarthealth:Cardio ;
-                           rdfs:range xsd:float .
-
-
-###  http://dhia.org/ontologies/smarthealth#calories_total
-smarthealth:calories_total rdf:type owl:DatatypeProperty ;
-                           rdfs:subPropertyOf smarthealth:Meal ;
-                           rdfs:domain smarthealth:Meal ;
-                           rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#calories_value
-smarthealth:calories_value rdf:type owl:DatatypeProperty ;
-                           rdfs:subPropertyOf smarthealth:calorie ;
-                           rdfs:domain smarthealth:calories ;
-                           rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#carbs
-smarthealth:carbs rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#carbs_value
-smarthealth:carbs_value rdf:type owl:DatatypeProperty ;
-                        rdfs:subPropertyOf smarthealth:carbs ;
-                        rdfs:domain smarthealth:carbs ;
-                        rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#classe
-smarthealth:classe rdf:type owl:DatatypeProperty ;
-                   rdfs:subPropertyOf smarthealth:Student ;
-                   rdfs:domain smarthealth:Student ;
-                   rdfs:range xsd:string .
-
-
-###  http://dhia.org/ontologies/smarthealth#comfortLevel
-smarthealth:comfortLevel rdf:type owl:DatatypeProperty ;
-                         rdfs:subPropertyOf smarthealth:Low ;
-                         rdfs:domain smarthealth:Low ;
-                         rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#completed
-smarthealth:completed rdf:type owl:DatatypeProperty ;
-                      rdfs:subPropertyOf smarthealth:Defi_Status ;
-                      rdfs:domain smarthealth:Defis_Status ;
-                      rdfs:range xsd:boolean .
-
-
-###  http://dhia.org/ontologies/smarthealth#daily
-smarthealth:daily rdf:type owl:DatatypeProperty ;
-                  rdfs:subPropertyOf smarthealth:Habitlog_Frequency ;
-                  rdfs:domain smarthealth:HabitLog_Frequency ;
-                  rdfs:range xsd:boolean .
-
-
-###  http://dhia.org/ontologies/smarthealth#date
-smarthealth:date rdf:type owl:DatatypeProperty ;
-                 rdfs:subPropertyOf smarthealth:Journaling ;
-                 rdfs:domain smarthealth:Journaling ;
-                 rdfs:range xsd:dateTime .
-
-
-###  http://dhia.org/ontologies/smarthealth#dateActivityLog
-smarthealth:dateActivityLog rdf:type owl:DatatypeProperty ;
-                            rdfs:subPropertyOf smarthealth:ActivityLog ;
-                            rdfs:domain smarthealth:ActivityLog ;
-                            rdfs:range xsd:dateTime .
-
-
-###  http://dhia.org/ontologies/smarthealth#defiDescription
-smarthealth:defiDescription rdf:type owl:DatatypeProperty ;
-                            rdfs:subPropertyOf smarthealth:Defi ;
-                            rdfs:domain smarthealth:Defi ;
-                            rdfs:range xsd:string .
-
-
-###  http://dhia.org/ontologies/smarthealth#defiId
-smarthealth:defiId rdf:type owl:DatatypeProperty ;
-                   rdfs:subPropertyOf smarthealth:Defi ;
-                   rdfs:domain smarthealth:Defi ;
-                   rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#defiName
-smarthealth:defiName rdf:type owl:DatatypeProperty ;
-                     rdfs:subPropertyOf smarthealth:Defi ;
-                     rdfs:domain smarthealth:Defi ;
-                     rdfs:range xsd:string .
-
-
-###  http://dhia.org/ontologies/smarthealth#description
-smarthealth:description rdf:type owl:DatatypeProperty ;
-                        rdfs:subPropertyOf smarthealth:Drawing ;
-                        rdfs:domain smarthealth:Drawing ;
-                        rdfs:range xsd:string .
-
-
-###  http://dhia.org/ontologies/smarthealth#description_DefiObjc
-smarthealth:description_DefiObjc rdf:type owl:DatatypeProperty ;
-                                 rdfs:subPropertyOf smarthealth:Defis_Objectifs ;
-                                 rdfs:domain smarthealth:Defis_Objectif ;
-                                 rdfs:range xsd:string .
-
-
-###  http://dhia.org/ontologies/smarthealth#description_habitLogNotes
-smarthealth:description_habitLogNotes rdf:type owl:DatatypeProperty ;
-                                      rdfs:subPropertyOf smarthealth:HabitLog_Notes ;
-                                      rdfs:domain smarthealth:HabitLog_Notes ;
-                                      rdfs:range xsd:string .
-
-
-###  http://dhia.org/ontologies/smarthealth#dinner
-smarthealth:dinner rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#dinner_score
-smarthealth:dinner_score rdf:type owl:DatatypeProperty ;
-                         rdfs:subPropertyOf smarthealth:dinner ;
-                         rdfs:domain smarthealth:Dinner ;
-                         rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#distance
-smarthealth:distance rdf:type owl:DatatypeProperty ;
-                     rdfs:subPropertyOf smarthealth:Natation ;
-                     rdfs:domain smarthealth:Natation ;
-                     rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#done
-smarthealth:done rdf:type owl:DatatypeProperty ;
-                 rdfs:subPropertyOf smarthealth:Journaling ;
-                 rdfs:domain smarthealth:Journaling ;
-                 rdfs:range xsd:boolean .
-
-
-###  http://dhia.org/ontologies/smarthealth#duration
-smarthealth:duration rdf:type owl:DatatypeProperty ;
-                     rdfs:subPropertyOf smarthealth:ActivityLog ;
-                     rdfs:domain smarthealth:ActivityLog ;
-                     rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#email
-smarthealth:email rdf:type owl:DatatypeProperty ;
-                  rdfs:subPropertyOf smarthealth:User ;
-                  rdfs:domain smarthealth:User ;
-                  rdfs:range xsd:string .
-
-
-###  http://dhia.org/ontologies/smarthealth#endDate
-smarthealth:endDate rdf:type owl:DatatypeProperty ;
-                    rdfs:subPropertyOf smarthealth:habitLog_Date ;
-                    rdfs:domain smarthealth:HabitLog_StartDate ;
-                    rdfs:range xsd:dateTime .
-
-
-###  http://dhia.org/ontologies/smarthealth#end_Date
-smarthealth:end_Date rdf:type owl:DatatypeProperty ;
-                     rdfs:subPropertyOf smarthealth:Participation ;
-                     rdfs:domain smarthealth:Participation ;
-                     rdfs:range xsd:dateTime .
-
-
-###  http://dhia.org/ontologies/smarthealth#end_date
-smarthealth:end_date rdf:type owl:DatatypeProperty ;
-                     rdfs:subPropertyOf smarthealth:Defis_Objectifs ;
-                     rdfs:domain smarthealth:Defis_Objectif ;
-                     rdfs:range xsd:dateTime .
-
-
-###  http://dhia.org/ontologies/smarthealth#end_time
-smarthealth:end_time rdf:type owl:DatatypeProperty ;
-                     rdfs:subPropertyOf smarthealth:Cooking ;
-                     rdfs:domain smarthealth:Cooking ;
-                     rdfs:range xsd:dateTime .
-
-
-###  http://dhia.org/ontologies/smarthealth#fiber
-smarthealth:fiber rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#fiber_value
-smarthealth:fiber_value rdf:type owl:DatatypeProperty ;
-                        rdfs:subPropertyOf smarthealth:fiber ;
-                        rdfs:domain smarthealth:fiber ;
-                        rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#firstName
-smarthealth:firstName rdf:type owl:DatatypeProperty ;
-                      rdfs:subPropertyOf smarthealth:UserName ;
-                      rdfs:domain smarthealth:UserName ;
-                      rdfs:range xsd:string .
-
-
-###  http://dhia.org/ontologies/smarthealth#foodItemDescription
-smarthealth:foodItemDescription rdf:type owl:DatatypeProperty ;
-                                rdfs:subPropertyOf smarthealth:FoodItem ;
-                                rdfs:domain smarthealth:FoodItem ;
-                                rdfs:range xsd:string .
-
-
-###  http://dhia.org/ontologies/smarthealth#foodItemId
-smarthealth:foodItemId rdf:type owl:DatatypeProperty ;
-                       rdfs:subPropertyOf smarthealth:FoodItem ;
-                       rdfs:domain smarthealth:FoodItem ;
-                       rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#foodItemName
-smarthealth:foodItemName rdf:type owl:DatatypeProperty ;
-                         rdfs:subPropertyOf smarthealth:FoodItem ;
-                         rdfs:domain smarthealth:FoodItem ;
-                         rdfs:range xsd:string .
-
-
-###  http://dhia.org/ontologies/smarthealth#gold
-smarthealth:gold rdf:type owl:DatatypeProperty ;
-                 rdfs:subPropertyOf smarthealth:Defis_Badge ;
-                 rdfs:domain smarthealth:Defis_Badge ;
-                 rdfs:range xsd:boolean .
-
-
-###  http://dhia.org/ontologies/smarthealth#habbit-name
-smarthealth:habbit-name rdf:type owl:DatatypeProperty ;
-                        rdfs:subPropertyOf smarthealth:Habit ;
-                        rdfs:domain smarthealth:Habit ;
-                        rdfs:range xsd:string .
-
-
-###  http://dhia.org/ontologies/smarthealth#habbitId
-smarthealth:habbitId rdf:type owl:DatatypeProperty ;
-                     rdfs:subPropertyOf smarthealth:Habit ;
-                     rdfs:domain smarthealth:Habit ;
-                     rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#habitLogId
-smarthealth:habitLogId rdf:type owl:DatatypeProperty ;
-                       rdfs:subPropertyOf smarthealth:HabitLog ;
-                       rdfs:domain smarthealth:HabitLog ;
-                       rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#habitLog_Date
-smarthealth:habitLog_Date rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#healthMetricDescription
-smarthealth:healthMetricDescription rdf:type owl:DatatypeProperty ;
-                                    rdfs:subPropertyOf smarthealth:HealthMetric ;
-                                    rdfs:domain smarthealth:HealthMetric ;
-                                    rdfs:range xsd:string .
-
-
-###  http://dhia.org/ontologies/smarthealth#healthMetricId
-smarthealth:healthMetricId rdf:type owl:DatatypeProperty ;
-                           rdfs:subPropertyOf smarthealth:HealthMetric ;
-                           rdfs:domain smarthealth:HealthMetric ;
-                           rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#healthMetricName
-smarthealth:healthMetricName rdf:type owl:DatatypeProperty ;
-                             rdfs:subPropertyOf smarthealth:HealthMetric ;
-                             rdfs:domain smarthealth:HealthMetric ;
-                             rdfs:range xsd:string .
-
-
-###  http://dhia.org/ontologies/smarthealth#healthMetricUnit
-smarthealth:healthMetricUnit rdf:type owl:DatatypeProperty ;
-                             rdfs:subPropertyOf smarthealth:HealthMetric ;
-                             rdfs:domain smarthealth:HealthMetric ;
-                             rdfs:range xsd:string .
-
-
-###  http://dhia.org/ontologies/smarthealth#healthMetricRecordedAt
-smarthealth:healthMetricRecordedAt rdf:type owl:DatatypeProperty ;
-                                    rdfs:subPropertyOf smarthealth:HealthMetric ;
-                                    rdfs:domain smarthealth:HealthMetric ;
-                                    rdfs:range xsd:dateTime .
-
-
-###  http://dhia.org/ontologies/smarthealth#healthRecordId
-smarthealth:healthRecordId rdf:type owl:DatatypeProperty ;
-                           rdfs:subPropertyOf smarthealth:HealthRecord ;
-                           rdfs:domain smarthealth:HealthRecord ;
-                           rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#healthRecordValue
-smarthealth:healthRecordValue rdf:type owl:DatatypeProperty ;
-                              rdfs:subPropertyOf smarthealth:HealthRecord ;
-                              rdfs:domain smarthealth:HealthRecord ;
-                              rdfs:range xsd:float .
-
-
-###  http://dhia.org/ontologies/smarthealth#healthRecord_endDate
-smarthealth:healthRecord_endDate rdf:type owl:DatatypeProperty ;
-                                 rdfs:subPropertyOf smarthealth:HealthRecord ;
-                                 rdfs:domain smarthealth:HealthRecord ;
-                                 rdfs:range xsd:dateTime .
-
-
-###  http://dhia.org/ontologies/smarthealth#heartRate-cardio
-smarthealth:heartRate-cardio rdf:type owl:DatatypeProperty ;
-                             rdfs:subPropertyOf smarthealth:Cardio ;
-                             rdfs:domain smarthealth:Cardio ;
-                             rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#healthRecordDescription
-smarthealth:healthRecordDescription rdf:type owl:DatatypeProperty ;
-                                    rdfs:subPropertyOf smarthealth:HealthRecord ;
-                                    rdfs:domain smarthealth:HealthRecord ;
-                                    rdfs:range xsd:string .
-
-
-###  http://dhia.org/ontologies/smarthealth#healthRecord_startDate
-smarthealth:healthRecord_startDate rdf:type owl:DatatypeProperty ;
-                                   rdfs:subPropertyOf smarthealth:HealthRecord ;
-                                   rdfs:domain smarthealth:HealthRecord ;
-                                   rdfs:range xsd:dateTime .
-
-
-###  http://dhia.org/ontologies/smarthealth#healthRecordCreatedAt
-smarthealth:healthRecordCreatedAt rdf:type owl:DatatypeProperty ;
-                                  rdfs:subPropertyOf smarthealth:HealthRecord ;
-                                  rdfs:domain smarthealth:HealthRecord ;
-                                  rdfs:range xsd:dateTime .
-
-
-###  http://dhia.org/ontologies/smarthealth#healthRecordDate
-smarthealth:healthRecordDate rdf:type owl:DatatypeProperty ;
-                             rdfs:subPropertyOf smarthealth:HealthRecord ;
-                             rdfs:domain smarthealth:HealthRecord ;
-                             rdfs:range xsd:dateTime .
-
-
-###  http://dhia.org/ontologies/smarthealth#hight
-smarthealth:hight rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#injuryRisk
-smarthealth:injuryRisk rdf:type owl:DatatypeProperty ;
-                       rdfs:subPropertyOf smarthealth:High ;
-                       rdfs:domain smarthealth:High ;
-                       rdfs:range xsd:string .
-
-
-###  http://dhia.org/ontologies/smarthealth#inspiration
-smarthealth:inspiration rdf:type owl:DatatypeProperty ;
-                        rdfs:subPropertyOf smarthealth:Drawing ;
-                        rdfs:domain smarthealth:Drawing ;
-                        rdfs:range xsd:string .
-
-
-###  http://dhia.org/ontologies/smarthealth#lacticAcidLevel
-smarthealth:lacticAcidLevel rdf:type owl:DatatypeProperty ;
-                            rdfs:subPropertyOf smarthealth:High ;
-                            rdfs:domain smarthealth:High ;
-                            rdfs:range xsd:float .
-
-
-###  http://dhia.org/ontologies/smarthealth#lunch
-smarthealth:lunch rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#lunch_score
-smarthealth:lunch_score rdf:type owl:DatatypeProperty ;
-                        rdfs:subPropertyOf smarthealth:lunch ;
-                        rdfs:domain smarthealth:Lunch ;
-                        rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#matier
-smarthealth:matier rdf:type owl:DatatypeProperty ;
-                   rdfs:subPropertyOf smarthealth:teacher ;
-                   rdfs:domain smarthealth:Teacher ;
-                   rdfs:range xsd:string .
-
-
-###  http://dhia.org/ontologies/smarthealth#mealId
-smarthealth:mealId rdf:type owl:DatatypeProperty ;
-                   rdfs:subPropertyOf smarthealth:Meal ;
-                   rdfs:domain smarthealth:Meal ;
-                   rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#name
-smarthealth:name rdf:type owl:DatatypeProperty ;
-                 rdfs:subPropertyOf smarthealth:User ;
-                 rdfs:domain smarthealth:User ;
-                 rdfs:range xsd:string .
-
-
-###  http://dhia.org/ontologies/smarthealth#name_meal
-smarthealth:name_meal rdf:type owl:DatatypeProperty ;
-                      rdfs:subPropertyOf smarthealth:Meal ;
-                      rdfs:domain smarthealth:Meal ;
-                      rdfs:range xsd:string .
-
-
-###  http://dhia.org/ontologies/smarthealth#nbr_pages
-smarthealth:nbr_pages rdf:type owl:DatatypeProperty ;
-                      rdfs:subPropertyOf smarthealth:Reading ;
-                      rdfs:domain smarthealth:Reading ;
-                      rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#oxygen_value
-smarthealth:oxygen_value rdf:type owl:DatatypeProperty ;
-                         rdfs:subPropertyOf smarthealth:Oxygen ;
-                         rdfs:domain smarthealth:Oxygen ;
-                         rdfs:range xsd:float .
-
-
-###  http://dhia.org/ontologies/smarthealth#participationId
-smarthealth:participationId rdf:type owl:DatatypeProperty ;
-                            rdfs:subPropertyOf smarthealth:Participation ;
-                            rdfs:domain smarthealth:Participation ;
-                            rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#participationNumber
-smarthealth:participationNumber rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#participationNumber_value
-smarthealth:participationNumber_value rdf:type owl:DatatypeProperty ;
-                                      rdfs:subPropertyOf smarthealth:participationNumber ;
-                                      rdfs:domain smarthealth:Participation_Number ;
-                                      rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#participationProgress
-smarthealth:participationProgress rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#participationProgress_value
-smarthealth:participationProgress_value rdf:type owl:DatatypeProperty ;
-                                        rdfs:subPropertyOf smarthealth:participationProgress ;
-                                        rdfs:domain smarthealth:Participation_Progress ;
-                                        rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#participationRange
-smarthealth:participationRange rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#participationRange_value
-smarthealth:participationRange_value rdf:type owl:DatatypeProperty ;
-                                     rdfs:subPropertyOf smarthealth:participationRange ;
-                                     rdfs:domain smarthealth:participation_Range ;
-                                     rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#password
-smarthealth:password rdf:type owl:DatatypeProperty ;
-                     rdfs:subPropertyOf smarthealth:User ;
-                     rdfs:domain smarthealth:User ;
-                     rdfs:range xsd:string .
-
-
-###  http://dhia.org/ontologies/smarthealth#progress
-smarthealth:progress rdf:type owl:DatatypeProperty ;
-                     rdfs:subPropertyOf smarthealth:Defi_Status ;
-                     rdfs:domain smarthealth:Defis_Status ;
-                     rdfs:range xsd:boolean .
-
-
-###  http://dhia.org/ontologies/smarthealth#protein
-smarthealth:protein rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#protein_value
-smarthealth:protein_value rdf:type owl:DatatypeProperty ;
-                          rdfs:subPropertyOf smarthealth:protein ;
-                          rdfs:domain smarthealth:protein ;
-                          rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#reminder_time
-smarthealth:reminder_time rdf:type owl:DatatypeProperty ;
-                          rdfs:subPropertyOf smarthealth:HabitLog ;
-                          rdfs:domain smarthealth:HabitLog ;
-                          rdfs:range xsd:dateTime .
-
-
-###  http://dhia.org/ontologies/smarthealth#repetitions
-smarthealth:repetitions rdf:type owl:DatatypeProperty ;
-                        rdfs:subPropertyOf smarthealth:Musculation ;
-                        rdfs:domain smarthealth:Musculation ;
-                        rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#sets
-smarthealth:sets rdf:type owl:DatatypeProperty ;
-                 rdfs:subPropertyOf smarthealth:Musculation ;
-                 rdfs:domain smarthealth:Musculation ;
-                 rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#silver
-smarthealth:silver rdf:type owl:DatatypeProperty ;
-                   rdfs:subPropertyOf smarthealth:Defis_Badge ;
-                   rdfs:domain smarthealth:Defis_Badge ;
-                   rdfs:range xsd:boolean .
-
-
-###  http://dhia.org/ontologies/smarthealth#snack
-smarthealth:snack rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#snack_score
-smarthealth:snack_score rdf:type owl:DatatypeProperty ;
-                        rdfs:subPropertyOf smarthealth:snack ;
-                        rdfs:domain smarthealth:Snack ;
-                        rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#startDate
-smarthealth:startDate rdf:type owl:DatatypeProperty ;
-                      rdfs:subPropertyOf smarthealth:habitLog_Date ;
-                      rdfs:domain smarthealth:HabitLog_StartDate ;
-                      rdfs:range xsd:dateTime .
-
-
-###  http://dhia.org/ontologies/smarthealth#start_date
-smarthealth:start_date rdf:type owl:DatatypeProperty ;
-                       rdfs:subPropertyOf smarthealth:Participation ;
-                       rdfs:domain smarthealth:Participation ;
-                       rdfs:range xsd:dateTime .
-
-
-###  http://dhia.org/ontologies/smarthealth#start_time
-smarthealth:start_time rdf:type owl:DatatypeProperty ;
-                       rdfs:subPropertyOf smarthealth:Cooking ;
-                       rdfs:domain smarthealth:Cooking ;
-                       rdfs:range xsd:dateTime .
-
-
-###  http://dhia.org/ontologies/smarthealth#style
-smarthealth:style rdf:type owl:DatatypeProperty ;
-                  rdfs:subPropertyOf smarthealth:Natation ;
-                  rdfs:domain smarthealth:Natation ;
-                  rdfs:range xsd:string .
-
-
-###  http://dhia.org/ontologies/smarthealth#sugar
-smarthealth:sugar rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#sugar_value
-smarthealth:sugar_value rdf:type owl:DatatypeProperty ;
-                        rdfs:subPropertyOf smarthealth:sugar ;
-                        rdfs:domain smarthealth:sugar ;
-                        rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#teacher
-smarthealth:teacher rdf:type owl:DatatypeProperty .
-
-
-###  http://dhia.org/ontologies/smarthealth#type
-smarthealth:type rdf:type owl:DatatypeProperty ;
-                 rdfs:subPropertyOf smarthealth:Habit ;
-                 rdfs:domain smarthealth:Habit ;
-                 rdfs:range xsd:string .
-
-
-###  http://dhia.org/ontologies/smarthealth#type_FoodItem
-smarthealth:type_FoodItem rdf:type owl:DatatypeProperty ;
-                          rdfs:subPropertyOf smarthealth:FoodItem ;
-                          rdfs:domain smarthealth:FoodItem ;
-                          rdfs:range xsd:string .
-
-
-###  http://dhia.org/ontologies/smarthealth#value_hight
-smarthealth:value_hight rdf:type owl:DatatypeProperty ;
-                        rdfs:subPropertyOf smarthealth:hight ;
-                        rdfs:domain smarthealth:Height ;
-                        rdfs:range xsd:float .
-
-
-###  http://dhia.org/ontologies/smarthealth#value_wight
-smarthealth:value_wight rdf:type owl:DatatypeProperty ;
-                        rdfs:subPropertyOf smarthealth:wight ;
-                        rdfs:domain smarthealth:Weight ;
-                        rdfs:range xsd:float .
-
-
-###  http://dhia.org/ontologies/smarthealth#weekly
-smarthealth:weekly rdf:type owl:DatatypeProperty ;
-                   rdfs:subPropertyOf smarthealth:Habitlog_Frequency ;
-                   rdfs:domain smarthealth:HabitLog_Frequency ;
-                   rdfs:range xsd:boolean .
-
-
-###  http://dhia.org/ontologies/smarthealth#weight_musculation
-smarthealth:weight_musculation rdf:type owl:DatatypeProperty ;
-                               rdfs:subPropertyOf smarthealth:Musculation ;
-                               rdfs:domain smarthealth:Musculation ;
-                               rdfs:range xsd:int .
-
-
-###  http://dhia.org/ontologies/smarthealth#wight
-smarthealth:wight rdf:type owl:DatatypeProperty .
-
-
-#################################################################
-#    Classes
-#################################################################
-
-###  http://dhia.org/ontologies/smarthealth#Activity
-smarthealth:Activity rdf:type owl:Class .
-
-
-###  http://dhia.org/ontologies/smarthealth#ActivityLog
-smarthealth:ActivityLog rdf:type owl:Class .
-
-
-###  http://dhia.org/ontologies/smarthealth#Breakfast
-smarthealth:Breakfast rdf:type owl:Class ;
-                      rdfs:subClassOf smarthealth:Meal .
-
-
-###  http://dhia.org/ontologies/smarthealth#Cardio
-smarthealth:Cardio rdf:type owl:Class ;
-                   rdfs:subClassOf smarthealth:Activity .
-
-
-###  http://dhia.org/ontologies/smarthealth#Cholesterol
-smarthealth:Cholesterol rdf:type owl:Class ;
-                        rdfs:subClassOf smarthealth:HealthMetric .
-
-
-###  http://dhia.org/ontologies/smarthealth#Cooking
-smarthealth:Cooking rdf:type owl:Class ;
-                    rdfs:subClassOf smarthealth:Habit .
-
-
-###  http://dhia.org/ontologies/smarthealth#Defi
-smarthealth:Defi rdf:type owl:Class .
-
-
-###  http://dhia.org/ontologies/smarthealth#Defis_Badge
-smarthealth:Defis_Badge rdf:type owl:Class ;
-                        rdfs:subClassOf smarthealth:Defi .
-
-
-###  http://dhia.org/ontologies/smarthealth#Defis_Objectif
-smarthealth:Defis_Objectif rdf:type owl:Class ;
-                           rdfs:subClassOf smarthealth:Defi .
-
-
-###  http://dhia.org/ontologies/smarthealth#Defis_Status
-smarthealth:Defis_Status rdf:type owl:Class ;
-                         rdfs:subClassOf smarthealth:Defi .
-
-
-###  http://dhia.org/ontologies/smarthealth#Dinner
-smarthealth:Dinner rdf:type owl:Class ;
-                   rdfs:subClassOf smarthealth:Meal .
-
-
-###  http://dhia.org/ontologies/smarthealth#Drawing
-smarthealth:Drawing rdf:type owl:Class ;
-                    rdfs:subClassOf smarthealth:Habit .
-
-
-###  http://dhia.org/ontologies/smarthealth#FoodItem
-smarthealth:FoodItem rdf:type owl:Class .
-
-
-###  http://dhia.org/ontologies/smarthealth#Habit
-smarthealth:Habit rdf:type owl:Class .
-
-
-###  http://dhia.org/ontologies/smarthealth#HabitLog
-smarthealth:HabitLog rdf:type owl:Class .
-
-
-###  http://dhia.org/ontologies/smarthealth#HabitLog_Frequency
-smarthealth:HabitLog_Frequency rdf:type owl:Class ;
-                               rdfs:subClassOf smarthealth:HabitLog .
-
-
-###  http://dhia.org/ontologies/smarthealth#HabitLog_Notes
-smarthealth:HabitLog_Notes rdf:type owl:Class ;
-                           rdfs:subClassOf smarthealth:HabitLog .
-
-
-###  http://dhia.org/ontologies/smarthealth#HabitLog_StartDate
-smarthealth:HabitLog_StartDate rdf:type owl:Class ;
-                               rdfs:subClassOf smarthealth:HabitLog .
-
-
-###  http://dhia.org/ontologies/smarthealth#HealthMetric
-smarthealth:HealthMetric rdf:type owl:Class .
-
-
-###  http://dhia.org/ontologies/smarthealth#HealthRecord
-smarthealth:HealthRecord rdf:type owl:Class .
-
-
-###  http://dhia.org/ontologies/smarthealth#Heart_Rate
-smarthealth:Heart_Rate rdf:type owl:Class ;
-                       rdfs:subClassOf smarthealth:HealthMetric .
-
-
-###  http://dhia.org/ontologies/smarthealth#Height
-smarthealth:Height rdf:type owl:Class ;
-                   rdfs:subClassOf smarthealth:HealthMetric .
-
-
-###  http://dhia.org/ontologies/smarthealth#High
-smarthealth:High rdf:type owl:Class ;
-                 rdfs:subClassOf smarthealth:ActivityLog .
-
-
-###  http://dhia.org/ontologies/smarthealth#Journaling
-smarthealth:Journaling rdf:type owl:Class ;
-                       rdfs:subClassOf smarthealth:Habit .
-
-
-###  http://dhia.org/ontologies/smarthealth#Low
-smarthealth:Low rdf:type owl:Class ;
-                rdfs:subClassOf smarthealth:ActivityLog .
-
-
-###  http://dhia.org/ontologies/smarthealth#Lunch
-smarthealth:Lunch rdf:type owl:Class ;
-                  rdfs:subClassOf smarthealth:Meal .
-
-
-###  http://dhia.org/ontologies/smarthealth#Meal
-smarthealth:Meal rdf:type owl:Class .
-
-
-###  http://dhia.org/ontologies/smarthealth#Medium
-smarthealth:Medium rdf:type owl:Class ;
-                   rdfs:subClassOf smarthealth:ActivityLog .
-
-
-###  http://dhia.org/ontologies/smarthealth#Musculation
-smarthealth:Musculation rdf:type owl:Class ;
-                        rdfs:subClassOf smarthealth:Activity .
-
-
-###  http://dhia.org/ontologies/smarthealth#Natation
-smarthealth:Natation rdf:type owl:Class ;
-                     rdfs:subClassOf smarthealth:Activity .
-
-
-###  http://dhia.org/ontologies/smarthealth#Oxygen
-smarthealth:Oxygen rdf:type owl:Class ;
-                   rdfs:subClassOf smarthealth:HealthMetric .
-
-
-###  http://dhia.org/ontologies/smarthealth#Participation
-smarthealth:Participation rdf:type owl:Class .
-
-
-###  http://dhia.org/ontologies/smarthealth#Participation_Number
-smarthealth:Participation_Number rdf:type owl:Class ;
-                                 rdfs:subClassOf smarthealth:Participation .
-
-
-###  http://dhia.org/ontologies/smarthealth#Participation_Progress
-smarthealth:Participation_Progress rdf:type owl:Class ;
-                                   rdfs:subClassOf smarthealth:Participation .
-
-
-###  http://dhia.org/ontologies/smarthealth#Reading
-smarthealth:Reading rdf:type owl:Class ;
-                    rdfs:subClassOf smarthealth:Habit .
-
-
-###  http://dhia.org/ontologies/smarthealth#Snack
-smarthealth:Snack rdf:type owl:Class ;
-                  rdfs:subClassOf smarthealth:Meal .
-
-
-###  http://dhia.org/ontologies/smarthealth#Student
-smarthealth:Student rdf:type owl:Class ;
-                    rdfs:subClassOf smarthealth:User .
-
-
-###  http://dhia.org/ontologies/smarthealth#Student_HealthRecord
-smarthealth:Student_HealthRecord rdf:type owl:Class ;
-                                 rdfs:subClassOf smarthealth:HealthRecord .
-
-
-###  http://dhia.org/ontologies/smarthealth#SugarLevel
-smarthealth:SugarLevel rdf:type owl:Class ;
-                       rdfs:subClassOf smarthealth:HealthMetric .
-
-
-###  http://dhia.org/ontologies/smarthealth#Teacher
-smarthealth:Teacher rdf:type owl:Class ;
-                    rdfs:subClassOf smarthealth:User .
-
-
-###  http://dhia.org/ontologies/smarthealth#Teacher_HealthRecord
-smarthealth:Teacher_HealthRecord rdf:type owl:Class ;
-                                 rdfs:subClassOf smarthealth:HealthRecord .
-
-
-###  http://dhia.org/ontologies/smarthealth#User
-smarthealth:User rdf:type owl:Class .
-
-
-###  http://dhia.org/ontologies/smarthealth#UserName
-smarthealth:UserName rdf:type owl:Class ;
-                     rdfs:subClassOf smarthealth:HabitLog .
-
-
-###  http://dhia.org/ontologies/smarthealth#Weight
-smarthealth:Weight rdf:type owl:Class ;
-                   rdfs:subClassOf smarthealth:HealthMetric .
-
-
-###  http://dhia.org/ontologies/smarthealth#calories
-smarthealth:calories rdf:type owl:Class ;
-                     rdfs:subClassOf smarthealth:FoodItem .
-
-
-###  http://dhia.org/ontologies/smarthealth#carbs
-smarthealth:carbs rdf:type owl:Class ;
-                  rdfs:subClassOf smarthealth:FoodItem .
-
-
-###  http://dhia.org/ontologies/smarthealth#fiber
-smarthealth:fiber rdf:type owl:Class ;
-                  rdfs:subClassOf smarthealth:FoodItem .
-
-
-###  http://dhia.org/ontologies/smarthealth#participation_Range
-smarthealth:participation_Range rdf:type owl:Class ;
-                                rdfs:subClassOf smarthealth:Participation .
-
-
-###  http://dhia.org/ontologies/smarthealth#protein
-smarthealth:protein rdf:type owl:Class ;
-                    rdfs:subClassOf smarthealth:FoodItem .
-
-
-###  http://dhia.org/ontologies/smarthealth#sugar
-smarthealth:sugar rdf:type owl:Class ;
-                  rdfs:subClassOf smarthealth:FoodItem .
-
-
-#################################################################
-#    Individuals
-#################################################################
-
-###  http://dhia.org/ontologies/smarthealth#Defis
-smarthealth:Defis rdf:type owl:NamedIndividual ,
-                           smarthealth:Defi ;
-                  smarthealth:hasParticipation smarthealth:Participation ;
-                  smarthealth:defiDescription "this is a challenge" ;
-                  smarthealth:defiId 1 ;
-                  smarthealth:defiName "nom defis" .
-
-
-###  http://dhia.org/ontologies/smarthealth#Meal
-smarthealth:Meal rdf:type owl:NamedIndividual ,
-                          smarthealth:Meal ;
-                 smarthealth:calories_total 1000 ;
-                 smarthealth:mealId 1 ;
-                 smarthealth:name_meal "kouskouss" .
-
-
-###  http://dhia.org/ontologies/smarthealth#Participation
-smarthealth:Participation rdf:type owl:NamedIndividual ,
-                                   smarthealth:Participation ;
-                          smarthealth:end_Date "2025-12-06T17:45:00Z"^^xsd:dateTime ;
-                          smarthealth:participationId 1 ;
-                          smarthealth:start_date "2025-10-16T17:45:00Z"^^xsd:dateTime .
-
-
-###  http://dhia.org/ontologies/smarthealth#UserName
-smarthealth:UserName rdf:type owl:NamedIndividual ,
-                              smarthealth:UserName ;
-                     smarthealth:firstName "dhaw" .
-
-
-###  http://dhia.org/ontologies/smarthealth#User_Dhia
-smarthealth:User_Dhia rdf:type owl:NamedIndividual ,
-                               smarthealth:User ;
-                      smarthealth:hasMeal smarthealth:Meal ;
-                      smarthealth:hasParticipation smarthealth:Participation ;
-                      smarthealth:UserId 1 ;
-                      smarthealth:email "dhia@gmail.com" ;
-                      smarthealth:name "Dhia" ;
-                      smarthealth:password "pass123" .
-
-
-###  http://dhia.org/ontologies/smarthealth#activity
-smarthealth:activity rdf:type owl:NamedIndividual ,
-                              smarthealth:Activity ;
-                     smarthealth:activityId 1 ;
-                     smarthealth:activity_description "descreption a une avtivitéactivity" ;
-                     smarthealth:activity_name "test" .
-
-
-###  http://dhia.org/ontologies/smarthealth#activityLogNatation
-smarthealth:activityLogNatation rdf:type owl:NamedIndividual ;
-                                smarthealth:hasActivityLog smarthealth:User_Dhia ;
-                                smarthealth:ActivityLogId 1 ;
-                                smarthealth:dateActivityLog "2025-10-02T12:30:00"^^xsd:dateTime ;
-                                smarthealth:duration 30 .
-
-
-###  http://dhia.org/ontologies/smarthealth#cardio
-smarthealth:cardio rdf:type owl:NamedIndividual ,
-                            smarthealth:Cardio ;
-                   smarthealth:caloriesBurned 350 ;
-                   smarthealth:heartRate-cardio 120 .
-
-
-###  http://dhia.org/ontologies/smarthealth#cooking
-smarthealth:cooking rdf:type owl:NamedIndividual ,
-                             smarthealth:Cooking ;
-                    smarthealth:end_time "2025-12-10T17:45:00Z"^^xsd:dateTime ;
-                    smarthealth:start_time "2025-10-06T17:45:00Z"^^xsd:dateTime .
-
-
-###  http://dhia.org/ontologies/smarthealth#drawing
-smarthealth:drawing rdf:type owl:NamedIndividual ,
-                             smarthealth:Drawing ;
-                    smarthealth:description "descreption d'une image dessiné" ;
-                    smarthealth:inspiration "inspirer du nature" .
-
-
-###  http://dhia.org/ontologies/smarthealth#habbit
-smarthealth:habbit rdf:type owl:NamedIndividual ,
-                            smarthealth:Habit ;
-                   smarthealth:habbit-name "read books" ;
-                   smarthealth:habbitId 1 ;
-                   smarthealth:type "reading" .
-
-
-###  http://dhia.org/ontologies/smarthealth#habitLogFrequencly
-smarthealth:habitLogFrequencly rdf:type owl:NamedIndividual ,
-                                        smarthealth:HabitLog_Frequency ;
-                               smarthealth:daily "true"^^xsd:boolean ;
-                               smarthealth:weekly "false"^^xsd:boolean .
-
-
-###  http://dhia.org/ontologies/smarthealth#habitLogStartDate
-smarthealth:habitLogStartDate rdf:type owl:NamedIndividual ,
-                                       smarthealth:HabitLog_StartDate ;
-                              smarthealth:endDate "2025-11-06T17:45:00Z"^^xsd:dateTime ;
-                              smarthealth:startDate "2025-10-08T17:45:00Z"^^xsd:dateTime .
-
-
-###  http://dhia.org/ontologies/smarthealth#habiyLogNotes
-smarthealth:habiyLogNotes rdf:type owl:NamedIndividual ,
-                                   smarthealth:HabitLog_Notes ;
-                          smarthealth:description_habitLogNotes "descreption d'une habbit" .
-
-
-###  http://dhia.org/ontologies/smarthealth#healthMetric
-smarthealth:healthMetric rdf:type owl:NamedIndividual ,
-                                  smarthealth:HealthMetric ;
-                         smarthealth:healthMetricDescription "this is heart beats" ;
-                         smarthealth:healthMetricId 1 ;
-                         smarthealth:healthMetricName "heartbeats" ;
-                         smarthealth:healthMetricUnit "BPS" ;
-                         smarthealth:healthMetricRecordedAt "2025-11-05T12:00:00Z"^^xsd:dateTime .
-
-
-###  http://dhia.org/ontologies/smarthealth#journaling
-smarthealth:journaling rdf:type owl:NamedIndividual ,
-                                smarthealth:Journaling ;
-                       smarthealth:date "2025-10-06T17:45:00Z"^^xsd:dateTime ;
-                       smarthealth:done "true"^^xsd:boolean .
-
-
-###  http://dhia.org/ontologies/smarthealth#musculation
-smarthealth:musculation rdf:type owl:NamedIndividual ,
-                                 smarthealth:Musculation ;
-                        smarthealth:repetitions 5 ;
-                        smarthealth:sets 3 ;
-                        smarthealth:weight_musculation 40 .
-
-
-###  http://dhia.org/ontologies/smarthealth#natation
-smarthealth:natation rdf:type owl:NamedIndividual ,
-                              smarthealth:Natation ;
-                     smarthealth:distance 200 ;
-                     smarthealth:style "papillon" .
-
-
-###  http://dhia.org/ontologies/smarthealth#reading
-smarthealth:reading rdf:type owl:NamedIndividual ,
-                             smarthealth:Reading ;
-                    smarthealth:Bookname "la rousse" ;
-                    smarthealth:nbr_pages 240 .
-
-
-###  Generated by the OWL API (version 4.5.29.2024-05-13T12:11:03Z) https://github.com/owlcs/owlapi
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+smarthealth: a owl:Ontology .
+
+smarthealth:ActivityLogId a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:ActivityLog ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:ActivityLog .
+
+smarthealth:Belongs_To a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Teacher_HealthRecord ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf smarthealth:Teacher_HealthRecord .
+
+smarthealth:Belongs_To_Student a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Student_HealthRecord ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf smarthealth:Student_HealthRecord .
+
+smarthealth:Bookname a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Reading ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf smarthealth:Reading .
+
+smarthealth:Cholesterol_value a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Cholesterol ;
+    rdfs:range xsd:float ;
+    rdfs:subPropertyOf smarthealth:Cholesterol .
+
+smarthealth:CreatesActivity a owl:ObjectProperty .
+
+smarthealth:CreatesActivityLog a owl:ObjectProperty .
+
+smarthealth:CreatesDefis a owl:ObjectProperty ;
+    rdfs:subPropertyOf owl:topObjectProperty .
+
+smarthealth:CreatesFoodItem a owl:ObjectProperty .
+
+smarthealth:CreatesHabit a owl:ObjectProperty .
+
+smarthealth:CreatesHealthRecord a owl:ObjectProperty .
+
+smarthealth:Defis a smarthealth:Defi,
+        owl:NamedIndividual ;
+    smarthealth:defiDescription "this is a challenge" ;
+    smarthealth:defiId 1 ;
+    smarthealth:defiName "nom defis" ;
+    smarthealth:hasParticipation smarthealth:Participation .
+
+smarthealth:Heart_Rate_value a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Heart_Rate ;
+    rdfs:range xsd:float ;
+    rdfs:subPropertyOf smarthealth:Heart_Rate .
+
+smarthealth:PerformedBy a owl:ObjectProperty ;
+    rdfs:domain smarthealth:Activity ;
+    rdfs:range smarthealth:User ;
+    owl:inverseOf smarthealth:PerformsActivity .
+
+smarthealth:SugarLevel_value a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:SugarLevel ;
+    rdfs:range xsd:float ;
+    rdfs:subPropertyOf smarthealth:SugarLevel .
+
+smarthealth:UserId a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:User ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:User .
+
+smarthealth:User_2 smarthealth:hasMeal smarthealth:Meal_6,
+        smarthealth:Meal_8 .
+
+smarthealth:activeTime a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Medium ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:Medium .
+
+smarthealth:activity a smarthealth:Activity,
+        owl:NamedIndividual ;
+    smarthealth:activityId 1 ;
+    smarthealth:activity_description "descreption a une avtivitéactivity" ;
+    smarthealth:activity_name "test" .
+
+smarthealth:activityId a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Activity ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:Activity .
+
+smarthealth:activityLogNatation a owl:NamedIndividual ;
+    smarthealth:ActivityLogId 1 ;
+    smarthealth:dateActivityLog "2025-10-02T12:30:00"^^xsd:dateTime ;
+    smarthealth:duration 30 ;
+    smarthealth:hasActivityLog smarthealth:User_Dhia .
+
+smarthealth:activity_description a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Activity ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf smarthealth:Activity .
+
+smarthealth:activity_name a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Activity ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf smarthealth:Activity .
+
+smarthealth:breakfast_score a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Breakfast ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:breakfast .
+
+smarthealth:breaksTaken a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Medium ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:Medium .
+
+smarthealth:breathingRate a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Low ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf smarthealth:Low .
+
+smarthealth:bronze a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Defis_Badge ;
+    rdfs:range xsd:boolean ;
+    rdfs:subPropertyOf smarthealth:Defis_Badge .
+
+smarthealth:caloriesBurned a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Cardio ;
+    rdfs:range xsd:float ;
+    rdfs:subPropertyOf smarthealth:Cardio .
+
+smarthealth:calories_total a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Meal ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:Meal .
+
+smarthealth:calories_value a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:calories ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:calorie .
+
+smarthealth:carbs_value a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:carbs ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:carbs .
+
+smarthealth:cardio a smarthealth:Cardio,
+        owl:NamedIndividual ;
+    smarthealth:caloriesBurned 350 ;
+    smarthealth:heartRate-cardio 120 .
+
+smarthealth:classe a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Student ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf smarthealth:Student .
+
+smarthealth:comfortLevel a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Low ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:Low .
+
+smarthealth:completed a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Defis_Status ;
+    rdfs:range xsd:boolean ;
+    rdfs:subPropertyOf smarthealth:Defi_Status .
+
+smarthealth:containsMetric a owl:ObjectProperty ;
+    rdfs:domain smarthealth:HealthRecord ;
+    rdfs:range smarthealth:HealthMetric .
+
+smarthealth:cooking a smarthealth:Cooking,
+        owl:NamedIndividual ;
+    smarthealth:end_time "2025-12-10T17:45:00+00:00"^^xsd:dateTime ;
+    smarthealth:start_time "2025-10-06T17:45:00+00:00"^^xsd:dateTime .
+
+smarthealth:daily a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:HabitLog_Frequency ;
+    rdfs:range xsd:boolean ;
+    rdfs:subPropertyOf smarthealth:Habitlog_Frequency .
+
+smarthealth:date a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Journaling ;
+    rdfs:range xsd:dateTime ;
+    rdfs:subPropertyOf smarthealth:Journaling .
+
+smarthealth:dateActivityLog a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:ActivityLog ;
+    rdfs:range xsd:dateTime ;
+    rdfs:subPropertyOf smarthealth:ActivityLog .
+
+smarthealth:defiDescription a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Defi ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf smarthealth:Defi .
+
+smarthealth:defiId a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Defi ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:Defi .
+
+smarthealth:defiName a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Defi ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf smarthealth:Defi .
+
+smarthealth:description a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Drawing ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf smarthealth:Drawing .
+
+smarthealth:description_DefiObjc a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Defis_Objectif ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf smarthealth:Defis_Objectifs .
+
+smarthealth:description_habitLogNotes a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:HabitLog_Notes ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf smarthealth:HabitLog_Notes .
+
+smarthealth:dinner_score a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Dinner ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:dinner .
+
+smarthealth:distance a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Natation ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:Natation .
+
+smarthealth:done a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Journaling ;
+    rdfs:range xsd:boolean ;
+    rdfs:subPropertyOf smarthealth:Journaling .
+
+smarthealth:drawing a smarthealth:Drawing,
+        owl:NamedIndividual ;
+    smarthealth:description "descreption d'une image dessiné" ;
+    smarthealth:inspiration "inspirer du nature" .
+
+smarthealth:duration a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:ActivityLog ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:ActivityLog .
+
+smarthealth:email a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:User ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf smarthealth:User .
+
+smarthealth:endDate a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:HabitLog_StartDate ;
+    rdfs:range xsd:dateTime ;
+    rdfs:subPropertyOf smarthealth:habitLog_Date .
+
+smarthealth:end_Date a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Participation ;
+    rdfs:range xsd:dateTime ;
+    rdfs:subPropertyOf smarthealth:Participation .
+
+smarthealth:end_date a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Defis_Objectif ;
+    rdfs:range xsd:dateTime ;
+    rdfs:subPropertyOf smarthealth:Defis_Objectifs .
+
+smarthealth:end_time a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Cooking ;
+    rdfs:range xsd:dateTime ;
+    rdfs:subPropertyOf smarthealth:Cooking .
+
+smarthealth:fiber_value a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:fiber ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:fiber .
+
+smarthealth:firstName a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:UserName ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf smarthealth:UserName .
+
+smarthealth:foodItemDescription a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:FoodItem ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf smarthealth:FoodItem .
+
+smarthealth:foodItemId a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:FoodItem ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:FoodItem .
+
+smarthealth:foodItemName a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:FoodItem ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf smarthealth:FoodItem .
+
+smarthealth:forUser a owl:ObjectProperty ;
+    rdfs:domain smarthealth:ActivityLog,
+        smarthealth:Habit ;
+    rdfs:range smarthealth:User .
+
+smarthealth:gold a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Defis_Badge ;
+    rdfs:range xsd:boolean ;
+    rdfs:subPropertyOf smarthealth:Defis_Badge .
+
+smarthealth:habbit a smarthealth:Habit,
+        owl:NamedIndividual ;
+    smarthealth:habbit-name "read books" ;
+    smarthealth:habbitId 1 ;
+    smarthealth:type "reading" .
+
+smarthealth:habbit-name a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Habit ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf smarthealth:Habit .
+
+smarthealth:habbitId a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Habit ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:Habit .
+
+smarthealth:habitLogFrequencly a smarthealth:HabitLog_Frequency,
+        owl:NamedIndividual ;
+    smarthealth:daily true ;
+    smarthealth:weekly false .
+
+smarthealth:habitLogId a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:HabitLog ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:HabitLog .
+
+smarthealth:habitLogStartDate a smarthealth:HabitLog_StartDate,
+        owl:NamedIndividual ;
+    smarthealth:endDate "2025-11-06T17:45:00+00:00"^^xsd:dateTime ;
+    smarthealth:startDate "2025-10-08T17:45:00+00:00"^^xsd:dateTime .
+
+smarthealth:habiyLogNotes a smarthealth:HabitLog_Notes,
+        owl:NamedIndividual ;
+    smarthealth:description_habitLogNotes "descreption d'une habbit" .
+
+smarthealth:hasActivityLog a owl:ObjectProperty ;
+    rdfs:domain smarthealth:Activity ;
+    rdfs:range smarthealth:ActivityLog .
+
+smarthealth:hasFoodItem a owl:ObjectProperty ;
+    rdfs:domain smarthealth:Meal ;
+    rdfs:range smarthealth:FoodItem .
+
+smarthealth:hasHealthRecord a owl:ObjectProperty ;
+    rdfs:domain smarthealth:User ;
+    rdfs:range smarthealth:HealthRecord .
+
+smarthealth:hasMeal a owl:ObjectProperty ;
+    rdfs:domain smarthealth:User ;
+    rdfs:range smarthealth:Meal .
+
+smarthealth:hasParticipation a owl:ObjectProperty ;
+    rdfs:domain smarthealth:Defi ;
+    rdfs:range smarthealth:Participation .
+
+smarthealth:hashabit a owl:ObjectProperty ;
+    rdfs:domain smarthealth:User ;
+    rdfs:range smarthealth:Habit .
+
+smarthealth:hashabitLog a owl:ObjectProperty ;
+    rdfs:domain smarthealth:Habit ;
+    rdfs:range smarthealth:HabitLog .
+
+smarthealth:healthMetric a smarthealth:HealthMetric,
+        owl:NamedIndividual ;
+    smarthealth:healthMetricDescription "this is heart beats" ;
+    smarthealth:healthMetricId 1 ;
+    smarthealth:healthMetricName "heartbeats" ;
+    smarthealth:healthMetricUnit "BPS" ;
+    smarthealth:healthMetricValue 10 .
+
+smarthealth:healthMetricDescription a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:HealthMetric ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf smarthealth:HealthMetric .
+
+smarthealth:healthMetricId a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:HealthMetric ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:HealthMetric .
+
+smarthealth:healthMetricName a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:HealthMetric ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf smarthealth:HealthMetric .
+
+smarthealth:healthMetricUnit a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:HealthMetric ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:HealthMetric .
+
+smarthealth:healthMetricValue a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:HealthMetric ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:HealthMetric .
+
+smarthealth:healthRecordId a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:HealthRecord ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:HealthRecord .
+
+smarthealth:healthRecordName a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:HealthRecord ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf smarthealth:HealthRecord .
+
+smarthealth:healthRecord_endDate a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:HealthRecord ;
+    rdfs:range xsd:dateTime ;
+    rdfs:subPropertyOf smarthealth:HealthRecord .
+
+smarthealth:heartRate-cardio a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Cardio ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:Cardio .
+
+smarthealth:helathRecordDescription a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:HealthRecord ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf smarthealth:HealthRecord .
+
+smarthealth:helthRecord_startDate a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:HealthRecord ;
+    rdfs:range xsd:dateTime ;
+    rdfs:subPropertyOf smarthealth:HealthRecord .
+
+smarthealth:injuryRisk a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:High ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf smarthealth:High .
+
+smarthealth:inspiration a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Drawing ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf smarthealth:Drawing .
+
+smarthealth:journaling a smarthealth:Journaling,
+        owl:NamedIndividual ;
+    smarthealth:date "2025-10-06T17:45:00+00:00"^^xsd:dateTime ;
+    smarthealth:done true .
+
+smarthealth:lacticAcidLevel a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:High ;
+    rdfs:range xsd:float ;
+    rdfs:subPropertyOf smarthealth:High .
+
+smarthealth:lunch_score a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Lunch ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:lunch .
+
+smarthealth:matier a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Teacher ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf smarthealth:teacher .
+
+smarthealth:mealId a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Meal ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:Meal .
+
+smarthealth:musculation a smarthealth:Musculation,
+        owl:NamedIndividual ;
+    smarthealth:repetitions 5 ;
+    smarthealth:sets 3 ;
+    smarthealth:weight_musculation 40 .
+
+smarthealth:name a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:User ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf smarthealth:User .
+
+smarthealth:name_meal a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Meal ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf smarthealth:Meal .
+
+smarthealth:natation a smarthealth:Natation,
+        owl:NamedIndividual ;
+    smarthealth:distance 200 ;
+    smarthealth:style "papillon" .
+
+smarthealth:nbr_pages a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Reading ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:Reading .
+
+smarthealth:oxygen_value a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Oxygen ;
+    rdfs:range xsd:float ;
+    rdfs:subPropertyOf smarthealth:Oxygen .
+
+smarthealth:participationId a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Participation ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:Participation .
+
+smarthealth:participationNumber_value a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Participation_Number ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:participationNumber .
+
+smarthealth:participationProgress_value a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Participation_Progress ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:participationProgress .
+
+smarthealth:participationRange_value a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:participation_Range ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:participationRange .
+
+smarthealth:password a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:User ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf smarthealth:User .
+
+smarthealth:progress a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Defis_Status ;
+    rdfs:range xsd:boolean ;
+    rdfs:subPropertyOf smarthealth:Defi_Status .
+
+smarthealth:protein_value a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:protein ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:protein .
+
+smarthealth:reading a smarthealth:Reading,
+        owl:NamedIndividual ;
+    smarthealth:Bookname "la rousse" ;
+    smarthealth:nbr_pages 240 .
+
+smarthealth:reminder_time a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:HabitLog ;
+    rdfs:range xsd:dateTime ;
+    rdfs:subPropertyOf smarthealth:HabitLog .
+
+smarthealth:repetitions a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Musculation ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:Musculation .
+
+smarthealth:sets a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Musculation ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:Musculation .
+
+smarthealth:silver a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Defis_Badge ;
+    rdfs:range xsd:boolean ;
+    rdfs:subPropertyOf smarthealth:Defis_Badge .
+
+smarthealth:snack_score a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Snack ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:snack .
+
+smarthealth:startDate a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:HabitLog_StartDate ;
+    rdfs:range xsd:dateTime ;
+    rdfs:subPropertyOf smarthealth:habitLog_Date .
+
+smarthealth:start_date a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Participation ;
+    rdfs:range xsd:dateTime ;
+    rdfs:subPropertyOf smarthealth:Participation .
+
+smarthealth:start_time a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Cooking ;
+    rdfs:range xsd:dateTime ;
+    rdfs:subPropertyOf smarthealth:Cooking .
+
+smarthealth:style a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Natation ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf smarthealth:Natation .
+
+smarthealth:sugar_value a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:sugar ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:sugar .
+
+smarthealth:type a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Habit ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf smarthealth:Habit .
+
+smarthealth:type_FoodItem a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:FoodItem ;
+    rdfs:range xsd:string ;
+    rdfs:subPropertyOf smarthealth:FoodItem .
+
+smarthealth:value_hight a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Height ;
+    rdfs:range xsd:float ;
+    rdfs:subPropertyOf smarthealth:hight .
+
+smarthealth:value_wight a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Weight ;
+    rdfs:range xsd:float ;
+    rdfs:subPropertyOf smarthealth:wight .
+
+smarthealth:weekly a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:HabitLog_Frequency ;
+    rdfs:range xsd:boolean ;
+    rdfs:subPropertyOf smarthealth:Habitlog_Frequency .
+
+smarthealth:weight_musculation a owl:DatatypeProperty ;
+    rdfs:domain smarthealth:Musculation ;
+    rdfs:range xsd:int ;
+    rdfs:subPropertyOf smarthealth:Musculation .
+
+smarthealth:Breakfast a owl:Class ;
+    rdfs:subClassOf smarthealth:Meal .
+
+smarthealth:Calories_2 a smarthealth:calories ;
+    smarthealth:calories_value 100 .
+
+smarthealth:Calories_3 a smarthealth:calories ;
+    smarthealth:calories_value 100 .
+
+smarthealth:Carbs_2 a smarthealth:carbs ;
+    smarthealth:carbs_value 100 .
+
+smarthealth:Carbs_3 a smarthealth:carbs ;
+    smarthealth:carbs_value 100 .
+
+smarthealth:Fiber_2 a smarthealth:fiber ;
+    smarthealth:fiber_value 100 .
+
+smarthealth:Fiber_3 a smarthealth:fiber ;
+    smarthealth:fiber_value 100 .
+
+smarthealth:FoodItem_2 a smarthealth:FoodItem ;
+    smarthealth:foodItemDescription "pouleeet"^^xsd:string ;
+    smarthealth:foodItemId 2 ;
+    smarthealth:foodItemName "poulet"^^xsd:string ;
+    smarthealth:hasCalories smarthealth:Calories_2 ;
+    smarthealth:hasCarbs smarthealth:Carbs_2 ;
+    smarthealth:hasFiber smarthealth:Fiber_2 ;
+    smarthealth:hasProtein smarthealth:Protein_2 ;
+    smarthealth:hasSugar smarthealth:Sugar_2 ;
+    smarthealth:type_FoodItem "PROTEIN"^^xsd:string .
+
+smarthealth:FoodItem_3 a smarthealth:FoodItem ;
+    smarthealth:foodItemDescription "test test test"^^xsd:string ;
+    smarthealth:foodItemId 3 ;
+    smarthealth:foodItemName "poulet"^^xsd:string ;
+    smarthealth:hasCalories smarthealth:Calories_3 ;
+    smarthealth:hasCarbs smarthealth:Carbs_3 ;
+    smarthealth:hasFiber smarthealth:Fiber_3 ;
+    smarthealth:hasProtein smarthealth:Protein_3 ;
+    smarthealth:hasSugar smarthealth:Sugar_3 ;
+    smarthealth:type_FoodItem "CARBS"^^xsd:string .
+
+smarthealth:Height a owl:Class ;
+    rdfs:subClassOf smarthealth:HealthMetric .
+
+smarthealth:Meal_6 a smarthealth:Lunch,
+        smarthealth:Meal ;
+    smarthealth:calories_total 100 ;
+    smarthealth:hasFoodItem smarthealth:FoodItem_3 ;
+    smarthealth:mealId 6 ;
+    smarthealth:meal_date "2025-11-06T00:30:00+00:00"^^xsd:dateTime ;
+    smarthealth:name_meal "testtttttt"^^xsd:string .
+
+smarthealth:Meal_8 a smarthealth:Dinner,
+        smarthealth:Meal ;
+    smarthealth:calories_total 100 ;
+    smarthealth:hasFoodItem smarthealth:FoodItem_2 ;
+    smarthealth:mealId 8 ;
+    smarthealth:meal_date "2025-11-06T00:39:00+00:00"^^xsd:dateTime ;
+    smarthealth:name_meal "dejeuner"^^xsd:string .
+
+smarthealth:Participation_Number a owl:Class ;
+    rdfs:subClassOf smarthealth:Participation .
+
+smarthealth:Participation_Progress a owl:Class ;
+    rdfs:subClassOf smarthealth:Participation .
+
+smarthealth:PerformsActivity a owl:ObjectProperty ;
+    rdfs:domain smarthealth:User ;
+    rdfs:range smarthealth:ActivityLog .
+
+smarthealth:Protein_2 a smarthealth:protein ;
+    smarthealth:protein_value 100 .
+
+smarthealth:Protein_3 a smarthealth:protein ;
+    smarthealth:protein_value 100 .
+
+smarthealth:Snack a owl:Class ;
+    rdfs:subClassOf smarthealth:Meal .
+
+smarthealth:Sugar_2 a smarthealth:sugar ;
+    smarthealth:sugar_value 100 .
+
+smarthealth:Sugar_3 a smarthealth:sugar ;
+    smarthealth:sugar_value 100 .
+
+smarthealth:Teacher a owl:Class ;
+    rdfs:subClassOf smarthealth:User .
+
+smarthealth:User_Dhia a smarthealth:User,
+        owl:NamedIndividual ;
+    smarthealth:UserId 1 ;
+    smarthealth:email "dhia@gmail.com" ;
+    smarthealth:hasMeal smarthealth:Meal ;
+    smarthealth:hasParticipation smarthealth:Participation ;
+    smarthealth:name "Dhia" ;
+    smarthealth:password "pass123" .
+
+smarthealth:Weight a owl:Class ;
+    rdfs:subClassOf smarthealth:HealthMetric .
+
+smarthealth:breakfast a owl:DatatypeProperty .
+
+smarthealth:calorie a owl:DatatypeProperty .
+
+smarthealth:dinner a owl:DatatypeProperty .
+
+smarthealth:hight a owl:DatatypeProperty .
+
+smarthealth:lunch a owl:DatatypeProperty .
+
+smarthealth:participationNumber a owl:DatatypeProperty .
+
+smarthealth:participationProgress a owl:DatatypeProperty .
+
+smarthealth:participationRange a owl:DatatypeProperty .
+
+smarthealth:participation_Range a owl:Class ;
+    rdfs:subClassOf smarthealth:Participation .
+
+smarthealth:snack a owl:DatatypeProperty .
+
+smarthealth:teacher a owl:DatatypeProperty .
+
+smarthealth:wight a owl:DatatypeProperty .
+
+smarthealth:Cholesterol a owl:Class,
+        owl:DatatypeProperty ;
+    rdfs:subClassOf smarthealth:HealthMetric .
+
+smarthealth:Defi_Status a owl:DatatypeProperty .
+
+smarthealth:Defis_Objectif a owl:Class ;
+    rdfs:subClassOf smarthealth:Defi .
+
+smarthealth:Defis_Objectifs a owl:DatatypeProperty .
+
+smarthealth:Defis_Status a owl:Class ;
+    rdfs:subClassOf smarthealth:Defi .
+
+smarthealth:Dinner a owl:Class ;
+    rdfs:subClassOf smarthealth:Meal .
+
+smarthealth:Habitlog_Frequency a owl:DatatypeProperty .
+
+smarthealth:Heart_Rate a owl:Class,
+        owl:DatatypeProperty ;
+    rdfs:subClassOf smarthealth:HealthMetric .
+
+smarthealth:Lunch a owl:Class ;
+    rdfs:subClassOf smarthealth:Meal .
+
+smarthealth:Oxygen a owl:Class,
+        owl:DatatypeProperty ;
+    rdfs:subClassOf smarthealth:HealthMetric .
+
+smarthealth:Student a owl:Class,
+        owl:DatatypeProperty ;
+    rdfs:subClassOf smarthealth:User .
+
+smarthealth:Student_HealthRecord a owl:Class,
+        owl:DatatypeProperty ;
+    rdfs:subClassOf smarthealth:HealthRecord .
+
+smarthealth:SugarLevel a owl:Class,
+        owl:DatatypeProperty ;
+    rdfs:subClassOf smarthealth:HealthMetric .
+
+smarthealth:Teacher_HealthRecord a owl:Class,
+        owl:DatatypeProperty ;
+    rdfs:subClassOf smarthealth:HealthRecord .
+
+smarthealth:habitLog_Date a owl:DatatypeProperty .
+
+smarthealth:HabitLog_Frequency a owl:Class ;
+    rdfs:subClassOf smarthealth:HabitLog .
+
+smarthealth:HabitLog_Notes a owl:Class,
+        owl:DatatypeProperty ;
+    rdfs:subClassOf smarthealth:HabitLog .
+
+smarthealth:HabitLog_StartDate a owl:Class ;
+    rdfs:subClassOf smarthealth:HabitLog .
+
+smarthealth:UserName a smarthealth:UserName,
+        owl:Class,
+        owl:DatatypeProperty,
+        owl:NamedIndividual ;
+    smarthealth:firstName "dhaw" ;
+    rdfs:subClassOf smarthealth:HabitLog .
+
+smarthealth:calories a owl:Class ;
+    rdfs:subClassOf smarthealth:FoodItem .
+
+smarthealth:High a owl:Class,
+        owl:DatatypeProperty ;
+    rdfs:subClassOf smarthealth:ActivityLog .
+
+smarthealth:Low a owl:Class,
+        owl:DatatypeProperty ;
+    rdfs:subClassOf smarthealth:ActivityLog .
+
+smarthealth:Medium a owl:Class,
+        owl:DatatypeProperty ;
+    rdfs:subClassOf smarthealth:ActivityLog .
+
+smarthealth:carbs a owl:Class,
+        owl:DatatypeProperty ;
+    rdfs:subClassOf smarthealth:FoodItem .
+
+smarthealth:fiber a owl:Class,
+        owl:DatatypeProperty ;
+    rdfs:subClassOf smarthealth:FoodItem .
+
+smarthealth:protein a owl:Class,
+        owl:DatatypeProperty ;
+    rdfs:subClassOf smarthealth:FoodItem .
+
+smarthealth:sugar a owl:Class,
+        owl:DatatypeProperty ;
+    rdfs:subClassOf smarthealth:FoodItem .
+
+smarthealth:Cardio a owl:Class,
+        owl:DatatypeProperty ;
+    rdfs:subClassOf smarthealth:Activity .
+
+smarthealth:Cooking a owl:Class,
+        owl:DatatypeProperty ;
+    rdfs:subClassOf smarthealth:Habit .
+
+smarthealth:Drawing a owl:Class,
+        owl:DatatypeProperty ;
+    rdfs:subClassOf smarthealth:Habit .
+
+smarthealth:Journaling a owl:Class,
+        owl:DatatypeProperty ;
+    rdfs:subClassOf smarthealth:Habit .
+
+smarthealth:Natation a owl:Class,
+        owl:DatatypeProperty ;
+    rdfs:subClassOf smarthealth:Activity .
+
+smarthealth:Reading a owl:Class,
+        owl:DatatypeProperty ;
+    rdfs:subClassOf smarthealth:Habit .
+
+smarthealth:Defis_Badge a owl:Class,
+        owl:DatatypeProperty ;
+    rdfs:subClassOf smarthealth:Defi .
+
+smarthealth:Musculation a owl:Class,
+        owl:DatatypeProperty ;
+    rdfs:subClassOf smarthealth:Activity .
+
+smarthealth:HabitLog a owl:Class,
+        owl:DatatypeProperty .
+
+smarthealth:Defi a owl:Class,
+        owl:DatatypeProperty .
+
+smarthealth:Activity a owl:Class,
+        owl:DatatypeProperty .
+
+smarthealth:ActivityLog a owl:Class,
+        owl:DatatypeProperty .
+
+smarthealth:Participation a smarthealth:Participation,
+        owl:Class,
+        owl:DatatypeProperty,
+        owl:NamedIndividual ;
+    smarthealth:end_Date "2025-12-06T17:45:00+00:00"^^xsd:dateTime ;
+    smarthealth:participationId 1 ;
+    smarthealth:start_date "2025-10-16T17:45:00+00:00"^^xsd:dateTime .
+
+smarthealth:Habit a owl:Class,
+        owl:DatatypeProperty .
+
+smarthealth:HealthRecord a owl:Class,
+        owl:DatatypeProperty .
+
+smarthealth:FoodItem a owl:Class,
+        owl:DatatypeProperty .
+
+smarthealth:Meal a smarthealth:Meal,
+        owl:Class,
+        owl:DatatypeProperty,
+        owl:NamedIndividual ;
+    smarthealth:calories_total 1000 ;
+    smarthealth:mealId 1 ;
+    smarthealth:name_meal "kouskouss" .
+
+smarthealth:User a owl:Class,
+        owl:DatatypeProperty .
+
+smarthealth:HealthMetric a owl:Class,
+        owl:DatatypeProperty .

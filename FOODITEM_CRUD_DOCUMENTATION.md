@@ -244,3 +244,4 @@ queryset = FoodItem.objects.select_related('meal', 'meal__user').prefetch_relate
 **Date de création** : Novembre 2025  
 **Version** : 1.0
 
+

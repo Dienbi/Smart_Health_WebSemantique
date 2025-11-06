@@ -10,6 +10,7 @@ from .serializers import (
     MealSerializer, FoodItemSerializer,
     BreakfastSerializer, LunchSerializer, DinnerSerializer, SnackSerializer
 )
+from .rdf_manager import rdf_manager
 
 
 class MealViewSet(viewsets.ModelViewSet):
@@ -28,7 +29,52 @@ class MealViewSet(viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         """Set user from request when creating meal"""
-        serializer.save(user=self.request.user)
+        meal = serializer.save(user=self.request.user)
+        
+        # Synchroniser avec RDF
+        try:
+            rdf_manager.create_meal(
+                meal_id=meal.meal_id,
+                meal_name=meal.meal_name,
+                meal_type=meal.meal_type,
+                total_calories=meal.total_calories,
+                meal_date=meal.meal_date,
+                user_id=self.request.user.user_id
+            )
+            print(f"[API] Meal cree en RDF via API: {meal.meal_name}")
+        except Exception as e:
+            print(f"[API ERROR] Erreur synchronisation RDF : {e}")
+    
+    def perform_update(self, serializer):
+        """Update meal and sync with RDF"""
+        meal = serializer.save()
+        
+        # Synchroniser avec RDF
+        try:
+            rdf_manager.update_meal(
+                meal_id=meal.meal_id,
+                meal_name=meal.meal_name,
+                total_calories=meal.total_calories,
+                meal_date=meal.meal_date
+            )
+            print(f"[API] Meal mis a jour en RDF via API: {meal.meal_name}")
+        except Exception as e:
+            print(f"[API ERROR] Erreur synchronisation RDF : {e}")
+    
+    def perform_destroy(self, instance):
+        """Delete meal and sync with RDF"""
+        meal_id = instance.meal_id
+        meal_name = instance.meal_name
+        
+        # Supprimer de Django
+        instance.delete()
+        
+        # Synchroniser avec RDF
+        try:
+            rdf_manager.delete_meal(meal_id)
+            print(f"[API] Meal supprime de RDF via API: {meal_name}")
+        except Exception as e:
+            print(f"[API ERROR] Erreur synchronisation RDF : {e}")
     
     @action(detail=False, methods=['get'])
     def my_meals(self, request):
@@ -83,6 +129,77 @@ class FoodItemViewSet(viewsets.ModelViewSet):
         if self.request.user.is_staff:
             return FoodItem.objects.all()
         return FoodItem.objects.filter(meal__user=self.request.user)
+    
+    def perform_create(self, serializer):
+        """Create food item and sync with RDF"""
+        fooditem = serializer.save()
+        
+        # Synchroniser avec RDF
+        try:
+            # Récupérer les valeurs nutritionnelles
+            calories = getattr(fooditem.calories, 'calories_value', None) if hasattr(fooditem, 'calories') else None
+            protein = getattr(fooditem.protein, 'protein_value', None) if hasattr(fooditem, 'protein') else None
+            carbs = getattr(fooditem.carbs, 'carbs_value', None) if hasattr(fooditem, 'carbs') else None
+            fiber = getattr(fooditem.fiber, 'fiber_value', None) if hasattr(fooditem, 'fiber') else None
+            sugar = getattr(fooditem.sugar, 'sugar_value', None) if hasattr(fooditem, 'sugar') else None
+            
+            rdf_manager.create_fooditem(
+                fooditem_id=fooditem.food_item_id,
+                name=fooditem.food_item_name,
+                description=fooditem.food_item_description,
+                food_type=fooditem.food_type,
+                calories=calories,
+                protein=protein,
+                carbs=carbs,
+                fiber=fiber,
+                sugar=sugar
+            )
+            print(f"[API] FoodItem cree en RDF via API: {fooditem.food_item_name}")
+        except Exception as e:
+            print(f"[API ERROR] Erreur synchronisation RDF : {e}")
+    
+    def perform_update(self, serializer):
+        """Update food item and sync with RDF"""
+        fooditem = serializer.save()
+        
+        # Synchroniser avec RDF
+        try:
+            # Récupérer les valeurs nutritionnelles
+            calories = getattr(fooditem.calories, 'calories_value', None) if hasattr(fooditem, 'calories') else None
+            protein = getattr(fooditem.protein, 'protein_value', None) if hasattr(fooditem, 'protein') else None
+            carbs = getattr(fooditem.carbs, 'carbs_value', None) if hasattr(fooditem, 'carbs') else None
+            fiber = getattr(fooditem.fiber, 'fiber_value', None) if hasattr(fooditem, 'fiber') else None
+            sugar = getattr(fooditem.sugar, 'sugar_value', None) if hasattr(fooditem, 'sugar') else None
+            
+            rdf_manager.update_fooditem(
+                fooditem_id=fooditem.food_item_id,
+                name=fooditem.food_item_name,
+                description=fooditem.food_item_description,
+                food_type=fooditem.food_type,
+                calories=calories,
+                protein=protein,
+                carbs=carbs,
+                fiber=fiber,
+                sugar=sugar
+            )
+            print(f"[API] FoodItem mis a jour en RDF via API: {fooditem.food_item_name}")
+        except Exception as e:
+            print(f"[API ERROR] Erreur synchronisation RDF : {e}")
+    
+    def perform_destroy(self, instance):
+        """Delete food item and sync with RDF"""
+        fooditem_id = instance.food_item_id
+        fooditem_name = instance.food_item_name
+        
+        # Supprimer de Django
+        instance.delete()
+        
+        # Synchroniser avec RDF
+        try:
+            rdf_manager.delete_fooditem(fooditem_id)
+            print(f"[API] FoodItem supprime de RDF via API: {fooditem_name}")
+        except Exception as e:
+            print(f"[API ERROR] Erreur synchronisation RDF : {e}")
     
     @action(detail=False, methods=['get'])
     def by_type(self, request):
@@ -264,7 +381,7 @@ def meal_create_view(request):
                 if timezone.is_naive(parsed_date):
                     parsed_date = timezone.make_aware(parsed_date)
                 
-                # Create meal
+                # Create meal in Django (SQL)
                 meal = Meal.objects.create(
                     user=request.user,
                     meal_name=meal_name,
@@ -273,11 +390,31 @@ def meal_create_view(request):
                     meal_date=parsed_date
                 )
                 
-                # Associate food items with meal
+                # 🔥 SYNCHRONISER AVEC RDF
+                try:
+                    rdf_manager.create_meal(
+                        meal_id=meal.meal_id,
+                        meal_name=meal_name,
+                        meal_type=meal_type,
+                        total_calories=total_calories,
+                        meal_date=parsed_date,
+                        user_id=request.user.user_id
+                    )
+                    
+                    # Lier les food items en RDF
+                    if food_items_ids:
+                        for item_id in food_items_ids:
+                            rdf_manager.link_fooditem_to_meal(meal.meal_id, int(item_id))
+                    
+                    messages.success(request, f'✅ Repas "{meal_name}" créé avec succès (Django + RDF) !')
+                except Exception as e:
+                    print(f"⚠️ Erreur synchronisation RDF : {e}")
+                    messages.warning(request, f'✅ Repas créé en Django, mais erreur RDF : {e}')
+                
+                # Associate food items with meal in Django
                 if food_items_ids:
                     FoodItem.objects.filter(food_item_id__in=food_items_ids).update(meal=meal)
                 
-                messages.success(request, f'✅ Repas "{meal_name}" créé avec succès !')
                 return redirect('meals:meal-detail', pk=meal.meal_id)
                 
         except Exception as e:
@@ -360,18 +497,42 @@ def meal_update_view(request, pk):
                 if timezone.is_naive(parsed_date):
                     parsed_date = timezone.make_aware(parsed_date)
                 
-                # Update meal
+                # Update meal in Django
                 meal.meal_name = meal_name
                 meal.meal_type = meal_type
                 meal.meal_date = parsed_date
                 meal.total_calories = total_calories
                 meal.save()
                 
-                # Associate new food items with meal
+                # 🔥 SYNCHRONISER LA MISE À JOUR AVEC RDF
+                try:
+                    rdf_manager.update_meal(
+                        meal_id=meal.meal_id,
+                        meal_name=meal_name,
+                        total_calories=total_calories,
+                        meal_date=parsed_date
+                    )
+                    
+                    # Mettre à jour les liens food items en RDF
+                    # D'abord, supprimer tous les anciens liens
+                    old_items = FoodItem.objects.filter(meal=meal)
+                    for item in old_items:
+                        rdf_manager.unlink_fooditem_from_meal(meal.meal_id, item.food_item_id)
+                    
+                    # Puis ajouter les nouveaux liens
+                    if food_items_ids:
+                        for item_id in food_items_ids:
+                            rdf_manager.link_fooditem_to_meal(meal.meal_id, int(item_id))
+                    
+                    messages.success(request, f'✅ Repas "{meal_name}" modifié avec succès (Django + RDF) !')
+                except Exception as e:
+                    print(f"⚠️ Erreur synchronisation RDF : {e}")
+                    messages.warning(request, f'✅ Repas modifié en Django, mais erreur RDF : {e}')
+                
+                # Associate new food items with meal in Django
                 if food_items_ids:
                     FoodItem.objects.filter(food_item_id__in=food_items_ids).update(meal=meal)
                 
-                messages.success(request, f'✅ Repas "{meal_name}" modifié avec succès !')
                 return redirect('meals:meal-detail', pk=meal.meal_id)
                 
         except Exception as e:
@@ -400,10 +561,22 @@ def meal_delete_view(request, pk):
     
     if request.method == 'POST':
         meal_name = meal.meal_name
+        meal_id = meal.meal_id
+        
         # Dissociate food items before deletion
         FoodItem.objects.filter(meal=meal).update(meal=None)
+        
+        # Delete from Django
         meal.delete()
-        messages.success(request, f'✅ Repas "{meal_name}" supprimé avec succès !')
+        
+        # 🔥 SUPPRIMER AUSSI DE RDF
+        try:
+            rdf_manager.delete_meal(meal_id)
+            messages.success(request, f'✅ Repas "{meal_name}" supprimé avec succès (Django + RDF) !')
+        except Exception as e:
+            print(f"⚠️ Erreur suppression RDF : {e}")
+            messages.success(request, f'✅ Repas "{meal_name}" supprimé de Django !')
+        
         return redirect('meals:meal-list')
     
     return render(request, 'meals/meal_confirm_delete.html', {
@@ -510,13 +683,21 @@ class AdminFoodItemCreateView(StaffRequiredMixin, generic.CreateView):
         # Save FoodItem instance first
         self.object = form.save()
         
+        # Collect nutritional values
+        calories_value = None
+        protein_value = None
+        carbs_value = None
+        fiber_value = None
+        sugar_value = None
+        
         # Handle nutritional information from POST data
         try:
             calories_value = self.request.POST.get('calories_value', '').strip()
             if calories_value:
+                calories_value = int(calories_value)
                 Calories.objects.create(
                     food_item=self.object,
-                    calories_value=int(calories_value)
+                    calories_value=calories_value
                 )
         except (ValueError, TypeError):
             pass
@@ -524,9 +705,10 @@ class AdminFoodItemCreateView(StaffRequiredMixin, generic.CreateView):
         try:
             protein_value = self.request.POST.get('protein_value', '').strip()
             if protein_value:
+                protein_value = int(protein_value)
                 Protein.objects.create(
                     food_item=self.object,
-                    protein_value=int(protein_value)
+                    protein_value=protein_value
                 )
         except (ValueError, TypeError):
             pass
@@ -534,9 +716,10 @@ class AdminFoodItemCreateView(StaffRequiredMixin, generic.CreateView):
         try:
             carbs_value = self.request.POST.get('carbs_value', '').strip()
             if carbs_value:
+                carbs_value = int(carbs_value)
                 Carbs.objects.create(
                     food_item=self.object,
-                    carbs_value=int(carbs_value)
+                    carbs_value=carbs_value
                 )
         except (ValueError, TypeError):
             pass
@@ -544,9 +727,10 @@ class AdminFoodItemCreateView(StaffRequiredMixin, generic.CreateView):
         try:
             fiber_value = self.request.POST.get('fiber_value', '').strip()
             if fiber_value:
+                fiber_value = int(fiber_value)
                 Fiber.objects.create(
                     food_item=self.object,
-                    fiber_value=int(fiber_value)
+                    fiber_value=fiber_value
                 )
         except (ValueError, TypeError):
             pass
@@ -554,12 +738,30 @@ class AdminFoodItemCreateView(StaffRequiredMixin, generic.CreateView):
         try:
             sugar_value = self.request.POST.get('sugar_value', '').strip()
             if sugar_value:
+                sugar_value = int(sugar_value)
                 Sugar.objects.create(
                     food_item=self.object,
-                    sugar_value=int(sugar_value)
+                    sugar_value=sugar_value
                 )
         except (ValueError, TypeError):
             pass
+        
+        # 🔥 SYNCHRONISER AVEC RDF
+        try:
+            rdf_manager.create_fooditem(
+                fooditem_id=self.object.food_item_id,
+                name=self.object.food_item_name,
+                description=self.object.food_item_description,
+                food_type=self.object.food_type,
+                calories=calories_value,
+                protein=protein_value,
+                carbs=carbs_value,
+                fiber=fiber_value,
+                sugar=sugar_value
+            )
+            print(f"✅ FoodItem synchronisé avec RDF : {self.object.food_item_name}")
+        except Exception as e:
+            print(f"⚠️ Erreur synchronisation RDF FoodItem : {e}")
         
         return redirect(self.get_success_url())
 
@@ -597,13 +799,21 @@ class AdminFoodItemUpdateView(StaffRequiredMixin, generic.UpdateView):
         # Save FoodItem instance first
         self.object = form.save()
         
+        # Collect nutritional values for RDF
+        calories_value = None
+        protein_value = None
+        carbs_value = None
+        fiber_value = None
+        sugar_value = None
+        
         # Update nutritional information from POST data
         try:
             calories_value = self.request.POST.get('calories_value', '').strip()
             if calories_value:
+                calories_value = int(calories_value)
                 Calories.objects.update_or_create(
                     food_item=self.object,
-                    defaults={'calories_value': int(calories_value)}
+                    defaults={'calories_value': calories_value}
                 )
         except (ValueError, TypeError):
             pass
@@ -611,9 +821,10 @@ class AdminFoodItemUpdateView(StaffRequiredMixin, generic.UpdateView):
         try:
             protein_value = self.request.POST.get('protein_value', '').strip()
             if protein_value:
+                protein_value = int(protein_value)
                 Protein.objects.update_or_create(
                     food_item=self.object,
-                    defaults={'protein_value': int(protein_value)}
+                    defaults={'protein_value': protein_value}
                 )
         except (ValueError, TypeError):
             pass
@@ -621,9 +832,10 @@ class AdminFoodItemUpdateView(StaffRequiredMixin, generic.UpdateView):
         try:
             carbs_value = self.request.POST.get('carbs_value', '').strip()
             if carbs_value:
+                carbs_value = int(carbs_value)
                 Carbs.objects.update_or_create(
                     food_item=self.object,
-                    defaults={'carbs_value': int(carbs_value)}
+                    defaults={'carbs_value': carbs_value}
                 )
         except (ValueError, TypeError):
             pass
@@ -631,9 +843,10 @@ class AdminFoodItemUpdateView(StaffRequiredMixin, generic.UpdateView):
         try:
             fiber_value = self.request.POST.get('fiber_value', '').strip()
             if fiber_value:
+                fiber_value = int(fiber_value)
                 Fiber.objects.update_or_create(
                     food_item=self.object,
-                    defaults={'fiber_value': int(fiber_value)}
+                    defaults={'fiber_value': fiber_value}
                 )
         except (ValueError, TypeError):
             pass
@@ -641,12 +854,30 @@ class AdminFoodItemUpdateView(StaffRequiredMixin, generic.UpdateView):
         try:
             sugar_value = self.request.POST.get('sugar_value', '').strip()
             if sugar_value:
+                sugar_value = int(sugar_value)
                 Sugar.objects.update_or_create(
                     food_item=self.object,
-                    defaults={'sugar_value': int(sugar_value)}
+                    defaults={'sugar_value': sugar_value}
                 )
         except (ValueError, TypeError):
             pass
+        
+        # 🔥 SYNCHRONISER LA MISE À JOUR AVEC RDF
+        try:
+            rdf_manager.update_fooditem(
+                fooditem_id=self.object.food_item_id,
+                name=self.object.food_item_name,
+                description=self.object.food_item_description,
+                food_type=self.object.food_type,
+                calories=calories_value,
+                protein=protein_value,
+                carbs=carbs_value,
+                fiber=fiber_value,
+                sugar=sugar_value
+            )
+            print(f"✅ FoodItem mis à jour en RDF : {self.object.food_item_name}")
+        except Exception as e:
+            print(f"⚠️ Erreur synchronisation RDF FoodItem : {e}")
         
         return redirect(self.get_success_url())
 
@@ -657,3 +888,79 @@ class AdminFoodItemDeleteView(StaffRequiredMixin, generic.DeleteView):
     template_name = 'admin/meals/fooditem_confirm_delete.html'
     success_url = reverse_lazy('meals_admin:list')
     context_object_name = 'fooditem'
+    
+    def delete(self, request, *args, **kwargs):
+        """Supprimer de Django ET de RDF"""
+        self.object = self.get_object()
+        fooditem_id = self.object.food_item_id
+        
+        # Supprimer de Django
+        response = super().delete(request, *args, **kwargs)
+        
+        # 🔥 SUPPRIMER AUSSI DE RDF
+        try:
+            rdf_manager.delete_fooditem(fooditem_id)
+            print(f"✅ FoodItem supprimé de RDF : ID {fooditem_id}")
+        except Exception as e:
+            print(f"⚠️ Erreur suppression RDF FoodItem : {e}")
+        
+        return response
+
+
+# ============== RDF/SPARQL STATISTICS VIEW ================
+@login_required
+def rdf_stats_view(request):
+    """Vue pour afficher les statistiques RDF et effectuer des requêtes SPARQL"""
+    stats = rdf_manager.get_stats()
+    
+    # Exemple de requêtes SPARQL
+    sparql_examples = [
+        {
+            'title': 'Tous les repas avec leurs calories',
+            'query': '''
+PREFIX smarthealth: <http://dhia.org/ontologies/smarthealth#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+SELECT ?mealName ?calories
+WHERE {
+    ?meal rdf:type smarthealth:Meal .
+    ?meal smarthealth:name_meal ?mealName .
+    ?meal smarthealth:calories_total ?calories .
+}
+ORDER BY DESC(?calories)
+LIMIT 10
+'''
+        },
+        {
+            'title': 'Tous les aliments avec valeurs nutritionnelles',
+            'query': '''
+PREFIX smarthealth: <http://dhia.org/ontologies/smarthealth#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+SELECT ?foodName ?type ?calories
+WHERE {
+    ?food rdf:type smarthealth:FoodItem .
+    ?food smarthealth:foodItemName ?foodName .
+    ?food smarthealth:type_FoodItem ?type .
+    OPTIONAL {
+        ?food smarthealth:hasCalories ?cal .
+        ?cal smarthealth:calories_value ?calories .
+    }
+}
+ORDER BY ?foodName
+'''
+        }
+    ]
+    
+    # Récupérer les repas depuis RDF
+    rdf_meals = rdf_manager.get_all_meals()
+    
+    # Récupérer les aliments depuis RDF
+    rdf_fooditems = rdf_manager.get_all_fooditems()
+    
+    return render(request, 'meals/rdf_stats.html', {
+        'stats': stats,
+        'sparql_examples': sparql_examples,
+        'rdf_meals': rdf_meals[:10],  # Top 10
+        'rdf_fooditems': rdf_fooditems[:10],  # Top 10
+    })

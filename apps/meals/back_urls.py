@@ -21,3 +21,4 @@ urlpatterns = [
     path('<int:pk>/delete/', AdminFoodItemDeleteView.as_view(), name='delete'),
 ]
 
+

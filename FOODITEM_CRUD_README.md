@@ -326,3 +326,4 @@ Pour toute question ou problème :
 **Développé avec ❤️ pour Smart Health**  
 Version 1.0 - Novembre 2025
 
+
