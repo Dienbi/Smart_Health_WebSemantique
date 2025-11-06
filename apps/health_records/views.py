@@ -12,6 +12,7 @@ from .serializers import (
     HealthRecordSerializer, HealthMetricSerializer,
     StudentHealthRecordSerializer, TeacherHealthRecordSerializer
 )
+from .rdf_service import HealthRecordRDFService
 
 
 # Staff Required Mixin
@@ -159,13 +160,85 @@ class TeacherHealthRecordViewSet(viewsets.ModelViewSet):
 # Web Interface Views
 @login_required
 def health_record_list_view(request):
-    """Display list of user's health records"""
-    records = HealthRecord.objects.filter(user=request.user).select_related('health_metric').order_by('-created_at')
-    metrics = HealthMetric.objects.all().order_by('metric_name')
-    return render(request, 'health_records/record_list.html', {
-        'records': records,
-        'metrics': metrics
-    })
+    """Display list of user's health records from Fuseki using SPARQL"""
+    rdf_service = HealthRecordRDFService()
+    
+    try:
+        # Get records from Fuseki
+        rdf_records = rdf_service.get_health_records_by_user(request.user.id)
+        
+        # Convert RDF results to Django-like objects for template compatibility
+        from datetime import datetime
+        records = []
+        for rdf_record in rdf_records:
+            # Parse dates from RDF (ISO format strings)
+            start_date_str = rdf_record.get('startDate', '')
+            end_date_str = rdf_record.get('endDate', '')
+            created_at_str = rdf_record.get('createdAt', '')
+            
+            start_date = None
+            end_date = None
+            created_at = None
+            
+            if start_date_str:
+                try:
+                    start_date = datetime.fromisoformat(start_date_str.replace('Z', '+00:00'))
+                except:
+                    try:
+                        start_date = datetime.strptime(start_date_str, '%Y-%m-%dT%H:%M:%S')
+                    except:
+                        pass
+            
+            if end_date_str:
+                try:
+                    end_date = datetime.fromisoformat(end_date_str.replace('Z', '+00:00'))
+                except:
+                    try:
+                        end_date = datetime.strptime(end_date_str, '%Y-%m-%dT%H:%M:%S')
+                    except:
+                        pass
+            
+            if created_at_str:
+                try:
+                    created_at = datetime.fromisoformat(created_at_str.replace('Z', '+00:00'))
+                except:
+                    try:
+                        created_at = datetime.strptime(created_at_str, '%Y-%m-%dT%H:%M:%S')
+                    except:
+                        pass
+            
+            record_obj = type('Record', (), {
+                'health_record_id': int(rdf_record.get('recordId', 0)),
+                'description': rdf_record.get('description', ''),
+                'value': float(rdf_record.get('value')) if rdf_record.get('value') else None,
+                'start_date': start_date,
+                'end_date': end_date,
+                'created_at': created_at,
+                'health_metric': type('Metric', (), {
+                    'health_metric_id': int(rdf_record.get('metricId')) if rdf_record.get('metricId') else None,
+                    'metric_name': rdf_record.get('metricName', ''),
+                    'metric_unit': rdf_record.get('metricUnit', '')
+                })() if rdf_record.get('metricId') else None
+            })()
+            records.append(record_obj)
+        
+        # Get metrics from Django (for dropdown) - can also be from Fuseki
+        metrics = HealthMetric.objects.all().order_by('metric_name')
+        
+        return render(request, 'health_records/record_list.html', {
+            'records': records,
+            'metrics': metrics
+        })
+    except Exception as e:
+        import traceback
+        # Fallback to Django ORM if Fuseki fails
+        records = HealthRecord.objects.filter(user=request.user).select_related('health_metric').order_by('-created_at')
+        metrics = HealthMetric.objects.all().order_by('metric_name')
+        return render(request, 'health_records/record_list.html', {
+            'records': records,
+            'metrics': metrics,
+            'error': f'Fuseki connection failed, using Django ORM: {str(e)}'
+        })
 
 
 @login_required
@@ -226,7 +299,7 @@ def health_record_create_view(request):
                 except HealthMetric.DoesNotExist:
                     pass
             
-            # Create health record
+            # Create health record in Django (signals will sync to Fuseki automatically)
             record = HealthRecord.objects.create(
                 user=request.user,
                 health_metric=health_metric,
@@ -328,7 +401,7 @@ def health_record_update_view(request, record_id):
                 else:
                     record.end_date = None
             
-            record.save()
+            record.save()  # Signals will sync to Fuseki automatically
             
             return JsonResponse({
                 'success': True,
@@ -348,7 +421,7 @@ def health_record_update_view(request, record_id):
 
 @login_required
 def health_record_delete_view(request, record_id):
-    """Delete a health record"""
+    """Delete a health record from both Django and Fuseki"""
     try:
         record = HealthRecord.objects.get(health_record_id=record_id, user=request.user)
     except HealthRecord.DoesNotExist:
@@ -358,7 +431,10 @@ def health_record_delete_view(request, record_id):
     if request.method == 'POST':
         from django.http import JsonResponse
         record_id_deleted = record.health_record_id
+        
+        # Delete from Django (signals will delete from Fuseki automatically)
         record.delete()
+        
         return JsonResponse({
             'success': True,
             'message': 'Health record deleted successfully',
@@ -371,30 +447,53 @@ def health_record_delete_view(request, record_id):
 
 @login_required
 def health_record_detail_view(request, record_id):
-    """Get details of a health record"""
-    try:
-        record = HealthRecord.objects.select_related('health_metric').get(health_record_id=record_id, user=request.user)
-    except HealthRecord.DoesNotExist:
-        from django.http import JsonResponse
-        return JsonResponse({'error': 'Record not found'}, status=404)
-    
+    """Get details of a health record from Fuseki using SPARQL"""
     from django.http import JsonResponse
-    from django.core.serializers.json import DjangoJSONEncoder
-    import json
-    from datetime import datetime
     
-    data = {
-        'health_record_id': record.health_record_id,
-        'description': record.description,
-        'value': record.value,
-        'health_metric_id': record.health_metric.health_metric_id if record.health_metric else None,
-        'health_metric_name': record.health_metric.metric_name if record.health_metric else None,
-        'start_date': record.start_date.isoformat() if record.start_date else None,
-        'end_date': record.end_date.isoformat() if record.end_date else None,
-        'created_at': record.created_at.isoformat() if record.created_at else None,
-    }
-    
-    return JsonResponse(data)
+    try:
+        rdf_service = HealthRecordRDFService()
+        rdf_record = rdf_service.get_health_record_by_id(record_id)
+        
+        if not rdf_record:
+            return JsonResponse({'error': 'Record not found'}, status=404)
+        
+        # Verify user owns this record (check user_id from RDF)
+        user_id_from_rdf = rdf_record.get('userId')
+        if user_id_from_rdf and str(user_id_from_rdf) != str(request.user.id):
+            return JsonResponse({'error': 'Record not found'}, status=404)
+        
+        # Convert RDF data to JSON response
+        data = {
+            'health_record_id': int(rdf_record.get('recordId', 0)),
+            'description': rdf_record.get('description', ''),
+            'value': float(rdf_record.get('value')) if rdf_record.get('value') else None,
+            'health_metric_id': int(rdf_record.get('metricId')) if rdf_record.get('metricId') else None,
+            'health_metric_name': rdf_record.get('metricName', ''),
+            'start_date': rdf_record.get('startDate', ''),
+            'end_date': rdf_record.get('endDate', ''),
+            'created_at': rdf_record.get('createdAt', ''),
+        }
+        
+        return JsonResponse(data)
+    except Exception as e:
+        import logging
+        logging.error(f"Error getting health record from Fuseki: {str(e)}")
+        # Fallback to Django ORM
+        try:
+            record = HealthRecord.objects.select_related('health_metric').get(health_record_id=record_id, user=request.user)
+            data = {
+                'health_record_id': record.health_record_id,
+                'description': record.description,
+                'value': record.value,
+                'health_metric_id': record.health_metric.health_metric_id if record.health_metric else None,
+                'health_metric_name': record.health_metric.metric_name if record.health_metric else None,
+                'start_date': record.start_date.isoformat() if record.start_date else None,
+                'end_date': record.end_date.isoformat() if record.end_date else None,
+                'created_at': record.created_at.isoformat() if record.created_at else None,
+            }
+            return JsonResponse(data)
+        except HealthRecord.DoesNotExist:
+            return JsonResponse({'error': 'Record not found'}, status=404)
 
 
 # Admin CRUD Views for Health Metrics

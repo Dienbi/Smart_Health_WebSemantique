@@ -84,6 +84,8 @@ You are a SPARQL query expert. Convert natural language questions to SPARQL quer
 - sh:ActivityLog (properties: duration, intensity, date)
 - sh:HealthRecord (properties: recordDate)
 - sh:HealthMetric (has subclasses: HeartRate, Cholesterol, SugarLevel, Oxygen, Weight, Height)
+  - Properties: healthMetricId (integer), healthMetricName (string), healthMetricDescription (string), healthMetricUnit (string), healthMetricRecordedAt (dateTime)
+  - IMPORTANT: For DELETE/UPDATE operations on HealthMetric, use healthMetricName (string) to identify metrics, NOT healthMetricId (integer)
 - sh:Meal (has subclasses: Breakfast, Lunch, Dinner, Snack) - IMPORTANT: Query for specific types
 - sh:FoodItem (properties: name, calories, protein, carbs)
 - sh:Habit (has subclasses: Reading, Cooking, Drawing, Journaling)
@@ -105,6 +107,7 @@ You are a SPARQL query expert. Convert natural language questions to SPARQL quer
 - "show users" → SELECT ?s ?name WHERE {{ ?s a sh:User . OPTIONAL {{ ?s sh:username ?name }} }}
 - "show meals" → SELECT ?s WHERE {{ {{ ?s a sh:Breakfast }} UNION {{ ?s a sh:Lunch }} UNION {{ ?s a sh:Dinner }} UNION {{ ?s a sh:Snack }} }}
 - "show activities" → SELECT ?s WHERE {{ {{ ?s a sh:Cardio }} UNION {{ ?s a sh:Musculation }} UNION {{ ?s a sh:Natation }} }}
+- "show health metrics" → SELECT ?metric ?metricId ?metricName ?metricUnit WHERE {{ ?metric a sh:HealthMetric . ?metric sh:healthMetricId ?metricId . ?metric sh:healthMetricName ?metricName . OPTIONAL {{ ?metric sh:healthMetricUnit ?metricUnit }} }}
 
 **INSERT Examples:**
 - "add user John with email john@email.com" → 
@@ -123,15 +126,18 @@ You are a SPARQL query expert. Convert natural language questions to SPARQL quer
 **DELETE Examples:**
 - "delete user John" → DELETE WHERE {{ ?u a sh:User ; sh:username "John" . ?u ?p ?o }}
 - "remove activity Running" → DELETE WHERE {{ ?a a sh:Cardio ; sh:activity_name "Running" . ?a ?p ?o }}
+- "delete health metric poid" → DELETE WHERE {{ ?metric a sh:HealthMetric ; sh:healthMetricName "poid" . ?metric ?p ?o }}
+- "remove health metric Cholesterol" → DELETE WHERE {{ ?metric a sh:HealthMetric ; sh:healthMetricName "Cholesterol" . ?metric ?p ?o }}
 
 **CRITICAL RULES:**
 1. Generate ONLY the SPARQL query, no explanations
 2. Always include PREFIX definitions
 3. Use the sh: namespace for all ontology terms
-4. **FOR PARENT CLASSES WITH SUBCLASSES** (Meal, Activity, HealthMetric, Habit):
-   - DO NOT query the parent class directly (e.g., sh:Meal)
-   - ALWAYS use UNION to query ALL subclasses
-   - Example: For "meals", query: {{ ?s a sh:Breakfast }} UNION {{ ?s a sh:Lunch }} UNION {{ ?s a sh:Dinner }} UNION {{ ?s a sh:Snack }}
+4. **FOR PARENT CLASSES WITH SUBCLASSES**:
+   - **Meal, Activity, Habit**: DO NOT query the parent class directly, ALWAYS use UNION to query ALL subclasses
+     Example: For "meals", query: {{ ?s a sh:Breakfast }} UNION {{ ?s a sh:Lunch }} UNION {{ ?s a sh:Dinner }} UNION {{ ?s a sh:Snack }}
+   - **HealthMetric**: Query the parent class directly (sh:HealthMetric) because instances are stored as HealthMetric, not as subclasses
+     Example: For "health metrics", query: ?metric a sh:HealthMetric
 5. For user-specific queries, filter by user ID if provided
 6. Return proper SELECT, INSERT DATA, DELETE/INSERT (UPDATE), or DELETE WHERE queries based on intent
 7. For INSERT operations, generate unique IDs using underscore notation (e.g., sh:User_John)

@@ -6,12 +6,34 @@ class SparqlResultFormatter:
         """Format raw SPARQL results to Python dict"""
         formatted = []
         
-        if 'results' in results and 'bindings' in results['results']:
-            for binding in results['results']['bindings']:
-                formatted_row = {}
-                for key, value in binding.items():
-                    formatted_row[key] = value.get('value', '')
-                formatted.append(formatted_row)
+        # Handle empty or None results
+        if not results:
+            return formatted
+        
+        # Handle different result formats
+        if isinstance(results, dict):
+            if 'results' in results and 'bindings' in results['results']:
+                for binding in results['results']['bindings']:
+                    formatted_row = {}
+                    for key, value in binding.items():
+                        if isinstance(value, dict):
+                            formatted_row[key] = value.get('value', '')
+                        else:
+                            formatted_row[key] = value
+                    formatted.append(formatted_row)
+            elif 'bindings' in results:
+                # Direct bindings format
+                for binding in results['bindings']:
+                    formatted_row = {}
+                    for key, value in binding.items():
+                        if isinstance(value, dict):
+                            formatted_row[key] = value.get('value', '')
+                        else:
+                            formatted_row[key] = value
+                    formatted.append(formatted_row)
+        elif isinstance(results, list):
+            # Already a list format
+            formatted = results
         
         return formatted
     
