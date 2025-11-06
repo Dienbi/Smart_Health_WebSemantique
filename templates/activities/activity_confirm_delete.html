@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+
+{% block title %}Supprimer {{ activity.activity_name }} - Smart Health{% endblock %}
+
+{% block extra_css %}
+<style>
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .delete-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .delete-warning {
+        background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+        color: white;
+        border-radius: 20px;
+        padding: 2.5rem;
+        text-align: center;
+        margin-bottom: 2.5rem;
+        box-shadow: 0 10px 40px rgba(245, 87, 108, 0.3);
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .delete-warning i {
+        font-size: 4rem;
+        display: block;
+        margin-bottom: 1.5rem;
+        animation: shake 0.5s ease-in-out;
+    }
+
+    .delete-warning h1 {
+        font-size: 2rem;
+        font-weight: 900;
+        margin: 0 0 1rem 0;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .delete-warning p {
+        margin: 0;
+        font-size: 1.1rem;
+        opacity: 0.95;
+    }
+
+    .activity-details {
+        background: white;
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 10px 40px rgba(44, 62, 80, 0.1);
+        margin-bottom: 2rem;
+        animation: fadeInUp 0.6s ease-out 0.1s both;
+    }
+
+    .activity-details h2 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #2c3e50;
+        margin: 0 0 1.5rem 0;
+        padding-bottom: 1rem;
+        border-bottom: 3px solid #e9ecef;
+    }
+
+    .detail-row {
+        display: grid;
+        grid-template-columns: 150px 1fr;
+        padding: 1rem 0;
+        border-bottom: 1px solid #f1f3f5;
+    }
+
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+
+    .detail-label {
+        font-weight: 700;
+        color: #6c757d;
+        font-size: 0.95rem;
+    }
+
+    .detail-value {
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+
+    .btn-action {
+        padding: 1rem 2.5rem;
+        border-radius: 15px;
+        font-weight: 800;
+        font-size: 1.1rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        min-width: 200px;
+        justify-content: center;
+    }
+
+    .btn-cancel {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+    }
+
+    .btn-cancel:hover {
+        transform: translateY(-4px) scale(1.05);
+        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        color: white;
+    }
+
+    .btn-confirm-delete {
+        background: linear-gradient(135deg, #f5576c, #f093fb);
+        color: white;
+    }
+
+    .btn-confirm-delete:hover {
+        transform: translateY(-4px) scale(1.05);
+        box-shadow: 0 15px 40px rgba(245, 87, 108, 0.6);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="delete-container">
+    <div class="delete-warning">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <h1>Confirmer la suppression</h1>
+        <p>Cette action est irréversible. L'activité sera définitivement supprimée.</p>
+    </div>
+
+    <div class="activity-details">
+        <h2><i class="bi bi-activity"></i> Détails de l'activité à supprimer</h2>
+        
+        <div class="detail-row">
+            <div class="detail-label">Nom :</div>
+            <div class="detail-value">{{ activity.activity_name }}</div>
+        </div>
+
+        <div class="detail-row">
+            <div class="detail-label">Description :</div>
+            <div class="detail-value">{{ activity.activity_description|default:"Aucune description" }}</div>
+        </div>
+
+        <div class="detail-row">
+            <div class="detail-label">Date de création :</div>
+            <div class="detail-value">{{ activity.created_at|date:"d/m/Y à H:i" }}</div>
+        </div>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="action-buttons">
+            <a href="{% url 'activities:activity-list' %}" class="btn-action btn-cancel">
+                <i class="bi bi-x-lg"></i>
+                Annuler
+            </a>
+            <button type="submit" class="btn-action btn-confirm-delete">
+                <i class="bi bi-trash-fill"></i>
+                Supprimer définitivement
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

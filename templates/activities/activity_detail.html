@@ -1,11 +1,203 @@
 {% extends 'base.html' %}
 
-{% block title %}Activity Details - Smart Health{% endblock %}
+{% block title %}{{ activity.activity_name }} - Smart Health{% endblock %}
+
+{% block extra_css %}
+<style>
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .detail-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .detail-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 20px;
+        padding: 2.5rem;
+        margin-bottom: 2.5rem;
+        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .detail-header h1 {
+        font-size: 2.5rem;
+        font-weight: 900;
+        margin: 0 0 1rem 0;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .activity-meta {
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+        opacity: 0.95;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1.1rem;
+    }
+
+    .meta-item i {
+        font-size: 1.5rem;
+    }
+
+    .detail-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .btn-action {
+        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-back {
+        background: white;
+        color: #667eea;
+    }
+
+    .btn-edit {
+        background: rgba(255,255,255,0.2);
+        color: white;
+    }
+
+    .btn-delete {
+        background: rgba(245, 87, 108, 0.9);
+        color: white;
+    }
+
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        color: white;
+    }
+
+    .info-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 10px 40px rgba(44, 62, 80, 0.1);
+        animation: fadeInUp 0.6s ease-out;
+        margin-bottom: 2rem;
+    }
+
+    .info-card h3 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #667eea;
+        margin: 0 0 1.5rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 3px solid #e9ecef;
+    }
+
+    .info-card p {
+        font-size: 1.1rem;
+        color: #2c3e50;
+        line-height: 1.8;
+        margin: 0;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2>Activity Details</h2>
-    <p>Details for activity #{{ activity.activity_log_id }}</p>
-    <a href="{% url 'activities:activity-list' %}" class="btn btn-secondary">Back</a>
+<div class="detail-container">
+    <div class="detail-header">
+        <h1><i class="bi bi-activity"></i> {{ activity.activity_name }}</h1>
+        <div class="activity-meta">
+            <div class="meta-item">
+                <i class="bi bi-calendar3"></i>
+                <span>Créée le {{ activity.created_at|date:"d/m/Y à H:i" }}</span>
+            </div>
+        </div>
+        <div class="detail-actions">
+            <a href="{% url 'activities:activity-list' %}" class="btn-action btn-back">
+                <i class="bi bi-arrow-left"></i> Retour
+            </a>
+            <a href="{% url 'activities:activity-edit' activity.activity_id %}" class="btn-action btn-edit">
+                <i class="bi bi-pencil-fill"></i> Modifier
+            </a>
+            <a href="{% url 'activities:activity-delete' activity.activity_id %}" class="btn-action btn-delete">
+                <i class="bi bi-trash-fill"></i> Supprimer
+            </a>
+        </div>
+    </div>
+
+    <div class="info-card">
+        <h3><i class="bi bi-info-circle"></i> Description</h3>
+        <p>{{ activity.activity_description|default:"Aucune description disponible pour cette activité." }}</p>
+    </div>
+
+    {% if activity.cardio_details %}
+    <div class="info-card">
+        <h3><i class="bi bi-heart-pulse"></i> Détails - Cardio</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <div>
+                <strong style="color: #667eea;">Calories brûlées:</strong>
+                <p style="margin: 0.5rem 0 0 0; font-size: 1.2rem; font-weight: 700;">{{ activity.cardio_details.calories_burned }} cal</p>
+            </div>
+            <div>
+                <strong style="color: #667eea;">Rythme cardiaque:</strong>
+                <p style="margin: 0.5rem 0 0 0; font-size: 1.2rem; font-weight: 700;">{{ activity.cardio_details.heart_rate }} BPM</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if activity.musculation_details %}
+    <div class="info-card">
+        <h3><i class="bi bi-barbell"></i> Détails - Musculation</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <div>
+                <strong style="color: #667eea;">Séries:</strong>
+                <p style="margin: 0.5rem 0 0 0; font-size: 1.2rem; font-weight: 700;">{{ activity.musculation_details.sets }}</p>
+            </div>
+            <div>
+                <strong style="color: #667eea;">Répétitions:</strong>
+                <p style="margin: 0.5rem 0 0 0; font-size: 1.2rem; font-weight: 700;">{{ activity.musculation_details.repetitions }}</p>
+            </div>
+            <div>
+                <strong style="color: #667eea;">Poids:</strong>
+                <p style="margin: 0.5rem 0 0 0; font-size: 1.2rem; font-weight: 700;">{{ activity.musculation_details.weight }} kg</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if activity.natation_details %}
+    <div class="info-card">
+        <h3><i class="bi bi-water"></i> Détails - Natation</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <div>
+                <strong style="color: #667eea;">Distance:</strong>
+                <p style="margin: 0.5rem 0 0 0; font-size: 1.2rem; font-weight: 700;">{{ activity.natation_details.distance }} m</p>
+            </div>
+            <div>
+                <strong style="color: #667eea;">Style:</strong>
+                <p style="margin: 0.5rem 0 0 0; font-size: 1.2rem; font-weight: 700;">{{ activity.natation_details.get_style_display }}</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

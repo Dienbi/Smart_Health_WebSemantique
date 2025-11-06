@@ -160,6 +160,7 @@
             <tr>
                 <th>ID</th>
                 <th>Nom</th>
+                <th>Type</th>
                 <th>Description</th>
                 <th>Date de création</th>
                 <th style="text-align: right;">Actions</th>
@@ -170,6 +171,23 @@
             <tr>
                 <td><span class="badge bg-secondary">#{{ activity.activity_id }}</span></td>
                 <td style="font-weight: 600; color: #2c3e50;">{{ activity.activity_name }}</td>
+                <td>
+                    {% if activity.cardio_details %}
+                    <span class="badge" style="background: linear-gradient(135deg, #f5576c, #f093fb); color: white;">
+                        <i class="bi bi-heart-pulse"></i> Cardio
+                    </span>
+                    {% elif activity.musculation_details %}
+                    <span class="badge" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white;">
+                        <i class="bi bi-barbell"></i> Musculation
+                    </span>
+                    {% elif activity.natation_details %}
+                    <span class="badge" style="background: linear-gradient(135deg, #30cfd0, #330867); color: white;">
+                        <i class="bi bi-water"></i> Natation
+                    </span>
+                    {% else %}
+                    <span class="badge bg-secondary">Général</span>
+                    {% endif %}
+                </td>
                 <td style="color: #6c757d; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                     {{ activity.activity_description|truncatewords:15 }}
                 </td>

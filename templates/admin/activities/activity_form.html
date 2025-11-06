@@ -90,6 +90,41 @@
         background: #667eea;
         color: white;
     }
+
+    .form-select {
+        border-radius: 12px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+
+    .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+        outline: none;
+    }
+
+    .type-fields {
+        display: none;
+        margin-top: 1rem;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 12px;
+        border: 2px solid #e9ecef;
+    }
+
+    .type-fields.show {
+        display: block;
+    }
+
+    .type-fields h5 {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #667eea;
+        margin-bottom: 1rem;
+    }
 </style>
 {% endblock %}
 
@@ -117,6 +152,78 @@
                     <div class="text-danger mt-1">{{ form.activity_description.errors }}</div>
                 {% endif %}
             </div>
+
+            <div class="form-group">
+                <label for="activity_type">Type d'activité</label>
+                <select class="form-select" id="activity_type" name="activity_type">
+                    <option value="">-- Sélectionnez un type (optionnel) --</option>
+                    <option value="CARDIO" {% if not is_create and current_type == 'CARDIO' %}selected{% endif %}>Cardio</option>
+                    <option value="MUSCULATION" {% if not is_create and current_type == 'MUSCULATION' %}selected{% endif %}>Musculation</option>
+                    <option value="NATATION" {% if not is_create and current_type == 'NATATION' %}selected{% endif %}>Natation</option>
+                </select>
+            </div>
+
+            <!-- Cardio Fields -->
+            <div class="type-fields" id="cardio-fields">
+                <h5><i class="bi bi-heart-pulse"></i> Détails - Cardio</h5>
+                <div class="form-group">
+                    <label for="calories_burned">Calories brûlées *</label>
+                    <input type="number" step="0.1" class="form-control" id="calories_burned" name="calories_burned" 
+                           value="{% if not is_create and current_type == 'CARDIO' %}{{ type_data.calories_burned }}{% endif %}"
+                           placeholder="Ex: 300.5" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="heart_rate">Rythme cardiaque (BPM) *</label>
+                    <input type="number" class="form-control" id="heart_rate" name="heart_rate" 
+                           value="{% if not is_create and current_type == 'CARDIO' %}{{ type_data.heart_rate }}{% endif %}"
+                           placeholder="Ex: 120" min="0">
+                </div>
+            </div>
+
+            <!-- Musculation Fields -->
+            <div class="type-fields" id="musculation-fields">
+                <h5><i class="bi bi-barbell"></i> Détails - Musculation</h5>
+                <div class="form-group">
+                    <label for="sets">Nombre de séries *</label>
+                    <input type="number" class="form-control" id="sets" name="sets" 
+                           value="{% if not is_create and current_type == 'MUSCULATION' %}{{ type_data.sets }}{% endif %}"
+                           placeholder="Ex: 3" min="1">
+                </div>
+                <div class="form-group">
+                    <label for="repetitions">Nombre de répétitions *</label>
+                    <input type="number" class="form-control" id="repetitions" name="repetitions" 
+                           value="{% if not is_create and current_type == 'MUSCULATION' %}{{ type_data.repetitions }}{% endif %}"
+                           placeholder="Ex: 12" min="1">
+                </div>
+                <div class="form-group">
+                    <label for="weight">Poids (kg) *</label>
+                    <input type="number" class="form-control" id="weight" name="weight" 
+                           value="{% if not is_create and current_type == 'MUSCULATION' %}{{ type_data.weight }}{% endif %}"
+                           placeholder="Ex: 20" min="0">
+                </div>
+            </div>
+
+            <!-- Natation Fields -->
+            <div class="type-fields" id="natation-fields">
+                <h5><i class="bi bi-water"></i> Détails - Natation</h5>
+                <div class="form-group">
+                    <label for="distance">Distance (mètres) *</label>
+                    <input type="number" class="form-control" id="distance" name="distance" 
+                           value="{% if not is_create and current_type == 'NATATION' %}{{ type_data.distance }}{% endif %}"
+                           placeholder="Ex: 500" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="style">Style *</label>
+                    <select class="form-select" id="style" name="style">
+                        <option value="">-- Sélectionnez un style --</option>
+                        <option value="FREESTYLE" {% if not is_create and current_type == 'NATATION' and type_data.style == 'FREESTYLE' %}selected{% endif %}>Nage libre</option>
+                        <option value="BACKSTROKE" {% if not is_create and current_type == 'NATATION' and type_data.style == 'BACKSTROKE' %}selected{% endif %}>Dos</option>
+                        <option value="BREASTSTROKE" {% if not is_create and current_type == 'NATATION' and type_data.style == 'BREASTSTROKE' %}selected{% endif %}>Brasse</option>
+                        <option value="BUTTERFLY" {% if not is_create and current_type == 'NATATION' and type_data.style == 'BUTTERFLY' %}selected{% endif %}>Papillon</option>
+                        <option value="PAPILLON" {% if not is_create and current_type == 'NATATION' and type_data.style == 'PAPILLON' %}selected{% endif %}>Papillon</option>
+                    </select>
+                </div>
+            </div>
         </div>
 
         <div class="d-flex gap-3">
@@ -130,5 +237,37 @@
         </div>
     </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const activityTypeSelect = document.getElementById('activity_type');
+    const cardioFields = document.getElementById('cardio-fields');
+    const musculationFields = document.getElementById('musculation-fields');
+    const natationFields = document.getElementById('natation-fields');
+
+    function toggleTypeFields() {
+        const value = activityTypeSelect.value;
+        
+        // Hide all fields
+        cardioFields.classList.remove('show');
+        musculationFields.classList.remove('show');
+        natationFields.classList.remove('show');
+        
+        // Show relevant fields
+        if (value === 'CARDIO') {
+            cardioFields.classList.add('show');
+        } else if (value === 'MUSCULATION') {
+            musculationFields.classList.add('show');
+        } else if (value === 'NATATION') {
+            natationFields.classList.add('show');
+        }
+    }
+
+    activityTypeSelect.addEventListener('change', toggleTypeFields);
+    
+    // Initial call to show fields if editing
+    toggleTypeFields();
+});
+</script>
 {% endblock %}
 

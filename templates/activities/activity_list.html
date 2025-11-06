@@ -1,17 +1,350 @@
 {% extends 'base.html' %}
 
-{% block title %}My Activities - Smart Health{% endblock %}
+{% block title %}Activités - Smart Health{% endblock %}
+
+{% block extra_css %}
+<style>
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .activities-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        padding: 2.5rem;
+        color: white;
+        margin-bottom: 2.5rem;
+        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .page-header h1 {
+        font-size: 2.5rem;
+        font-weight: 900;
+        margin: 0 0 0.5rem 0;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .page-header p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 1.1rem;
+    }
+
+    .header-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .btn-add-activity {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+        border-radius: 15px;
+        padding: 1rem 2.5rem;
+        color: white;
+        font-weight: 800;
+        font-size: 1.1rem;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .btn-add-activity:hover {
+        transform: translateY(-4px) scale(1.05);
+        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        color: white;
+    }
+
+    .activities-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .activity-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 10px 40px rgba(44, 62, 80, 0.1);
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.6s ease-out;
+        border: 2px solid transparent;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .activity-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+
+    .activity-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 50px rgba(102, 126, 234, 0.25);
+        border-color: rgba(102, 126, 234, 0.3);
+    }
+
+    .activity-card h3 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin: 0 0 1rem 0;
+        color: #2c3e50;
+    }
+
+    .activity-description {
+        color: #6c757d;
+        font-size: 0.95rem;
+        margin: 1rem 0;
+        line-height: 1.6;
+    }
+
+    .activity-info {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin: 1.5rem 0;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+
+    .info-item i {
+        font-size: 1.2rem;
+        color: #667eea;
+    }
+
+    .activity-actions {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 2px solid #f1f3f5;
+    }
+
+    .btn-activity-action {
+        flex: 1;
+        padding: 0.75rem 1rem;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-view {
+        background: linear-gradient(135deg, #17a2b8, #138496);
+        color: white;
+    }
+
+    .btn-view:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(23, 162, 184, 0.4);
+        color: white;
+    }
+
+    .btn-edit {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+    }
+
+    .btn-edit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+
+    .btn-delete {
+        background: linear-gradient(135deg, #f5576c, #f093fb);
+        color: white;
+    }
+
+    .btn-delete:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(245, 87, 108, 0.4);
+        color: white;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 5rem 2rem;
+        background: linear-gradient(145deg, #f8f9fa, white);
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(44, 62, 80, 0.08);
+    }
+
+    .empty-state i {
+        font-size: 5rem;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1.5rem;
+        display: block;
+    }
+
+    .empty-state h3 {
+        font-weight: 800;
+        font-size: 1.8rem;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state p {
+        color: #6c757d;
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-12">
-            <div class="alert alert-info">
-                <h4><i class="bi bi-activity"></i> Activities Module</h4>
-                <p>Full activity management interface coming soon! For now, use the <a href="{% url 'api_ai:ai-test' %}">AI Assistant</a> or <a href="{% url 'admin:index' %}">Django Admin</a>.</p>
-                <a href="{% url 'home' %}" class="btn btn-primary">Back to Home</a>
-            </div>
-        </div>
+<div class="activities-container">
+    <div class="page-header">
+        <h1><i class="bi bi-activity"></i> Activités</h1>
+        <p>Gérez les activités disponibles dans le système</p>
     </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="header-actions">
+        <h2 style="margin: 0; color: #2c3e50; font-weight: 800;">
+            <i class="bi bi-list-ul"></i> Toutes les activités
+        </h2>
+        <a href="{% url 'activities:activity-create' %}" class="btn-add-activity">
+            <i class="bi bi-plus-circle-fill"></i>
+            Créer une activité
+        </a>
+    </div>
+
+    {% if activities %}
+        <div class="activities-grid">
+            {% for activity in activities %}
+            <div class="activity-card">
+                {% if activity.cardio_details %}
+                <span class="intensity-badge" style="background: linear-gradient(135deg, #f5576c, #f093fb); color: white; display: inline-block; padding: 0.5rem 1.2rem; border-radius: 25px; font-size: 0.85rem; font-weight: 700; margin-bottom: 1rem;">
+                    <i class="bi bi-heart-pulse"></i> Cardio
+                </span>
+                {% elif activity.musculation_details %}
+                <span class="intensity-badge" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; display: inline-block; padding: 0.5rem 1.2rem; border-radius: 25px; font-size: 0.85rem; font-weight: 700; margin-bottom: 1rem;">
+                    <i class="bi bi-barbell"></i> Musculation
+                </span>
+                {% elif activity.natation_details %}
+                <span class="intensity-badge" style="background: linear-gradient(135deg, #30cfd0, #330867); color: white; display: inline-block; padding: 0.5rem 1.2rem; border-radius: 25px; font-size: 0.85rem; font-weight: 700; margin-bottom: 1rem;">
+                    <i class="bi bi-water"></i> Natation
+                </span>
+                {% endif %}
+                
+                <h3>{{ activity.activity_name }}</h3>
+                
+                {% if activity.activity_description %}
+                <div class="activity-description">
+                    {{ activity.activity_description|truncatewords:30 }}
+                </div>
+                {% else %}
+                <div class="activity-description" style="color: #adb5bd; font-style: italic;">
+                    Aucune description
+                </div>
+                {% endif %}
+                
+                <div class="activity-info">
+                    <div class="info-item">
+                        <i class="bi bi-calendar3"></i>
+                        <span>Créée le {{ activity.created_at|date:"d/m/Y" }}</span>
+                    </div>
+                    {% if activity.cardio_details %}
+                    <div class="info-item">
+                        <i class="bi bi-fire"></i>
+                        <strong>{{ activity.cardio_details.calories_burned }}</strong> cal
+                    </div>
+                    <div class="info-item">
+                        <i class="bi bi-heart"></i>
+                        <strong>{{ activity.cardio_details.heart_rate }}</strong> BPM
+                    </div>
+                    {% elif activity.musculation_details %}
+                    <div class="info-item">
+                        <i class="bi bi-list-ol"></i>
+                        <strong>{{ activity.musculation_details.sets }}</strong> séries
+                    </div>
+                    <div class="info-item">
+                        <i class="bi bi-arrow-repeat"></i>
+                        <strong>{{ activity.musculation_details.repetitions }}</strong> répétitions
+                    </div>
+                    <div class="info-item">
+                        <i class="bi bi-weight"></i>
+                        <strong>{{ activity.musculation_details.weight }}</strong> kg
+                    </div>
+                    {% elif activity.natation_details %}
+                    <div class="info-item">
+                        <i class="bi bi-rulers"></i>
+                        <strong>{{ activity.natation_details.distance }}</strong> m
+                    </div>
+                    <div class="info-item">
+                        <i class="bi bi-palette"></i>
+                        <strong>{{ activity.natation_details.get_style_display }}</strong>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="activity-actions">
+                    <a href="{% url 'activities:activity-detail' activity.activity_id %}" class="btn-activity-action btn-view">
+                        <i class="bi bi-eye-fill"></i> Voir
+                    </a>
+                    <a href="{% url 'activities:activity-edit' activity.activity_id %}" class="btn-activity-action btn-edit">
+                        <i class="bi bi-pencil-fill"></i> Modifier
+                    </a>
+                    <a href="{% url 'activities:activity-delete' activity.activity_id %}" class="btn-activity-action btn-delete">
+                        <i class="bi bi-trash-fill"></i> Supprimer
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="bi bi-inbox"></i>
+            <h3>Aucune activité enregistrée</h3>
+            <p>Commencez à créer des activités pour les utiliser dans vos journaux d'activité !</p>
+            <a href="{% url 'activities:activity-create' %}" class="btn-add-activity">
+                <i class="bi bi-plus-circle-fill"></i>
+                Créer ma première activité
+            </a>
+        </div>
+    {% endif %}
 </div>
 {% endblock %}

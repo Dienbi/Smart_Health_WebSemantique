@@ -99,6 +99,273 @@ class NatationViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
 
+# ============== WEB INTERFACE VIEWS FOR USERS (ACTIVITY CRUD) ================
+
+@login_required
+def activity_list_view(request):
+    """Display list of all activities"""
+    activities = Activity.objects.all().order_by('-created_at')
+    return render(request, 'activities/activity_list.html', {
+        'activities': activities
+    })
+
+
+@login_required
+def activity_create_view(request):
+    """Create a new activity"""
+    if request.method == 'POST':
+        # Validate form
+        errors = {}
+        activity_name = request.POST.get('activity_name', '').strip()
+        activity_description = request.POST.get('activity_description', '').strip()
+        activity_type = request.POST.get('activity_type', '').strip()
+        
+        # Validate activity_name
+        if not activity_name:
+            errors['activity_name'] = "Le nom de l'activité est obligatoire"
+        elif len(activity_name) < 3:
+            errors['activity_name'] = "Le nom doit contenir au moins 3 caractères"
+        elif len(activity_name) > 200:
+            errors['activity_name'] = "Le nom ne peut pas dépasser 200 caractères"
+        
+        # Validate activity_type if provided
+        valid_types = ['CARDIO', 'MUSCULATION', 'NATATION', '']
+        if activity_type and activity_type not in valid_types:
+            errors['activity_type'] = "Type d'activité invalide"
+        
+        # Validate type-specific fields
+        if activity_type == 'CARDIO':
+            calories_burned = request.POST.get('calories_burned', '').strip()
+            heart_rate = request.POST.get('heart_rate', '').strip()
+            if not calories_burned:
+                errors['calories_burned'] = "Les calories brûlées sont obligatoires pour le cardio"
+            if not heart_rate:
+                errors['heart_rate'] = "Le rythme cardiaque est obligatoire pour le cardio"
+        elif activity_type == 'MUSCULATION':
+            sets = request.POST.get('sets', '').strip()
+            repetitions = request.POST.get('repetitions', '').strip()
+            weight = request.POST.get('weight', '').strip()
+            if not sets:
+                errors['sets'] = "Le nombre de séries est obligatoire pour la musculation"
+            if not repetitions:
+                errors['repetitions'] = "Le nombre de répétitions est obligatoire pour la musculation"
+            if not weight:
+                errors['weight'] = "Le poids est obligatoire pour la musculation"
+        elif activity_type == 'NATATION':
+            distance = request.POST.get('distance', '').strip()
+            style = request.POST.get('style', '').strip()
+            if not distance:
+                errors['distance'] = "La distance est obligatoire pour la natation"
+            if not style:
+                errors['style'] = "Le style est obligatoire pour la natation"
+        
+        if errors:
+            return render(request, 'activities/activity_form.html', {
+                'is_create': True,
+                'errors': errors,
+                'form_data': request.POST
+            })
+        
+        # Create activity
+        try:
+            activity = Activity.objects.create(
+                activity_name=activity_name,
+                activity_description=activity_description if activity_description else ''
+            )
+            
+            # Create type-specific activity
+            if activity_type == 'CARDIO':
+                Cardio.objects.create(
+                    activity=activity,
+                    calories_burned=float(request.POST.get('calories_burned')),
+                    heart_rate=int(request.POST.get('heart_rate'))
+                )
+            elif activity_type == 'MUSCULATION':
+                Musculation.objects.create(
+                    activity=activity,
+                    sets=int(request.POST.get('sets')),
+                    repetitions=int(request.POST.get('repetitions')),
+                    weight=int(request.POST.get('weight'))
+                )
+            elif activity_type == 'NATATION':
+                Natation.objects.create(
+                    activity=activity,
+                    distance=int(request.POST.get('distance')),
+                    style=request.POST.get('style')
+                )
+            
+            messages.success(request, "Activité créée avec succès!")
+            return redirect('activities:activity-detail', activity_id=activity.activity_id)
+        except Exception as e:
+            messages.error(request, f"Erreur lors de la création: {str(e)}")
+    
+    return render(request, 'activities/activity_form.html', {
+        'is_create': True
+    })
+
+
+@login_required
+def activity_detail_view(request, activity_id):
+    """Display details for a specific activity"""
+    activity = get_object_or_404(Activity, activity_id=activity_id)
+    
+    # Get activity type and details
+    activity_type = None
+    if hasattr(activity, 'cardio_details'):
+        activity_type = 'CARDIO'
+    elif hasattr(activity, 'musculation_details'):
+        activity_type = 'MUSCULATION'
+    elif hasattr(activity, 'natation_details'):
+        activity_type = 'NATATION'
+    
+    return render(request, 'activities/activity_detail.html', {
+        'activity': activity,
+        'activity_type': activity_type
+    })
+
+
+@login_required
+def activity_update_view(request, activity_id):
+    """Update an activity"""
+    activity = get_object_or_404(Activity, activity_id=activity_id)
+    
+    if request.method == 'POST':
+        # Validate form
+        errors = {}
+        activity_name = request.POST.get('activity_name', '').strip()
+        activity_description = request.POST.get('activity_description', '').strip()
+        activity_type = request.POST.get('activity_type', '').strip()
+        
+        # Validate activity_name
+        if not activity_name:
+            errors['activity_name'] = "Le nom de l'activité est obligatoire"
+        elif len(activity_name) < 3:
+            errors['activity_name'] = "Le nom doit contenir au moins 3 caractères"
+        elif len(activity_name) > 200:
+            errors['activity_name'] = "Le nom ne peut pas dépasser 200 caractères"
+        
+        # Validate activity_type if provided
+        valid_types = ['CARDIO', 'MUSCULATION', 'NATATION', '']
+        if activity_type and activity_type not in valid_types:
+            errors['activity_type'] = "Type d'activité invalide"
+        
+        # Validate type-specific fields
+        if activity_type == 'CARDIO':
+            calories_burned = request.POST.get('calories_burned', '').strip()
+            heart_rate = request.POST.get('heart_rate', '').strip()
+            if not calories_burned:
+                errors['calories_burned'] = "Les calories brûlées sont obligatoires pour le cardio"
+            if not heart_rate:
+                errors['heart_rate'] = "Le rythme cardiaque est obligatoire pour le cardio"
+        elif activity_type == 'MUSCULATION':
+            sets = request.POST.get('sets', '').strip()
+            repetitions = request.POST.get('repetitions', '').strip()
+            weight = request.POST.get('weight', '').strip()
+            if not sets:
+                errors['sets'] = "Le nombre de séries est obligatoire pour la musculation"
+            if not repetitions:
+                errors['repetitions'] = "Le nombre de répétitions est obligatoire pour la musculation"
+            if not weight:
+                errors['weight'] = "Le poids est obligatoire pour la musculation"
+        elif activity_type == 'NATATION':
+            distance = request.POST.get('distance', '').strip()
+            style = request.POST.get('style', '').strip()
+            if not distance:
+                errors['distance'] = "La distance est obligatoire pour la natation"
+            if not style:
+                errors['style'] = "Le style est obligatoire pour la natation"
+        
+        if errors:
+            return render(request, 'activities/activity_form.html', {
+                'is_create': False,
+                'activity': activity,
+                'errors': errors,
+                'form_data': request.POST
+            })
+        
+        # Update activity
+        try:
+            activity.activity_name = activity_name
+            activity.activity_description = activity_description if activity_description else ''
+            activity.save()
+            
+            # Delete existing type-specific activities
+            Cardio.objects.filter(activity=activity).delete()
+            Musculation.objects.filter(activity=activity).delete()
+            Natation.objects.filter(activity=activity).delete()
+            
+            # Create new type-specific activity
+            if activity_type == 'CARDIO':
+                Cardio.objects.create(
+                    activity=activity,
+                    calories_burned=float(request.POST.get('calories_burned')),
+                    heart_rate=int(request.POST.get('heart_rate'))
+                )
+            elif activity_type == 'MUSCULATION':
+                Musculation.objects.create(
+                    activity=activity,
+                    sets=int(request.POST.get('sets')),
+                    repetitions=int(request.POST.get('repetitions')),
+                    weight=int(request.POST.get('weight'))
+                )
+            elif activity_type == 'NATATION':
+                Natation.objects.create(
+                    activity=activity,
+                    distance=int(request.POST.get('distance')),
+                    style=request.POST.get('style')
+                )
+            
+            messages.success(request, "Activité mise à jour avec succès!")
+            return redirect('activities:activity-detail', activity_id=activity.activity_id)
+        except Exception as e:
+            messages.error(request, f"Erreur lors de la mise à jour: {str(e)}")
+    
+    # Determine current activity type
+    current_type = ''
+    type_data = {}
+    if hasattr(activity, 'cardio_details'):
+        current_type = 'CARDIO'
+        type_data = {
+            'calories_burned': activity.cardio_details.calories_burned,
+            'heart_rate': activity.cardio_details.heart_rate
+        }
+    elif hasattr(activity, 'musculation_details'):
+        current_type = 'MUSCULATION'
+        type_data = {
+            'sets': activity.musculation_details.sets,
+            'repetitions': activity.musculation_details.repetitions,
+            'weight': activity.musculation_details.weight
+        }
+    elif hasattr(activity, 'natation_details'):
+        current_type = 'NATATION'
+        type_data = {
+            'distance': activity.natation_details.distance,
+            'style': activity.natation_details.style
+        }
+    
+    return render(request, 'activities/activity_form.html', {
+        'is_create': False,
+        'activity': activity,
+        'current_type': current_type,
+        'type_data': type_data
+    })
+
+
+@login_required
+def activity_delete_view(request, activity_id):
+    """Delete an activity"""
+    activity = get_object_or_404(Activity, activity_id=activity_id)
+    
+    if request.method == 'POST':
+        activity.delete()
+        messages.success(request, "Activité supprimée avec succès!")
+        return redirect('activities:activity-list')
+    
+    return render(request, 'activities/activity_confirm_delete.html', {
+        'activity': activity
+    })
+
+
 # ============== WEB INTERFACE VIEWS FOR USERS (ACTIVITY LOG CRUD) ================
 
 @login_required
@@ -422,6 +689,40 @@ class AdminActivityCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateVie
         return self.request.user.is_staff
     
     def form_valid(self, form):
+        activity = form.save()
+        activity_type = self.request.POST.get('activity_type', '').strip()
+        
+        # Create type-specific activity
+        if activity_type == 'CARDIO':
+            calories_burned = self.request.POST.get('calories_burned', '').strip()
+            heart_rate = self.request.POST.get('heart_rate', '').strip()
+            if calories_burned and heart_rate:
+                Cardio.objects.create(
+                    activity=activity,
+                    calories_burned=float(calories_burned),
+                    heart_rate=int(heart_rate)
+                )
+        elif activity_type == 'MUSCULATION':
+            sets = self.request.POST.get('sets', '').strip()
+            repetitions = self.request.POST.get('repetitions', '').strip()
+            weight = self.request.POST.get('weight', '').strip()
+            if sets and repetitions and weight:
+                Musculation.objects.create(
+                    activity=activity,
+                    sets=int(sets),
+                    repetitions=int(repetitions),
+                    weight=int(weight)
+                )
+        elif activity_type == 'NATATION':
+            distance = self.request.POST.get('distance', '').strip()
+            style = self.request.POST.get('style', '').strip()
+            if distance and style:
+                Natation.objects.create(
+                    activity=activity,
+                    distance=int(distance),
+                    style=style
+                )
+        
         messages.success(self.request, "Activité créée avec succès!")
         return super().form_valid(form)
     
@@ -442,14 +743,83 @@ class AdminActivityUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateVie
     def test_func(self):
         return self.request.user.is_staff
     
-    def get_success_url(self):
+    def form_valid(self, form):
+        activity = form.save()
+        activity_type = self.request.POST.get('activity_type', '').strip()
+        
+        # Delete existing type-specific activities
+        Cardio.objects.filter(activity=activity).delete()
+        Musculation.objects.filter(activity=activity).delete()
+        Natation.objects.filter(activity=activity).delete()
+        
+        # Create new type-specific activity
+        if activity_type == 'CARDIO':
+            calories_burned = self.request.POST.get('calories_burned', '').strip()
+            heart_rate = self.request.POST.get('heart_rate', '').strip()
+            if calories_burned and heart_rate:
+                Cardio.objects.create(
+                    activity=activity,
+                    calories_burned=float(calories_burned),
+                    heart_rate=int(heart_rate)
+                )
+        elif activity_type == 'MUSCULATION':
+            sets = self.request.POST.get('sets', '').strip()
+            repetitions = self.request.POST.get('repetitions', '').strip()
+            weight = self.request.POST.get('weight', '').strip()
+            if sets and repetitions and weight:
+                Musculation.objects.create(
+                    activity=activity,
+                    sets=int(sets),
+                    repetitions=int(repetitions),
+                    weight=int(weight)
+                )
+        elif activity_type == 'NATATION':
+            distance = self.request.POST.get('distance', '').strip()
+            style = self.request.POST.get('style', '').strip()
+            if distance and style:
+                Natation.objects.create(
+                    activity=activity,
+                    distance=int(distance),
+                    style=style
+                )
+        
         messages.success(self.request, "Activité mise à jour avec succès!")
+        return super().form_valid(form)
+    
+    def get_success_url(self):
         return reverse_lazy('activities_admin:detail', kwargs={'pk': self.object.pk})
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['is_create'] = False
         context['page_title'] = 'Modifier une Activité'
+        
+        # Determine current activity type
+        activity = self.get_object()
+        current_type = ''
+        type_data = {}
+        if hasattr(activity, 'cardio_details'):
+            current_type = 'CARDIO'
+            type_data = {
+                'calories_burned': activity.cardio_details.calories_burned,
+                'heart_rate': activity.cardio_details.heart_rate
+            }
+        elif hasattr(activity, 'musculation_details'):
+            current_type = 'MUSCULATION'
+            type_data = {
+                'sets': activity.musculation_details.sets,
+                'repetitions': activity.musculation_details.repetitions,
+                'weight': activity.musculation_details.weight
+            }
+        elif hasattr(activity, 'natation_details'):
+            current_type = 'NATATION'
+            type_data = {
+                'distance': activity.natation_details.distance,
+                'style': activity.natation_details.style
+            }
+        
+        context['current_type'] = current_type
+        context['type_data'] = type_data
         return context
 
 

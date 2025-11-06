@@ -23,6 +23,24 @@
             <p><strong>Nom:</strong> {{ activity.activity_name }}</p>
             <p><strong>Description:</strong> {{ activity.activity_description|default:"Aucune description" }}</p>
             <p><strong>Date de création:</strong> {{ activity.created_at|date:"d/m/Y H:i" }}</p>
+            
+            {% if activity.cardio_details %}
+            <hr>
+            <h5 class="card-title"><i class="bi bi-heart-pulse"></i> Détails - Cardio</h5>
+            <p><strong>Calories brûlées:</strong> {{ activity.cardio_details.calories_burned }} cal</p>
+            <p><strong>Rythme cardiaque:</strong> {{ activity.cardio_details.heart_rate }} BPM</p>
+            {% elif activity.musculation_details %}
+            <hr>
+            <h5 class="card-title"><i class="bi bi-barbell"></i> Détails - Musculation</h5>
+            <p><strong>Séries:</strong> {{ activity.musculation_details.sets }}</p>
+            <p><strong>Répétitions:</strong> {{ activity.musculation_details.repetitions }}</p>
+            <p><strong>Poids:</strong> {{ activity.musculation_details.weight }} kg</p>
+            {% elif activity.natation_details %}
+            <hr>
+            <h5 class="card-title"><i class="bi bi-water"></i> Détails - Natation</h5>
+            <p><strong>Distance:</strong> {{ activity.natation_details.distance }} m</p>
+            <p><strong>Style:</strong> {{ activity.natation_details.get_style_display }}</p>
+            {% endif %}
         </div>
     </div>
 </div>
