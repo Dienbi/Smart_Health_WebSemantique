@@ -27,17 +27,16 @@ class GeminiAIService:
     
     def _find_available_model(self):
         """Try to find an available Gemini model"""
-        # List of models to try in order (avoid experimental models)
+        # Use stable model names that are confirmed to work (as of Nov 2025)
+        # Prioritize stable 2.5 versions which have better quota and performance
         models_to_try = [
-            "gemini-1.5-flash-latest",
-            "gemini-1.5-flash",
-            "gemini-1.5-pro-latest", 
-            "gemini-1.5-pro",
-            "gemini-pro",
-            "gemini-1.0-pro"
+            "gemini-2.5-flash",         # Best balance of speed and quota (stable)
+            "gemini-flash-latest",      # Always points to latest flash
+            "gemini-2.5-pro",           # More capable but slower (stable)
+            "gemini-pro-latest",        # Always points to latest pro
         ]
         
-        # Try to list available models
+        # Try to list available models first
         try:
             response = requests.get(
                 f"{self.base_url}/models?key={self.api_key}",
@@ -45,21 +44,27 @@ class GeminiAIService:
             )
             if response.status_code == 200:
                 models_data = response.json().get('models', [])
+                available_models = []
                 for model in models_data:
                     if 'generateContent' in model.get('supportedGenerationMethods', []):
                         model_name = model['name'].replace('models/', '')
-                        # Skip experimental models that might have quota issues
-                        if '-exp' not in model_name and '2.5' not in model_name:
-                            return model_name
-                # If no stable model found, use first available
-                for model in models_data:
-                    if 'generateContent' in model.get('supportedGenerationMethods', []):
-                        return model['name'].replace('models/', '')
-        except Exception:
-            pass
+                        # Skip only experimental/preview models, keep stable 2.x versions
+                        if '-exp' not in model_name and '-preview' not in model_name and 'thinking' not in model_name:
+                            available_models.append(model_name)
+                
+                # Return first model from our priority list that's available
+                for preferred in models_to_try:
+                    if preferred in available_models:
+                        return preferred
+                
+                # If none of our preferred models, use first available stable model
+                if available_models:
+                    return available_models[0]
+        except Exception as e:
+            print(f"Could not list models: {e}")
         
-        # Fallback to trying models in order
-        return models_to_try[0]
+        # Fallback to most stable known model (as of Nov 2025)
+        return "gemini-2.5-flash"
     
     def generate_sparql(self, prompt, user_id=None):
         """
@@ -88,7 +93,7 @@ You are a SPARQL query expert. Convert natural language questions to SPARQL quer
   - IMPORTANT: For DELETE/UPDATE operations on HealthMetric, use healthMetricName (string) to identify metrics, NOT healthMetricId (integer)
 - sh:Meal (has subclasses: Breakfast, Lunch, Dinner, Snack) - IMPORTANT: Query for specific types
 - sh:FoodItem (properties: name, calories, protein, carbs)
-- sh:Habit (has subclasses: Reading, Cooking, Drawing, Journaling)
+- sh:Habit (has subclasses: Reading, Cooking, Drawing, Journaling, Other - for habits like gym, exercise, meditation, etc.)
 - sh:HabitLog (properties: frequency, notes)
 - sh:Defi (Challenge/Competition)
 - sh:Participation (properties: progress, status)
@@ -112,10 +117,24 @@ You are a SPARQL query expert. Convert natural language questions to SPARQL quer
 **INSERT Examples:**
 - "add user John with email john@email.com" → 
   INSERT DATA {{ sh:User_John a sh:User ; sh:username "John" ; sh:email "john@email.com" }}
-- "create activity Running" →
-  INSERT DATA {{ sh:Activity_Running a sh:Cardio ; sh:activity_name "Running" }}
-- "add meal Breakfast with 500 calories" →
-  INSERT DATA {{ sh:Meal_1 a sh:Breakfast ; sh:total_calories 500 }}
+- "create activity running" →
+  INSERT DATA {{ sh:Cardio_running a sh:Cardio ; sh:activity_name "running" }}
+- "add activity weight lifting" →
+  INSERT DATA {{ sh:Musculation_weightlifting a sh:Musculation ; sh:activity_name "weight lifting" }}
+- "create activity swimming" →
+  INSERT DATA {{ sh:Natation_swimming a sh:Natation ; sh:activity_name "swimming" }}
+- "add breakfast meal pancakes with 400 calories" →
+  INSERT DATA {{ sh:Breakfast_pancakes a sh:Breakfast ; sh:name "pancakes" ; sh:calories 400 }}
+- "create dinner pasta 600 calories" →
+  INSERT DATA {{ sh:Dinner_pasta a sh:Dinner ; sh:name "pasta" ; sh:calories 600 }}
+- "add habit reading books" →
+  INSERT DATA {{ sh:Reading_books a sh:Reading ; sh:habit_name "reading books" }}
+- "create habit gym" →
+  INSERT DATA {{ sh:Other_gym a sh:Other ; sh:habit_name "gym" }}
+- "create health metric weight in kg" →
+  INSERT DATA {{ sh:Weight_metric a sh:Weight ; sh:healthMetricName "weight" ; sh:healthMetricUnit "kg" }}
+- "add challenge 30 day fitness" →
+  INSERT DATA {{ sh:Defi_fitness a sh:Defi ; sh:defi_name "30 day fitness" ; sh:defi_description "Complete 30 days of exercise" }}
 
 **UPDATE Examples:**
 - "update user John set email to newemail@test.com" →
@@ -125,24 +144,39 @@ You are a SPARQL query expert. Convert natural language questions to SPARQL quer
 
 **DELETE Examples:**
 - "delete user John" → DELETE WHERE {{ ?u a sh:User ; sh:username "John" . ?u ?p ?o }}
-- "remove activity Running" → DELETE WHERE {{ ?a a sh:Cardio ; sh:activity_name "Running" . ?a ?p ?o }}
-- "delete health metric poid" → DELETE WHERE {{ ?metric a sh:HealthMetric ; sh:healthMetricName "poid" . ?metric ?p ?o }}
-- "remove health metric Cholesterol" → DELETE WHERE {{ ?metric a sh:HealthMetric ; sh:healthMetricName "Cholesterol" . ?metric ?p ?o }}
+- "remove activity Running" → DELETE WHERE {{ ?a sh:activity_name "Running" . ?a ?p ?o }}
+- "delete habit test" → DELETE WHERE {{ ?h sh:habit_name "test" . ?h ?p ?o }}
+- "delete habit gym" → DELETE WHERE {{ ?h sh:habit_name "gym" . ?h ?p ?o }}
+- "delete health metric poid" → DELETE WHERE {{ ?metric sh:healthMetricName "poid" . ?metric ?p ?o }}
+- "remove health metric Cholesterol" → DELETE WHERE {{ ?metric sh:healthMetricName "Cholesterol" . ?metric ?p ?o }}
+- "delete meal pancakes" → DELETE WHERE {{ ?m sh:name "pancakes" . ?m ?p ?o }}
 
 **CRITICAL RULES:**
 1. Generate ONLY the SPARQL query, no explanations
 2. Always include PREFIX definitions
 3. Use the sh: namespace for all ontology terms
 4. **FOR PARENT CLASSES WITH SUBCLASSES**:
-   - **Meal, Activity, Habit**: DO NOT query the parent class directly, ALWAYS use UNION to query ALL subclasses
-     Example: For "meals", query: {{ ?s a sh:Breakfast }} UNION {{ ?s a sh:Lunch }} UNION {{ ?s a sh:Dinner }} UNION {{ ?s a sh:Snack }}
+   - **Meal, Activity, Habit**: For SELECT queries, use UNION to query ALL subclasses
+     Example: For "show meals", query: {{ ?s a sh:Breakfast }} UNION {{ ?s a sh:Lunch }} UNION {{ ?s a sh:Dinner }} UNION {{ ?s a sh:Snack }}
    - **HealthMetric**: Query the parent class directly (sh:HealthMetric) because instances are stored as HealthMetric, not as subclasses
      Example: For "health metrics", query: ?metric a sh:HealthMetric
-5. For user-specific queries, filter by user ID if provided
-6. Return proper SELECT, INSERT DATA, DELETE/INSERT (UPDATE), or DELETE WHERE queries based on intent
-7. For INSERT operations, generate unique IDs using underscore notation (e.g., sh:User_John)
-8. For UPDATE operations, use DELETE/INSERT pattern
-9. For DELETE operations, ensure all related triples are removed
+5. **FOR DELETE OPERATIONS**: DO NOT use UNION in DELETE WHERE. Match by unique property (name, ID, etc.) without specifying the class type
+   - Example: DELETE WHERE {{ ?h sh:habit_name "test" . ?h ?p ?o }} (NOT: {{ ?h a sh:Other ; sh:habit_name "test" . ?h ?p ?o }})
+   - Example: DELETE WHERE {{ ?m sh:name "pancakes" . ?m ?p ?o }} (for meals)
+   - Example: DELETE WHERE {{ ?a sh:activity_name "Running" . ?a ?p ?o }} (for activities)
+6. For user-specific queries, filter by user ID if provided
+7. Return proper SELECT, INSERT DATA, DELETE/INSERT (UPDATE), or DELETE WHERE queries based on intent
+8. For INSERT operations, generate unique IDs using underscore notation (e.g., sh:User_John)
+9. For UPDATE operations, use DELETE/INSERT pattern
+10. For DELETE operations, ensure all related triples are removed using ?p ?o pattern
+11. **FOR MEAL INSERT**: ALWAYS include BOTH sh:name and sh:calories properties. Use format: sh:Breakfast_mealname a sh:Breakfast ; sh:name "mealname" ; sh:calories XXX
+12. **FOR ACTIVITY INSERT**: ALWAYS include sh:activity_name property. Use format: sh:Cardio_activityname a sh:Cardio for cardio activities, sh:Musculation_activityname a sh:Musculation for strength training, sh:Natation_activityname a sh:Natation for swimming
+13. **FOR HABIT INSERT**: ALWAYS include sh:habit_name property. For habits that don't fit Reading/Cooking/Drawing/Journaling, use sh:Other class (e.g., gym, meditation, exercise)
+14. **ACTIVITY TYPE INFERENCE**: When creating activities, intelligently infer the type:
+   - **Cardio (sh:Cardio)**: running, jogging, cycling, walking, sprinting, treadmill, elliptical, aerobics, dance, zumba, hiking, rope jumping
+   - **Musculation (sh:Musculation)**: weight lifting, bench press, squats, deadlifts, push-ups, pull-ups, strength training, bodybuilding, resistance training, dumbbells, barbells
+   - **Natation (sh:Natation)**: swimming, swim, freestyle, backstroke, breaststroke, butterfly, pool, laps
+   - If unsure, default to **Cardio** for general movement activities
 
 **User Question:** {prompt}
 """
@@ -164,11 +198,28 @@ You are a SPARQL query expert. Convert natural language questions to SPARQL quer
             response = requests.post(
                 f"{self.api_url}?key={self.api_key}",
                 headers=headers,
-                json=payload
+                json=payload,
+                timeout=30
             )
             
             if response.status_code != 200:
-                return None, f"AI API Error: {response.status_code} - {response.text}"
+                error_detail = response.text
+                
+                # Parse error for better user feedback
+                if response.status_code == 429:
+                    try:
+                        error_json = response.json()
+                        if 'error' in error_json and 'message' in error_json['error']:
+                            message = error_json['error']['message']
+                            if 'quota' in message.lower():
+                                return None, "❌ API Quota Exceeded: You've hit the free tier limit (200 requests/day). Please wait or upgrade your plan at: https://ai.google.dev/pricing"
+                    except:
+                        pass
+                    return None, "❌ API Rate Limit: Too many requests. Please wait a moment and try again."
+                elif response.status_code == 404:
+                    return None, f"❌ Model Not Found: The model '{self.model_name}' is not available. Trying to find alternative..."
+                
+                return None, f"AI API Error: {response.status_code} - {error_detail}"
             
             result = response.json()
             sparql_query = result['candidates'][0]['content']['parts'][0]['text'].strip()
@@ -182,6 +233,8 @@ You are a SPARQL query expert. Convert natural language questions to SPARQL quer
             error_msg = f"AI Error: {str(e)}"
             if "API_KEY" in str(e).upper():
                 error_msg = "Invalid or missing GEMINI_API_KEY. Get your free key at: https://makersuite.google.com/app/apikey"
+            elif "timeout" in str(e).lower():
+                error_msg = "AI service timeout. Please try again."
             return None, error_msg
     
     def _clean_sparql(self, text):
