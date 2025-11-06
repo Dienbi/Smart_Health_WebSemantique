@@ -1,0 +1,132 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Gestion des Journaux d'Activité - Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2.5rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+    }
+
+    .admin-header h3 {
+        margin: 0;
+        font-weight: 800;
+        font-size: 2rem;
+        color: white;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background: #fff;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(44, 62, 80, 0.1);
+    }
+
+    .data-table thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .data-table th {
+        padding: 1.5rem 1.25rem;
+        text-align: left;
+        font-weight: 800;
+        color: white;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+    }
+
+    .data-table tbody tr:hover {
+        background: linear-gradient(90deg, rgba(102, 126, 234, 0.05), transparent);
+    }
+
+    .data-table td {
+        padding: 1.5rem 1.25rem;
+        vertical-align: middle;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <h3><i class="bi bi-journal-text me-2"></i>Gestion des Journaux d'Activité</h3>
+    <a href="{% url 'activities_admin:log-create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-1"></i>Ajouter un Journal
+    </a>
+</div>
+
+<div class="filters-section mb-4">
+    <form method="get" class="row g-3">
+        <div class="col-md-5">
+            <input type="text" class="form-control" name="search" placeholder="Rechercher..." value="{{ current_search }}">
+        </div>
+        <div class="col-md-4">
+            <select class="form-select" name="intensity">
+                <option value="">Toutes les intensités</option>
+                {% for code, label in intensity_choices %}
+                    <option value="{{ code }}" {% if current_intensity == code %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-primary w-100">Filtrer</button>
+        </div>
+    </form>
+</div>
+
+{% if activity_logs %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Activité</th>
+                <th>Utilisateur</th>
+                <th>Date</th>
+                <th>Durée</th>
+                <th>Intensité</th>
+                <th style="text-align: right;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in activity_logs %}
+            <tr>
+                <td><span class="badge bg-secondary">#{{ log.activity_log_id }}</span></td>
+                <td>{{ log.activity.activity_name }}</td>
+                <td>{{ log.user.username }}</td>
+                <td>{{ log.date|date:"d/m/Y H:i" }}</td>
+                <td>{{ log.duration }} min</td>
+                <td>{% if log.intensity %}<span class="badge bg-info">{{ log.get_intensity_display }}</span>{% else %}-{% endif %}</td>
+                <td style="text-align: right;">
+                    <div class="d-flex gap-2 justify-content-end">
+                        <a href="{% url 'activities_admin:log-detail' log.pk %}" class="btn btn-sm btn-outline-info">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="{% url 'activities_admin:log-edit' log.pk %}" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="{% url 'activities_admin:log-delete' log.pk %}" class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div class="alert alert-info text-center">
+        <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+        <h5>Aucun journal d'activité trouvé</h5>
+    </div>
+{% endif %}
+{% endblock %}
+

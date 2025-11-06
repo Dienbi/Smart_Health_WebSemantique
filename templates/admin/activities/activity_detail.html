@@ -1,0 +1,30 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}{{ activity.activity_name }} - Admin{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3><i class="bi bi-activity me-2"></i>{{ activity.activity_name }}</h3>
+        <div class="d-flex gap-2">
+            <a href="{% url 'activities_admin:edit' activity.pk %}" class="btn btn-primary">
+                <i class="bi bi-pencil me-1"></i>Modifier
+            </a>
+            <a href="{% url 'activities_admin:list' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Retour
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Informations</h5>
+            <p><strong>ID:</strong> {{ activity.activity_id }}</p>
+            <p><strong>Nom:</strong> {{ activity.activity_name }}</p>
+            <p><strong>Description:</strong> {{ activity.activity_description|default:"Aucune description" }}</p>
+            <p><strong>Date de création:</strong> {{ activity.created_at|date:"d/m/Y H:i" }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

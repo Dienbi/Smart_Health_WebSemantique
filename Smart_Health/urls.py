@@ -31,6 +31,7 @@ urlpatterns = [
     path('backoffice/defis/', include(('apps.defis.back_urls', 'defis_admin'), namespace='defis_admin')),
     path('backoffice/fooditems/', include(('apps.meals.back_urls', 'meals_admin'), namespace='meals_admin')),
     path('backoffice/health-metrics/', include(('apps.health_records.back_urls', 'health_metrics_admin'), namespace='health_metrics_admin')),
+    path('backoffice/activities/', include(('apps.activities.back_urls', 'activities_admin'), namespace='activities_admin')),
     
     # API endpoints
     path('api/ai/', include(('apps.ai_service.urls', 'api_ai'), namespace='api_ai')),

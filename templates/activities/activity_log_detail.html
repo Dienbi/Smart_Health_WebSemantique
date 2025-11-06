@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ activity_log.activity.activity_name }} - Smart Health{% endblock %}
+
+{% block extra_css %}
+<style>
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .detail-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .detail-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 20px;
+        padding: 2.5rem;
+        margin-bottom: 2.5rem;
+        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .detail-header h1 {
+        font-size: 2.5rem;
+        font-weight: 900;
+        margin: 0 0 1rem 0;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .activity-meta {
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+        opacity: 0.95;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1.1rem;
+    }
+
+    .meta-item i {
+        font-size: 1.5rem;
+    }
+
+    .detail-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .btn-action {
+        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-back {
+        background: white;
+        color: #667eea;
+    }
+
+    .btn-edit {
+        background: rgba(255,255,255,0.2);
+        color: white;
+    }
+
+    .btn-delete {
+        background: rgba(245, 87, 108, 0.9);
+        color: white;
+    }
+
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        color: white;
+    }
+
+    .info-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .info-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 10px 40px rgba(44, 62, 80, 0.1);
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .info-card h3 {
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: #667eea;
+        margin: 0 0 1rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-card p {
+        font-size: 1.5rem;
+        font-weight: 900;
+        color: #2c3e50;
+        margin: 0;
+    }
+
+    .intensity-badge {
+        display: inline-block;
+        padding: 0.5rem 1.2rem;
+        border-radius: 25px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .badge-low { background: linear-gradient(135deg, #30cfd0, #330867); color: white; }
+    .badge-medium { background: linear-gradient(135deg, #fa709a, #fee140); color: white; }
+    .badge-high { background: linear-gradient(135deg, #f5576c, #f093fb); color: white; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+    <div class="detail-header">
+        <h1><i class="bi bi-activity"></i> {{ activity_log.activity.activity_name }}</h1>
+        <div class="activity-meta">
+            <div class="meta-item">
+                <i class="bi bi-calendar3"></i>
+                <span>{{ activity_log.date|date:"d/m/Y à H:i" }}</span>
+            </div>
+            <div class="meta-item">
+                <i class="bi bi-clock"></i>
+                <span><strong>{{ activity_log.duration }}</strong> minutes</span>
+            </div>
+            {% if activity_log.intensity %}
+            <div class="meta-item">
+                <i class="bi bi-speedometer2"></i>
+                <span class="intensity-badge badge-{{ activity_log.intensity|lower }}">{{ activity_log.get_intensity_display }}</span>
+            </div>
+            {% endif %}
+        </div>
+        <div class="detail-actions">
+            <a href="{% url 'activities:activity-log-list' %}" class="btn-action btn-back">
+                <i class="bi bi-arrow-left"></i> Retour
+            </a>
+            <a href="{% url 'activities:activity-log-edit' activity_log.activity_log_id %}" class="btn-action btn-edit">
+                <i class="bi bi-pencil-fill"></i> Modifier
+            </a>
+            <a href="{% url 'activities:activity-log-delete' activity_log.activity_log_id %}" class="btn-action btn-delete">
+                <i class="bi bi-trash-fill"></i> Supprimer
+            </a>
+        </div>
+    </div>
+
+    <div class="info-cards">
+        <div class="info-card">
+            <h3><i class="bi bi-info-circle"></i> Description</h3>
+            <p style="font-size: 1rem; font-weight: 400;">{{ activity_log.activity.activity_description|default:"Aucune description" }}</p>
+        </div>
+        <div class="info-card">
+            <h3><i class="bi bi-clock"></i> Durée</h3>
+            <p>{{ activity_log.duration }} min</p>
+        </div>
+        {% if activity_log.intensity %}
+        <div class="info-card">
+            <h3><i class="bi bi-speedometer2"></i> Intensité</h3>
+            <p>{{ activity_log.get_intensity_display }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if activity_log.low_intensity %}
+    <div class="info-card">
+        <h3><i class="bi bi-heart-pulse"></i> Détails - Intensité Faible</h3>
+        <p><strong>Fréquence respiratoire:</strong> {{ activity_log.low_intensity.breathing_rate }}</p>
+        <p><strong>Niveau de confort:</strong> {{ activity_log.low_intensity.comfort_level }}/10</p>
+    </div>
+    {% endif %}
+
+    {% if activity_log.medium_intensity %}
+    <div class="info-card">
+        <h3><i class="bi bi-stopwatch"></i> Détails - Intensité Moyenne</h3>
+        <p><strong>Temps actif:</strong> {{ activity_log.medium_intensity.active_time }} min</p>
+        <p><strong>Pauses prises:</strong> {{ activity_log.medium_intensity.breaks_taken }}</p>
+    </div>
+    {% endif %}
+
+    {% if activity_log.high_intensity %}
+    <div class="info-card">
+        <h3><i class="bi bi-exclamation-triangle"></i> Détails - Intensité Élevée</h3>
+        <p><strong>Niveau d'acide lactique:</strong> {{ activity_log.high_intensity.lactic_acid_level }}</p>
+        <p><strong>Risque de blessure:</strong> {{ activity_log.high_intensity.injury_risk }}</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

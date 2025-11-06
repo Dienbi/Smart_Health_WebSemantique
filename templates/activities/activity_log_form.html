@@ -1,0 +1,348 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if is_create %}Créer une activité{% else %}Modifier une activité{% endif %} - Smart Health{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+<style>
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .form-header {
+        margin-bottom: 3rem;
+        padding: 2.5rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .form-header h1 {
+        font-size: 2.2rem;
+        font-weight: 900;
+        color: white;
+        margin: 0;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .form-section {
+        background: linear-gradient(145deg, #ffffff, #f8f9fa);
+        border: 2px solid transparent;
+        border-radius: 20px;
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.15);
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1rem;
+    }
+
+    .form-control, .form-select {
+        border-radius: 12px;
+        border: 2px solid #e9ecef;
+        padding: 1rem 1.25rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+        width: 100%;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 5px rgba(102, 126, 234, 0.15);
+        transform: translateY(-2px);
+        outline: none;
+    }
+
+    .form-control.is-invalid {
+        border-color: #f5576c;
+    }
+
+    .error-message {
+        display: none;
+        color: #f5576c;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-top: 0.5rem;
+        padding: 0.75rem 1rem;
+        background: linear-gradient(145deg, #fff5f5, #ffe5e5);
+        border-left: 4px solid #f5576c;
+        border-radius: 8px;
+    }
+
+    .error-message.show {
+        display: block;
+    }
+
+    .intensity-fields {
+        display: none;
+        margin-top: 1rem;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 12px;
+        border: 2px solid #e9ecef;
+    }
+
+    .intensity-fields.show {
+        display: block;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 3px solid #e9ecef;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+        border-radius: 15px;
+        padding: 1rem 2.5rem;
+        color: white;
+        font-weight: 800;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-4px) scale(1.05);
+        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+    }
+
+    .btn-cancel {
+        border: 2px solid #667eea;
+        background: transparent;
+        color: #667eea;
+        border-radius: 15px;
+        padding: 1rem 2.5rem;
+        font-weight: 800;
+        font-size: 1.1rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-cancel:hover {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        transform: translateY(-4px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-header">
+        <h1>
+            <i class="bi bi-activity"></i>
+            {% if is_create %}Créer un nouveau journal d'activité{% else %}Modifier l'activité{% endif %}
+        </h1>
+    </div>
+
+    <form method="post" id="activityForm">
+        {% csrf_token %}
+
+        <div class="form-section">
+            <div class="form-group">
+                <label for="activity">
+                    <i class="bi bi-list-ul"></i>
+                    Activité <span style="color: #f5576c;">*</span>
+                </label>
+                <select class="form-select {% if errors.activity %}is-invalid{% endif %}" 
+                        id="activity" 
+                        name="activity"
+                        required>
+                    <option value="">-- Sélectionnez une activité --</option>
+                    {% for activity in activities %}
+                        <option value="{{ activity.activity_id }}" 
+                                {% if form_data.activity == activity.activity_id|stringformat:"s" %}selected
+                                {% elif not is_create and not form_data and activity_log.activity.activity_id == activity.activity_id %}selected{% endif %}>
+                            {{ activity.activity_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <div class="error-message {% if errors.activity %}show{% endif %}" id="error-activity">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    {% if errors.activity %}{{ errors.activity }}{% endif %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="date">
+                    <i class="bi bi-calendar3"></i>
+                    Date et heure <span style="color: #f5576c;">*</span>
+                </label>
+                <input type="datetime-local" 
+                       class="form-control {% if errors.date %}is-invalid{% endif %}" 
+                       id="date" 
+                       name="date" 
+                       value="{% if form_data.date %}{{ form_data.date }}{% elif not is_create %}{{ activity_log.date|date:'Y-m-d\TH:i' }}{% endif %}"
+                       required>
+                <div class="error-message {% if errors.date %}show{% endif %}" id="error-date">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    {% if errors.date %}{{ errors.date }}{% endif %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="duration">
+                    <i class="bi bi-clock"></i>
+                    Durée (minutes) <span style="color: #f5576c;">*</span>
+                </label>
+                <input type="number" 
+                       class="form-control {% if errors.duration %}is-invalid{% endif %}" 
+                       id="duration" 
+                       name="duration" 
+                       value="{% if form_data.duration %}{{ form_data.duration }}{% elif not is_create %}{{ activity_log.duration }}{% endif %}"
+                       min="1"
+                       max="1440"
+                       required>
+                <div class="error-message {% if errors.duration %}show{% endif %}" id="error-duration">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    {% if errors.duration %}{{ errors.duration }}{% endif %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="intensity">
+                    <i class="bi bi-speedometer2"></i>
+                    Intensité
+                </label>
+                <select class="form-select {% if errors.intensity %}is-invalid{% endif %}" 
+                        id="intensity" 
+                        name="intensity">
+                    <option value="">-- Sélectionnez une intensité --</option>
+                    <option value="LOW" {% if form_data.intensity == 'LOW' %}selected{% elif not is_create and not form_data and activity_log.intensity == 'LOW' %}selected{% endif %}>Faible</option>
+                    <option value="MEDIUM" {% if form_data.intensity == 'MEDIUM' %}selected{% elif not is_create and not form_data and activity_log.intensity == 'MEDIUM' %}selected{% endif %}>Moyenne</option>
+                    <option value="HIGH" {% if form_data.intensity == 'HIGH' %}selected{% elif not is_create and not form_data and activity_log.intensity == 'HIGH' %}selected{% endif %}>Élevée</option>
+                </select>
+                <div class="error-message {% if errors.intensity %}show{% endif %}" id="error-intensity">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    {% if errors.intensity %}{{ errors.intensity }}{% endif %}
+                </div>
+            </div>
+
+            <!-- Intensity-specific fields -->
+            <div class="intensity-fields" id="low-intensity-fields">
+                <h5 style="margin-bottom: 1rem; color: #667eea;">Détails - Intensité Faible</h5>
+                <div class="form-group">
+                    <label for="breathing_rate">Fréquence respiratoire</label>
+                    <input type="text" class="form-control" id="breathing_rate" name="breathing_rate"
+                           value="{% if form_data.breathing_rate %}{{ form_data.breathing_rate }}{% elif not is_create and activity_log.low_intensity %}{{ activity_log.low_intensity.breathing_rate }}{% endif %}">
+                </div>
+                <div class="form-group">
+                    <label for="comfort_level">Niveau de confort (1-10)</label>
+                    <input type="number" class="form-control" id="comfort_level" name="comfort_level"
+                           value="{% if form_data.comfort_level %}{{ form_data.comfort_level }}{% elif not is_create and activity_log.low_intensity %}{{ activity_log.low_intensity.comfort_level }}{% endif %}"
+                           min="1" max="10">
+                </div>
+            </div>
+
+            <div class="intensity-fields" id="medium-intensity-fields">
+                <h5 style="margin-bottom: 1rem; color: #667eea;">Détails - Intensité Moyenne</h5>
+                <div class="form-group">
+                    <label for="active_time">Temps actif (minutes)</label>
+                    <input type="number" class="form-control" id="active_time" name="active_time"
+                           value="{% if form_data.active_time %}{{ form_data.active_time }}{% elif not is_create and activity_log.medium_intensity %}{{ activity_log.medium_intensity.active_time }}{% endif %}">
+                </div>
+                <div class="form-group">
+                    <label for="breaks_taken">Pauses prises</label>
+                    <input type="number" class="form-control" id="breaks_taken" name="breaks_taken"
+                           value="{% if form_data.breaks_taken %}{{ form_data.breaks_taken }}{% elif not is_create and activity_log.medium_intensity %}{{ activity_log.medium_intensity.breaks_taken }}{% endif %}">
+                </div>
+            </div>
+
+            <div class="intensity-fields" id="high-intensity-fields">
+                <h5 style="margin-bottom: 1rem; color: #667eea;">Détails - Intensité Élevée</h5>
+                <div class="form-group">
+                    <label for="lactic_acid_level">Niveau d'acide lactique</label>
+                    <input type="number" step="0.1" class="form-control" id="lactic_acid_level" name="lactic_acid_level"
+                           value="{% if form_data.lactic_acid_level %}{{ form_data.lactic_acid_level }}{% elif not is_create and activity_log.high_intensity %}{{ activity_log.high_intensity.lactic_acid_level }}{% endif %}">
+                </div>
+                <div class="form-group">
+                    <label for="injury_risk">Risque de blessure</label>
+                    <input type="text" class="form-control" id="injury_risk" name="injury_risk"
+                           value="{% if form_data.injury_risk %}{{ form_data.injury_risk }}{% elif not is_create and activity_log.high_intensity %}{{ activity_log.high_intensity.injury_risk }}{% endif %}">
+                </div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button type="submit" class="btn-submit">
+                <i class="bi bi-check-lg"></i>
+                {% if is_create %}Créer le journal d'activité{% else %}Mettre à jour{% endif %}
+            </button>
+            <a href="{% url 'activities:activity-log-list' %}" class="btn-cancel">
+                <i class="bi bi-x-lg"></i>
+                Annuler
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const intensitySelect = document.getElementById('intensity');
+    const lowFields = document.getElementById('low-intensity-fields');
+    const mediumFields = document.getElementById('medium-intensity-fields');
+    const highFields = document.getElementById('high-intensity-fields');
+
+    function toggleIntensityFields() {
+        const value = intensitySelect.value;
+        lowFields.classList.remove('show');
+        mediumFields.classList.remove('show');
+        highFields.classList.remove('show');
+
+        if (value === 'LOW') {
+            lowFields.classList.add('show');
+        } else if (value === 'MEDIUM') {
+            mediumFields.classList.add('show');
+        } else if (value === 'HIGH') {
+            highFields.classList.add('show');
+        }
+    }
+
+    intensitySelect.addEventListener('change', toggleIntensityFields);
+    toggleIntensityFields(); // Initial call
+
+    // Set default datetime if creating
+    {% if is_create %}
+    const dateField = document.getElementById('date');
+    if (!dateField.value) {
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        dateField.value = now.toISOString().slice(0, 16);
+    }
+    {% endif %}
+});
+</script>
+{% endblock %}
+
